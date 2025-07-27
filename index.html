@@ -1,0 +1,2224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CloudCFO.ai - Complete Frontend Technical Specifications</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            /* Modern Color Palette */
+            --primary-navy: #0A1628;
+            --electric-blue: #0066FF;
+            --emerald: #10B981;
+            --forest-green: #065F46;
+            --teal: #0891B2;
+            --off-white: #FAFBFC;
+            --pure-white: #FFFFFF;
+            --charcoal: #1F2937;
+            --gray-500: #6B7280;
+            --gray-400: #9CA3AF;
+            --coral: #FF6B6B;
+            --amber: #F59E0B;
+            --purple: #8B5CF6;
+            
+            /* Typography */
+            --font-main: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --font-mono: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+            
+            /* Shadows */
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --shadow-glow: 0 0 20px rgba(0, 102, 255, 0.3);
+            
+            /* Animations */
+            --transition-base: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        body {
+            font-family: var(--font-main);
+            line-height: 1.6;
+            color: var(--charcoal);
+            background: var(--off-white);
+            font-size: 16px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* Modern Header with Gradient */
+        header {
+            background: linear-gradient(135deg, var(--primary-navy) 0%, var(--electric-blue) 100%);
+            color: white;
+            padding: 60px 40px;
+            margin: -20px -20px 60px -20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.3; }
+        }
+        
+        h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            font-weight: 800;
+            position: relative;
+            z-index: 1;
+            letter-spacing: -0.02em;
+        }
+        
+        h2 {
+            color: var(--primary-navy);
+            margin: 60px 0 30px;
+            font-size: 2.5em;
+            font-weight: 700;
+            position: relative;
+            padding-bottom: 15px;
+            letter-spacing: -0.01em;
+        }
+        
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--electric-blue) 0%, var(--teal) 100%);
+            border-radius: 2px;
+        }
+        
+        h3 {
+            color: var(--primary-navy);
+            margin: 40px 0 20px;
+            font-size: 1.8em;
+            font-weight: 600;
+        }
+        
+        h4 {
+            color: var(--charcoal);
+            margin: 25px 0 15px;
+            font-size: 1.3em;
+            font-weight: 600;
+        }
+        
+        /* Table of Contents - Fixed positioning issues */
+        .toc {
+            background: var(--pure-white);
+            border-radius: 16px;
+            padding: 30px;
+            margin: 30px 0;
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .toc h3 {
+            color: var(--electric-blue);
+            margin-bottom: 20px;
+        }
+        
+        .toc ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .toc li {
+            padding: 8px 0;
+        }
+        
+        .toc a {
+            color: var(--charcoal);
+            text-decoration: none;
+            transition: color 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .toc a:hover {
+            color: var(--electric-blue);
+            transform: translateX(5px);
+        }
+        
+        /* Modern Card Design */
+        .wireframe {
+            background: var(--pure-white);
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            border-radius: 16px;
+            padding: 0;
+            margin: 30px 0;
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            transition: var(--transition-base);
+        }
+        
+        .wireframe:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-xl);
+        }
+        
+        .wireframe-title {
+            background: linear-gradient(135deg, var(--primary-navy) 0%, var(--electric-blue) 100%);
+            color: white;
+            padding: 20px 30px;
+            font-weight: 600;
+            font-size: 1.2em;
+            letter-spacing: -0.01em;
+        }
+        
+        /* Code Block Styling */
+        .code-block {
+            background: var(--primary-navy);
+            color: #E6F3FF;
+            padding: 30px;
+            border-radius: 12px;
+            overflow-x: auto;
+            margin: 25px 0;
+            font-family: var(--font-mono);
+            font-size: 14px;
+            line-height: 1.6;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+        }
+        
+        .code-block::before {
+            content: 'CODE';
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.3);
+            font-weight: 600;
+            letter-spacing: 0.1em;
+        }
+        
+        /* Component Specifications */
+        .component-spec {
+            background: linear-gradient(135deg, rgba(0, 102, 255, 0.05) 0%, rgba(8, 145, 178, 0.05) 100%);
+            border-left: 4px solid var(--electric-blue);
+            padding: 30px;
+            margin: 30px 0;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+        }
+        
+        /* Service Connection Cards */
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+        }
+        
+        .service-card {
+            background: var(--pure-white);
+            border: 2px solid rgba(0, 0, 0, 0.06);
+            border-radius: 16px;
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition-base);
+            cursor: pointer;
+        }
+        
+        .service-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-xl);
+            border-color: var(--electric-blue);
+        }
+        
+        .service-card.connected {
+            border-color: var(--emerald);
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(16, 185, 129, 0.02) 100%);
+        }
+        
+        .service-card.connected::before {
+            content: '✓';
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--emerald);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .service-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+        
+        .service-name {
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--primary-navy);
+        }
+        
+        .service-description {
+            color: var(--gray-500);
+            font-size: 0.95em;
+            margin-bottom: 20px;
+        }
+        
+        .service-stats {
+            display: flex;
+            gap: 20px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(0, 0, 0, 0.06);
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: var(--electric-blue);
+        }
+        
+        .stat-label {
+            font-size: 0.8em;
+            color: var(--gray-500);
+        }
+        
+        /* Feature Grid with Modern Cards */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+        }
+        
+        .feature-card {
+            background: var(--pure-white);
+            padding: 30px;
+            border-radius: 16px;
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            transition: var(--transition-base);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--electric-blue) 0%, var(--teal) 100%);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: var(--shadow-xl);
+            border-color: transparent;
+        }
+        
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        /* Status Badges */
+        .status-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 24px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin: 0 5px;
+            transition: var(--transition-base);
+        }
+        
+        .status-processing {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--amber);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+        
+        .status-complete {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--emerald);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+        
+        .status-error {
+            background: rgba(255, 107, 107, 0.1);
+            color: var(--coral);
+            border: 1px solid rgba(255, 107, 107, 0.2);
+        }
+        
+        /* Tech Stack Section */
+        .tech-stack {
+            background: linear-gradient(135deg, var(--primary-navy) 0%, var(--electric-blue) 100%);
+            padding: 50px;
+            border-radius: 20px;
+            margin: 50px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .tech-stack::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            50% { transform: translate(-20px, -20px) rotate(10deg); }
+        }
+        
+        /* Modern Mockup Container */
+        .mockup-container {
+            background: var(--off-white);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 16px;
+            padding: 30px;
+            margin: 30px 0;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .mockup-header {
+            background: var(--pure-white);
+            padding: 20px 30px;
+            border-radius: 12px 12px 0 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+        }
+        
+        .mockup-body {
+            background: var(--pure-white);
+            padding: 40px;
+            border-radius: 0 0 12px 12px;
+            min-height: 400px;
+        }
+        
+        /* OAuth Connection Flow */
+        .oauth-flow {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            margin: 30px 0;
+            padding: 30px;
+            background: var(--off-white);
+            border-radius: 12px;
+        }
+        
+        .oauth-step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+        }
+        
+        .oauth-step::after {
+            content: '→';
+            position: absolute;
+            right: -30px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 2em;
+            color: var(--gray-400);
+        }
+        
+        .oauth-step:last-child::after {
+            display: none;
+        }
+        
+        .oauth-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--electric-blue);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            margin: 0 auto 15px;
+        }
+        
+        /* Discovery Stats */
+        .discovery-stats {
+            background: linear-gradient(135deg, var(--electric-blue) 0%, var(--purple) 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 16px;
+            margin: 30px 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+        }
+        
+        .discovery-stat {
+            text-align: center;
+        }
+        
+        .discovery-stat-value {
+            font-size: 3em;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+        
+        .discovery-stat-label {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        /* Upload Zone with Animation */
+        .upload-zone {
+            border: 3px dashed var(--electric-blue);
+            border-radius: 16px;
+            padding: 60px;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(0, 102, 255, 0.02) 0%, rgba(8, 145, 178, 0.02) 100%);
+            transition: var(--transition-base);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .upload-zone::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(0, 102, 255, 0.1) 0%, transparent 50%);
+            transform: translate(-50%, -50%) scale(0);
+            transition: transform 0.5s ease;
+        }
+        
+        .upload-zone:hover {
+            background: linear-gradient(135deg, rgba(0, 102, 255, 0.05) 0%, rgba(8, 145, 178, 0.05) 100%);
+            border-color: var(--electric-blue);
+            transform: scale(1.01);
+            box-shadow: var(--shadow-glow);
+        }
+        
+        .upload-zone:hover::before {
+            transform: translate(-50%, -50%) scale(2);
+        }
+        
+        /* Modern Table Design */
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin: 25px 0;
+            overflow: hidden;
+            border-radius: 12px;
+            box-shadow: var(--shadow-md);
+        }
+        
+        th, td {
+            padding: 16px 20px;
+            text-align: left;
+        }
+        
+        th {
+            background: var(--primary-navy);
+            color: white;
+            font-weight: 600;
+            font-size: 0.9em;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+        }
+        
+        td {
+            background: var(--pure-white);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+        }
+        
+        tr:hover td {
+            background: var(--off-white);
+            cursor: pointer;
+        }
+        
+        tr:last-child td {
+            border-bottom: none;
+        }
+        
+        /* Timeline with Modern Design */
+        .timeline {
+            position: relative;
+            padding-left: 50px;
+            margin: 30px 0;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(180deg, var(--electric-blue) 0%, var(--teal) 100%);
+        }
+        
+        .timeline-item {
+            position: relative;
+            padding: 25px 30px;
+            margin-bottom: 25px;
+            background: var(--pure-white);
+            border-radius: 12px;
+            box-shadow: var(--shadow-md);
+            transition: var(--transition-base);
+            border: 1px solid rgba(0, 0, 0, 0.06);
+        }
+        
+        .timeline-item:hover {
+            transform: translateX(5px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -42px;
+            top: 30px;
+            width: 24px;
+            height: 24px;
+            background: var(--electric-blue);
+            border-radius: 50%;
+            border: 4px solid var(--pure-white);
+            box-shadow: var(--shadow-md);
+        }
+        
+        /* Buttons with Modern Styling */
+        button, .button {
+            display: inline-block;
+            padding: 14px 28px;
+            background: var(--electric-blue);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1em;
+            cursor: pointer;
+            transition: var(--transition-base);
+            text-decoration: none;
+            box-shadow: var(--shadow-md);
+        }
+        
+        button:hover, .button:hover {
+            background: #0052CC;
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .button-secondary {
+            background: var(--pure-white);
+            color: var(--electric-blue);
+            border: 2px solid var(--electric-blue);
+        }
+        
+        .button-secondary:hover {
+            background: var(--electric-blue);
+            color: white;
+        }
+        
+        .button-success {
+            background: var(--emerald);
+        }
+        
+        .button-success:hover {
+            background: #059669;
+        }
+        
+        /* Carbon Footprint Specific Styles */
+        .carbon-section {
+            background: linear-gradient(135deg, var(--forest-green) 0%, var(--teal) 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 16px;
+            margin: 30px 0;
+        }
+        
+        .scope-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: var(--transition-base);
+        }
+        
+        .scope-card:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-4px);
+        }
+        
+        /* Architecture Diagram */
+        .architecture-diagram {
+            background: var(--pure-white);
+            padding: 40px;
+            border-radius: 16px;
+            margin: 30px 0;
+            text-align: center;
+            font-family: var(--font-mono);
+            line-height: 1.8;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(0, 0, 0, 0.06);
+        }
+        
+        /* Glassmorphism Effect */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+        
+        /* Progress Indicator */
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--electric-blue) 0%, var(--teal) 100%);
+            border-radius: 4px;
+            transition: width 0.6s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%);
+            animation: progress-shimmer 2s infinite;
+        }
+        
+        @keyframes progress-shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        /* Modern Sidebar Navigation */
+        .sidebar-nav {
+            background: var(--primary-navy);
+            color: white;
+            padding: 25px;
+            border-radius: 16px;
+            min-height: 600px;
+        }
+        
+        .nav-item {
+            padding: 12px 20px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            transition: var(--transition-base);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+        
+        .nav-item.active {
+            background: var(--electric-blue);
+            box-shadow: var(--shadow-md);
+        }
+        
+        /* Carbon Passport Specific */
+        .carbon-metric {
+            font-size: 3.5em;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--electric-blue) 0%, var(--teal) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 15px 0;
+        }
+        
+        /* Security Section Styles */
+        .security-card {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(139, 92, 246, 0.1) 100%);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            padding: 30px;
+            border-radius: 16px;
+            margin: 20px 0;
+        }
+        
+        .flow-diagram {
+            background: var(--pure-white);
+            padding: 40px;
+            border-radius: 16px;
+            margin: 30px 0;
+            box-shadow: var(--shadow-md);
+            text-align: center;
+        }
+        
+        .flow-step {
+            display: inline-block;
+            background: var(--electric-blue);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 8px;
+            margin: 10px;
+            font-weight: 600;
+        }
+        
+        /* Mobile Device Mockup */
+        .mobile-mockup {
+            max-width: 400px;
+            margin: 0 auto;
+            background: var(--primary-navy);
+            border: 12px solid #222;
+            border-radius: 36px;
+            padding: 0;
+            overflow: hidden;
+            box-shadow: var(--shadow-xl);
+        }
+        
+        .mobile-screen {
+            background: var(--pure-white);
+            min-height: 700px;
+            position: relative;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            h2 {
+                font-size: 1.8em;
+            }
+            
+            .feature-grid, .service-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .mockup-body {
+                padding: 20px;
+            }
+            
+            .oauth-flow {
+                flex-direction: column;
+            }
+            
+            .oauth-step::after {
+                display: none;
+            }
+            
+            table {
+                font-size: 0.9em;
+            }
+            
+            th, td {
+                padding: 12px 15px;
+            }
+        }
+        
+        /* Print Styles */
+        @media print {
+            body {
+                background: white;
+            }
+            
+            .container {
+                max-width: 100%;
+            }
+            
+            .tech-stack {
+                background: var(--off-white) !important;
+                color: var(--charcoal) !important;
+            }
+            
+            button {
+                display: none;
+            }
+        }
+        
+        /* Smooth Scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* Selection Color */
+        ::selection {
+            background: var(--electric-blue);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>CloudCFO.ai</h1>
+            <p style="font-size: 1.3em; margin-top: 10px; opacity: 0.9; font-weight: 300;">Complete Frontend Technical Specifications</p>
+            <p style="margin-top: 15px; font-size: 1.1em;">🔄 Auto-Discovery | 🌱 Carbon Passport | ✨ AI-Powered Financial Automation</p>
+        </header>
+
+        <!-- Table of Contents -->
+        <div class="toc">
+            <h3>📋 Table of Contents</h3>
+            <ul>
+                <li><a href="#tech-stack">🛠️ Technology Stack</a></li>
+                <li><a href="#architecture">🏗️ System Architecture</a></li>
+                <li><a href="#landing">🏠 Landing Page</a></li>
+                <li><a href="#discovery">🔍 Service Connection & Auto-Discovery</a></li>
+                <li><a href="#dashboard">📊 Main Dashboard</a></li>
+                <li><a href="#upload">📤 Document Upload</a></li>
+                <li><a href="#processing">⚡ Real-time Processing</a></li>
+                <li><a href="#knowledge">🧠 Knowledge Base Analytics</a></li>
+                <li><a href="#carbon">🌱 Carbon Passport Dashboard</a></li>
+                <li><a href="#security">🔒 Security & Privacy Implementation</a></li>
+                <li><a href="#ux-flow">🎯 User Experience Flow</a></li>
+                <li><a href="#api-specs">🔌 API Integration Specifications</a></li>
+                <li><a href="#performance">🚀 Performance & Optimization</a></li>
+                <li><a href="#mobile">📱 Mobile-First Responsive Design</a></li>
+                <li><a href="#implementation">💻 Technical Implementation</a></li>
+                <li><a href="#timeline">📅 Implementation Timeline</a></li>
+            </ul>
+        </div>
+
+        <div class="tech-stack" id="tech-stack">
+            <h2 style="margin-top: 0; color: white; border: none;">Modern Technology Stack</h2>
+            <div class="feature-grid">
+                <div class="feature-card glass-panel">
+                    <h4>Frontend Framework</h4>
+                    <p><strong>Next.js 14</strong></p>
+                    <ul style="list-style: none; padding: 0; margin-top: 10px;">
+                        <li style="padding: 5px 0;">✓ App Router for modern React</li>
+                        <li style="padding: 5px 0;">✓ OAuth integration handlers</li>
+                        <li style="padding: 5px 0;">✓ Real-time discovery status</li>
+                        <li style="padding: 5px 0;">✓ Server Components</li>
+                    </ul>
+                </div>
+                <div class="feature-card glass-panel">
+                    <h4>Integration Layer</h4>
+                    <p><strong>OAuth 2.0 + API Clients</strong></p>
+                    <ul style="list-style: none; padding: 0; margin-top: 10px;">
+                        <li style="padding: 5px 0;">✓ Gmail API integration</li>
+                        <li style="padding: 5px 0;">✓ Google Drive SDK</li>
+                        <li style="padding: 5px 0;">✓ Dropbox API</li>
+                        <li style="padding: 5px 0;">✓ Social media connectors</li>
+                    </ul>
+                </div>
+                <div class="feature-card glass-panel">
+                    <h4>Discovery Engine</h4>
+                    <p><strong>AI Document Analysis</strong></p>
+                    <ul style="list-style: none; padding: 0; margin-top: 10px;">
+                        <li style="padding: 5px 0;">✓ Pattern recognition</li>
+                        <li style="padding: 5px 0;">✓ Vendor detection</li>
+                        <li style="padding: 5px 0;">✓ Receipt validation</li>
+                        <li style="padding: 5px 0;">✓ Smart filtering</li>
+                    </ul>
+                </div>
+                <div class="feature-card glass-panel">
+                    <h4>UI Components</h4>
+                    <p><strong>shadcn/ui + Tailwind CSS</strong></p>
+                    <ul style="list-style: none; padding: 0; margin-top: 10px;">
+                        <li style="padding: 5px 0;">✓ Radix UI primitives</li>
+                        <li style="padding: 5px 0;">✓ Framer Motion animations</li>
+                        <li style="padding: 5px 0;">✓ Dark mode support</li>
+                        <li style="padding: 5px 0;">✓ TypeScript ready</li>
+                    </ul>
+                </div>
+                <div class="feature-card glass-panel">
+                    <h4>Real-time & Analytics</h4>
+                    <p><strong>Socket.io + Chart.js</strong></p>
+                    <ul style="list-style: none; padding: 0; margin-top: 10px;">
+                        <li style="padding: 5px 0;">✓ Live processing updates</li>
+                        <li style="padding: 5px 0;">✓ Interactive visualizations</li>
+                        <li style="padding: 5px 0;">✓ Custom animations</li>
+                        <li style="padding: 5px 0;">✓ Scalable pub/sub</li>
+                    </ul>
+                </div>
+                <div class="feature-card glass-panel">
+                    <h4>ESG & Carbon Tracking</h4>
+                    <p><strong>Carbon Passport Module</strong></p>
+                    <ul style="list-style: none; padding: 0; margin-top: 10px;">
+                        <li style="padding: 5px 0;">✓ Product carbon footprint</li>
+                        <li style="padding: 5px 0;">✓ Scope 1, 2, 3 emissions</li>
+                        <li style="padding: 5px 0;">✓ Multi-API integration</li>
+                        <li style="padding: 5px 0;">✓ Certified PDF reports</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <h2 id="architecture">System Architecture</h2>
+        
+        <div class="architecture-diagram">
+            <pre style="color: var(--charcoal);">
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│  User Services  │────▶│ OAuth Gateway   │────▶│ Discovery Engine│
+│  (Gmail, Drive) │◀────│ (Next.js API)   │◀────│ (n8n Workflows) │
+└────────┬────────┘     └────────┬────────┘     └────────┬────────┘
+         │                       │                         │
+         ▼                       ▼                         ▼
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│    Supabase     │     │     Redis       │     │   PostgreSQL    │
+│  (Auth + DB)    │     │  (Pub/Sub)      │     │   (Shared DB)   │
+└─────────────────┘     └─────────────────┘     └─────────────────┘
+            </pre>
+        </div>
+
+        <h2 id="landing">Landing Page - Modern Design</h2>
+        
+        <div class="wireframe">
+            <div class="wireframe-title">CloudCFO.ai - Hero Section with Animated Elements</div>
+            
+            <div class="mockup-container">
+                <div class="mockup-header">
+                    <div style="font-weight: 600; font-size: 1.2em;">CloudCFO.ai</div>
+                    <div style="display: flex; align-items: center; gap: 30px;">
+                        <span style="cursor: pointer; transition: color 0.3s;">Features</span>
+                        <span style="cursor: pointer; transition: color 0.3s;">Pricing</span>
+                        <span style="cursor: pointer; transition: color 0.3s;">Login</span>
+                        <span style="background: var(--electric-blue); color: white; padding: 10px 24px; border-radius: 8px; cursor: pointer; transition: all 0.3s; box-shadow: var(--shadow-md);">Start Free Trial</span>
+                    </div>
+                </div>
+                
+                <div class="mockup-body" style="background: linear-gradient(180deg, var(--off-white) 0%, var(--pure-white) 100%);">
+                    <h3 style="text-align: center; font-size: 3.5em; margin: 50px 0 20px; background: linear-gradient(135deg, var(--primary-navy) 0%, var(--electric-blue) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Your AI-Powered CFO in the Cloud</h3>
+                    <p style="text-align: center; font-size: 1.4em; color: var(--gray-500); margin-bottom: 50px; font-weight: 300;">
+                        Turn receipts into insights in seconds. Auto-discovery from your existing accounts.
+                    </p>
+                    
+                    <div style="text-align: center; margin: 60px 0;">
+                        <button style="padding: 20px 40px; background: linear-gradient(135deg, var(--electric-blue) 0%, var(--teal) 100%); color: white; border: none; border-radius: 12px; font-size: 1.2em; font-weight: 600; box-shadow: var(--shadow-lg); margin-right: 20px;">
+                            🔍 Connect Your Accounts
+                        </button>
+                        <button class="button-secondary" style="padding: 20px 40px; font-size: 1.2em;">
+                            📤 Upload Manually
+                        </button>
+                    </div>
+                    
+                    <div style="text-align: center; margin: 60px 0;">
+                        <p style="color: var(--gray-500); font-weight: 500;">Works with:</p>
+                        <div style="display: flex; justify-content: center; gap: 40px; margin-top: 30px;">
+                            <div style="text-align: center; cursor: pointer; transition: transform 0.3s;">
+                                <div style="font-size: 2.5em; margin-bottom: 10px;">📧</div>
+                                <div style="font-weight: 500;">Gmail</div>
+                            </div>
+                            <div style="text-align: center; cursor: pointer; transition: transform 0.3s;">
+                                <div style="font-size: 2.5em; margin-bottom: 10px;">📁</div>
+                                <div style="font-weight: 500;">Google Drive</div>
+                            </div>
+                            <div style="text-align: center; cursor: pointer; transition: transform 0.3s;">
+                                <div style="font-size: 2.5em; margin-bottom: 10px;">💧</div>
+                                <div style="font-weight: 500;">Dropbox</div>
+                            </div>
+                            <div style="text-align: center; cursor: pointer; transition: transform 0.3s;">
+                                <div style="font-size: 2.5em; margin-bottom: 10px;">💬</div>
+                                <div style="font-weight: 500;">Telegram</div>
+                            </div>
+                            <div style="text-align: center; cursor: pointer; transition: transform 0.3s;">
+                                <div style="font-size: 2.5em; margin-bottom: 10px;">📱</div>
+                                <div style="font-weight: 500;">WhatsApp</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Trust Indicators -->
+                    <div style="margin-top: 80px; padding: 40px; background: rgba(0, 102, 255, 0.03); border-radius: 16px;">
+                        <div style="display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap; gap: 30px;">
+                            <div style="text-align: center;">
+                                <div style="font-size: 2.5em; font-weight: 800; color: var(--electric-blue);">99.9%</div>
+                                <div style="color: var(--gray-500); margin-top: 5px;">Uptime SLA</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 2.5em; font-weight: 800; color: var(--emerald);">95%+</div>
+                                <div style="color: var(--gray-500); margin-top: 5px;">Accuracy Rate</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 2.5em; font-weight: 800; color: var(--teal);">0.8s</div>
+                                <div style="color: var(--gray-500); margin-top: 5px;">Avg Process Time</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 2.5em; font-weight: 800; color: var(--forest-green);">SOC 2</div>
+                                <div style="color: var(--gray-500); margin-top: 5px;">Certified</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h2 id="discovery">Service Connection & Auto-Discovery Dashboard</h2>
+        
+        <div class="wireframe">
+            <div class="wireframe-title">Connect Your Accounts - Auto-Discovery Dashboard</div>
+            
+            <div class="mockup-container">
+                <div class="mockup-header">
+                    <div style="font-weight: 600; font-size: 1.2em;">CloudCFO.ai - Connect Services</div>
+                    <div style="display: flex; align-items: center; gap: 20px;">
+                        <span class="status-badge status-complete">3 Connected</span>
+                        <span style="color: var(--gray-500);">4 Available</span>
+                    </div>
+                </div>
+                
+                <div class="mockup-body">
+                    <h3 style="font-size: 2em; margin-bottom: 10px;">Connect Your Accounts</h3>
+                    <p style="color: var(--gray-500); margin-bottom: 40px;">CloudCFO will automatically discover and import receipts from your connected services</p>
+                    
+                    <!-- Discovery Stats -->
+                    <div class="discovery-stats">
+                        <div class="discovery-stat">
+                            <div class="discovery-stat-value">847</div>
+                            <div class="discovery-stat-label">Receipts Found</div>
+                        </div>
+                        <div class="discovery-stat">
+                            <div class="discovery-stat-value">$12,459</div>
+                            <div class="discovery-stat-label">Total Value</div>
+                        </div>
+                        <div class="discovery-stat">
+                            <div class="discovery-stat-value">92%</div>
+                            <div class="discovery-stat-label">Accuracy Rate</div>
+                        </div>
+                        <div class="discovery-stat">
+                            <div class="discovery-stat-value">3.2min</div>
+                            <div class="discovery-stat-label">Avg Discovery Time</div>
+                        </div>
+                    </div>
+                    
+                    <h4 style="margin-top: 50px; margin-bottom: 25px;">📧 Email Services</h4>
+                    <div class="service-grid">
+                        <div class="service-card connected">
+                            <div class="service-icon">📧</div>
+                            <div class="service-name">Gmail</div>
+                            <div class="service-description">Scan inbox for receipts and invoices</div>
+                            <div class="service-stats">
+                                <div class="stat-item">
+                                    <div class="stat-value">523</div>
+                                    <div class="stat-label">Found</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value">95%</div>
+                                    <div class="stat-label">Accuracy</div>
+                                </div>
+                            </div>
+                            <button class="button-success" style="width: 100%; margin-top: 20px;">✓ Connected</button>
+                        </div>
+                        
+                        <div class="service-card">
+                            <div class="service-icon">📮</div>
+                            <div class="service-name">Outlook</div>
+                            <div class="service-description">Import from Microsoft email</div>
+                            <button style="width: 100%; margin-top: 20px;">Connect Account</button>
+                        </div>
+                        
+                        <div class="service-card">
+                            <div class="service-icon">📨</div>
+                            <div class="service-name">Yahoo Mail</div>
+                            <div class="service-description">Scan Yahoo inbox</div>
+                            <button style="width: 100%; margin-top: 20px;">Connect Account</button>
+                        </div>
+                    </div>
+                    
+                    <h4 style="margin-top: 50px; margin-bottom: 25px;">☁️ Cloud Storage</h4>
+                    <div class="service-grid">
+                        <div class="service-card connected">
+                            <div class="service-icon">📁</div>
+                            <div class="service-name">Google Drive</div>
+                            <div class="service-description">Scan folders for receipt files</div>
+                            <div class="service-stats">
+                                <div class="stat-item">
+                                    <div class="stat-value">189</div>
+                                    <div class="stat-label">Found</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value">100%</div>
+                                    <div class="stat-label">Accuracy</div>
+                                </div>
+                            </div>
+                            <button class="button-success" style="width: 100%; margin-top: 20px;">✓ Connected</button>
+                        </div>
+                        
+                        <div class="service-card">
+                            <div class="service-icon">💧</div>
+                            <div class="service-name">Dropbox</div>
+                            <div class="service-description">Import from Dropbox folders</div>
+                            <button style="width: 100%; margin-top: 20px;">Connect Account</button>
+                        </div>
+                        
+                        <div class="service-card">
+                            <div class="service-icon">☁️</div>
+                            <div class="service-name">OneDrive</div>
+                            <div class="service-description">Scan Microsoft cloud storage</div>
+                            <button style="width: 100%; margin-top: 20px;">Connect Account</button>
+                        </div>
+                    </div>
+                    
+                    <h4 style="margin-top: 50px; margin-bottom: 25px;">💬 Messaging & Social</h4>
+                    <div class="service-grid">
+                        <div class="service-card">
+                            <div class="service-icon">📱</div>
+                            <div class="service-name">WhatsApp</div>
+                            <div class="service-description">Import from chat exports</div>
+                            <button style="width: 100%; margin-top: 20px;">View Instructions</button>
+                        </div>
+                        
+                        <div class="service-card connected">
+                            <div class="service-icon">💬</div>
+                            <div class="service-name">Telegram</div>
+                            <div class="service-description">Scan saved messages</div>
+                            <div class="service-stats">
+                                <div class="stat-item">
+                                    <div class="stat-value">135</div>
+                                    <div class="stat-label">Found</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value">88%</div>
+                                    <div class="stat-label">Accuracy</div>
+                                </div>
+                            </div>
+                            <button class="button-success" style="width: 100%; margin-top: 20px;">✓ Connected</button>
+                        </div>
+                        
+                        <div class="service-card">
+                            <div class="service-icon">👔</div>
+                            <div class="service-name">Slack</div>
+                            <div class="service-description">Scan workspace channels</div>
+                            <button style="width: 100%; margin-top: 20px;">Connect Workspace</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h3>Auto-Discovery Process</h3>
+        <div class="wireframe">
+            <div class="wireframe-title">Intelligent Receipt Discovery Engine</div>
+            
+            <div class="mockup-container">
+                <div class="mockup-body">
+                    <h3 style="font-size: 2em; margin-bottom: 30px;">Discovering Your Receipts...</h3>
+                    
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <strong style="font-size: 1.1em;">Scanning Gmail Inbox</strong>
+                                    <p style="color: var(--gray-500); font-size: 0.9em; margin-top: 5px;">Analyzing 3,847 emails...</p>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 25px;">
+                                    <div style="width: 250px;">
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" style="width: 75%;"></div>
+                                        </div>
+                                        <p style="color: var(--gray-500); font-size: 0.8em; margin-top: 5px;">523 receipts found</p>
+                                    </div>
+                                    <span class="status-badge status-processing">Processing</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <strong style="font-size: 1.1em;">Scanning Google Drive</strong>
+                                    <p style="color: var(--gray-500); font-size: 0.9em; margin-top: 5px;">Checking /Receipts folder...</p>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 15px;">
+                                    <span class="status-badge status-complete">Complete</span>
+                                    <span style="color: var(--emerald); font-weight: 500;">✓ 189 receipts found</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <strong style="font-size: 1.1em;">Analyzing Telegram Messages</strong>
+                                    <p style="color: var(--gray-500); font-size: 0.9em; margin-top: 5px;">Processing saved messages...</p>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 15px;">
+                                    <span class="status-badge status-complete">Complete</span>
+                                    <span style="color: var(--emerald); font-weight: 500;">✓ 135 receipts found</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 50px; padding: 30px; background: var(--off-white); border-radius: 16px;">
+                        <h4 style="margin-bottom: 20px;">Discovery Intelligence</h4>
+                        <div class="feature-grid">
+                            <div class="feature-card">
+                                <h5>Pattern Recognition</h5>
+                                <ul style="list-style: none; padding: 0; margin-top: 10px;">
+                                    <li style="padding: 5px 0;">✓ Amazon orders: 156</li>
+                                    <li style="padding: 5px 0;">✓ Uber receipts: 89</li>
+                                    <li style="padding: 5px 0;">✓ Restaurant bills: 234</li>
+                                    <li style="padding: 5px 0;">✓ Software invoices: 67</li>
+                                </ul>
+                            </div>
+                            <div class="feature-card">
+                                <h5>Smart Filtering</h5>
+                                <ul style="list-style: none; padding: 0; margin-top: 10px;">
+                                    <li style="padding: 5px 0;">📧 Emails scanned: 3,847</li>
+                                    <li style="padding: 5px 0;">🎯 Receipts identified: 523</li>
+                                    <li style="padding: 5px 0;">❌ False positives: 12</li>
+                                    <li style="padding: 5px 0;">✅ Accuracy: 97.7%</li>
+                                </ul>
+                            </div>
+                            <div class="feature-card">
+                                <h5>Value Discovery</h5>
+                                <ul style="list-style: none; padding: 0; margin-top: 10px;">
+                                    <li style="padding: 5px 0;">💰 Total value: $45,892</li>
+                                    <li style="padding: 5px 0;">📊 Tax deductions: $3,456</li>
+                                    <li style="padding: 5px 0;">🏷️ Categories: 12</li>
+                                    <li style="padding: 5px 0;">📅 Date range: 3 years</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h2 id="dashboard">Modern Dashboard Design</h2>
+        
+        <h3>1. Main Dashboard - Neumorphic Design</h3>
+        <div class="wireframe">
+            <div class="wireframe-title">Dashboard - Overview with Enhanced UI</div>
+            
+            <div class="mockup-container">
+                <div style="display: flex; gap: 0; height: 700px; overflow: hidden; border-radius: 16px;">
+                    <div class="sidebar-nav" style="width: 280px;">
+                        <h4 style="color: white; margin-bottom: 40px; font-size: 1.5em;">CloudCFO.ai</h4>
+                        <nav>
+                            <div class="nav-item active">
+                                <span style="font-size: 1.2em;">📊</span>
+                                <span>Dashboard</span>
+                            </div>
+                            <div class="nav-item">
+                                <span style="font-size: 1.2em;">🔗</span>
+                                <span>Connections</span>
+                            </div>
+                            <div class="nav-item">
+                                <span style="font-size: 1.2em;">📤</span>
+                                <span>Upload</span>
+                            </div>
+                            <div class="nav-item">
+                                <span style="font-size: 1.2em;">📁</span>
+                                <span>Documents</span>
+                            </div>
+                            <div class="nav-item">
+                                <span style="font-size: 1.2em;">🏦</span>
+                                <span>Banking</span>
+                            </div>
+                            <div class="nav-item">
+                                <span style="font-size: 1.2em;">📈</span>
+                                <span>Reports</span>
+                            </div>
+                            <div class="nav-item">
+                                <span style="font-size: 1.2em;">🌱</span>
+                                <span>Carbon Passport</span>
+                            </div>
+                            <div class="nav-item">
+                                <span style="font-size: 1.2em;">🧠</span>
+                                <span>Knowledge Base</span>
+                            </div>
+                            <div class="nav-item">
+                                <span style="font-size: 1.2em;">⚙️</span>
+                                <span>Settings</span>
+                            </div>
+                        </nav>
+                        
+                        <div style="margin-top: auto; padding-top: 40px;">
+                            <div style="background: rgba(255, 255, 255, 0.1); padding: 20px; border-radius: 12px;">
+                                <p style="font-size: 0.9em; opacity: 0.8;">Pro Plan</p>
+                                <p style="font-size: 0.8em; opacity: 0.6; margin-top: 5px;">1,247 docs this month</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="flex: 1; background: var(--off-white); padding: 40px; overflow-y: auto;">
+                        <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 40px;">
+                            <div>
+                                <h3 style="font-size: 2em; margin: 0;">Welcome back, John! 👋</h3>
+                                <p style="color: var(--gray-500); margin-top: 10px;">Here's your financial overview for December 2024</p>
+                            </div>
+                            <div style="display: flex; gap: 15px; margin-left: auto;">
+                                <button style="background: var(--pure-white); color: var(--charcoal); box-shadow: var(--shadow-md);">
+                                    📥 Export
+                                </button>
+                                <button>
+                                    ➕ Quick Upload
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="feature-grid">
+                            <div class="feature-card" style="background: var(--pure-white); position: relative; overflow: hidden;">
+                                <div style="position: absolute; top: 0; right: 0; width: 100px; height: 100px; background: linear-gradient(135deg, rgba(0, 102, 255, 0.1) 0%, transparent 100%); border-radius: 0 0 0 100%;"></div>
+                                <h4 style="color: var(--gray-500); font-weight: 500; font-size: 0.9em;">Total Expenses</h4>
+                                <p class="carbon-metric" style="font-size: 2.5em;">$12,458</p>
+                                <p style="color: var(--emerald); font-size: 0.9em; display: flex; align-items: center; gap: 5px;">
+                                    <span>↓</span> 12% from last month
+                                </p>
+                            </div>
+                            <div class="feature-card" style="background: var(--pure-white); position: relative; overflow: hidden;">
+                                <div style="position: absolute; top: 0; right: 0; width: 100px; height: 100px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, transparent 100%); border-radius: 0 0 0 100%;"></div>
+                                <h4 style="color: var(--gray-500); font-weight: 500; font-size: 0.9em;">Documents Processed</h4>
+                                <p style="font-size: 2.5em; font-weight: 800; color: var(--charcoal);">847</p>
+                                <p style="color: var(--gray-500); font-size: 0.9em;">Auto-discovered: 712</p>
+                                <div class="progress-bar" style="margin-top: 15px;">
+                                    <div class="progress-fill" style="width: 84%;"></div>
+                                </div>
+                            </div>
+                            <div class="feature-card" style="background: var(--pure-white); position: relative; overflow: hidden;">
+                                <div style="position: absolute; top: 0; right: 0; width: 100px; height: 100px; background: linear-gradient(135deg, rgba(8, 145, 178, 0.1) 0%, transparent 100%); border-radius: 0 0 0 100%;"></div>
+                                <h4 style="color: var(--gray-500); font-weight: 500; font-size: 0.9em;">Tax Deductions Found</h4>
+                                <p style="font-size: 2.5em; font-weight: 800; color: var(--emerald);">$3,892</p>
+                                <p style="color: var(--gray-500); font-size: 0.9em;">23 new deductions</p>
+                            </div>
+                            <div class="feature-card carbon-section" style="color: white;">
+                                <h4 style="color: white; font-weight: 500; font-size: 0.9em;">Carbon Footprint</h4>
+                                <p style="font-size: 2.5em; font-weight: 800;">2.4t</p>
+                                <p style="opacity: 0.9; font-size: 0.9em;">CO₂e this month</p>
+                                <div style="margin-top: 15px; display: flex; gap: 10px; font-size: 0.8em;">
+                                    <span style="background: rgba(255, 255, 255, 0.2); padding: 4px 8px; border-radius: 4px;">Scope 1: 15%</span>
+                                    <span style="background: rgba(255, 255, 255, 0.2); padding: 4px 8px; border-radius: 4px;">Scope 2: 25%</span>
+                                    <span style="background: rgba(255, 255, 255, 0.2); padding: 4px 8px; border-radius: 4px;">Scope 3: 60%</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <h4 style="margin-top: 50px; margin-bottom: 25px;">Recent Activity</h4>
+                        <table style="background: var(--pure-white);">
+                            <thead>
+                                <tr>
+                                    <th>Document</th>
+                                    <th>Source</th>
+                                    <th>Vendor</th>
+                                    <th>Amount</th>
+                                    <th>Category</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="font-weight: 500;">Receipt_001.jpg</td>
+                                    <td><span style="display: flex; align-items: center; gap: 5px;">📧 Gmail</span></td>
+                                    <td>Starbucks</td>
+                                    <td style="font-weight: 600; color: var(--charcoal);">$12.45</td>
+                                    <td>Meals</td>
+                                    <td><span class="status-badge status-complete">Complete</span></td>
+                                    <td><button style="padding: 6px 12px; font-size: 0.85em;">View</button></td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: 500;">Invoice_Dec.pdf</td>
+                                    <td><span style="display: flex; align-items: center; gap: 5px;">📁 Drive</span></td>
+                                    <td>AWS</td>
+                                    <td style="font-weight: 600; color: var(--charcoal);">$847.23</td>
+                                    <td>Software</td>
+                                    <td><span class="status-badge status-processing">Processing</span></td>
+                                    <td><button style="padding: 6px 12px; font-size: 0.85em;">View</button></td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: 500;">Uber_receipt.png</td>
+                                    <td><span style="display: flex; align-items: center; gap: 5px;">💬 Telegram</span></td>
+                                    <td>Uber</td>
+                                    <td style="font-weight: 600; color: var(--charcoal);">$34.67</td>
+                                    <td>Travel</td>
+                                    <td><span class="status-badge status-complete">Complete</span></td>
+                                    <td><button style="padding: 6px 12px; font-size: 0.85em;">View</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h3 id="upload">2. Document Upload - Animated Drop Zone</h3>
+        <div class="wireframe">
+            <div class="wireframe-title">Upload Center with Modern Interactions</div>
+            
+            <div class="mockup-container">
+                <div class="mockup-body" style="background: var(--off-white);">
+                    <h3 style="font-size: 2em; margin-bottom: 10px;">Upload Documents</h3>
+                    <p style="color: var(--gray-500); margin-bottom: 40px;">Choose your preferred upload method</p>
+                    
+                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px;">
+                        <div class="upload-zone" style="height: 350px; display: flex; flex-direction: column; justify-content: center;">
+                            <div style="font-size: 5em; margin-bottom: 20px; filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));">📤</div>
+                            <h4 style="font-size: 1.5em; margin-bottom: 10px;">Drag & Drop Files Here</h4>
+                            <p style="color: var(--gray-500); margin: 10px 0;">or click to browse</p>
+                            <p style="color: var(--gray-400); font-size: 0.9em; margin-top: 20px;">Supports: PDF, JPG, PNG, HEIC • Max 10MB</p>
+                            <div style="margin-top: 30px;">
+                                <span style="display: inline-block; padding: 8px 16px; background: rgba(0, 102, 255, 0.1); color: var(--electric-blue); border-radius: 20px; font-size: 0.85em;">
+                                    💡 Pro tip: Drop multiple files at once
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; flex-direction: column; gap: 15px;">
+                            <div class="glass-panel" style="flex: 1;">
+                                <h4 style="margin-bottom: 20px;">Quick Upload Options</h4>
+                                <button style="display: block; width: 100%; padding: 14px; margin-bottom: 12px; background: #25D366; color: white; border: none; border-radius: 8px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                                    <span style="font-size: 1.2em;">📱</span> Connect WhatsApp
+                                </button>
+                                <button style="display: block; width: 100%; padding: 14px; margin-bottom: 12px; background: #0088cc; color: white; border: none; border-radius: 8px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                                    <span style="font-size: 1.2em;">💬</span> Connect Telegram
+                                </button>
+                                <button style="display: block; width: 100%; padding: 14px; margin-bottom: 20px; background: var(--coral); color: white; border: none; border-radius: 8px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                                    <span style="font-size: 1.2em;">📧</span> Forward to Email
+                                </button>
+                                <div style="text-align: center; padding: 15px; background: var(--off-white); border-radius: 8px;">
+                                    <p style="color: var(--gray-500); font-size: 0.85em; margin-bottom: 5px;">Your email address:</p>
+                                    <p style="font-family: var(--font-mono); color: var(--electric-blue); font-weight: 500;">receipts@cloudcfo.ai</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h4 style="margin-top: 50px; margin-bottom: 25px;">Processing Queue</h4>
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <strong style="font-size: 1.1em;">Starbucks_receipt.jpg</strong>
+                                    <p style="color: var(--gray-500); font-size: 0.9em; margin-top: 5px;">2.3 MB • Uploaded 2 seconds ago</p>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 25px;">
+                                    <div style="width: 250px;">
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" style="width: 75%;"></div>
+                                        </div>
+                                        <p style="color: var(--gray-500); font-size: 0.8em; margin-top: 5px;">OCR Processing...</p>
+                                    </div>
+                                    <span class="status-badge status-processing">Processing</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <strong style="font-size: 1.1em;">Amazon_invoice.pdf</strong>
+                                    <p style="color: var(--gray-500); font-size: 0.9em; margin-top: 5px;">156 KB • Uploaded 1 minute ago</p>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 15px;">
+                                    <span class="status-badge status-complete">Complete</span>
+                                    <span style="color: var(--emerald); font-weight: 500;">✓ $234.56 • Office Supplies</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <strong style="font-size: 1.1em;">Hotel_booking.pdf</strong>
+                                    <p style="color: var(--gray-500); font-size: 0.9em; margin-top: 5px;">2.1 MB • Uploaded 5 minutes ago</p>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 15px;">
+                                    <span class="status-badge status-complete">Complete</span>
+                                    <span style="color: var(--emerald); font-weight: 500;">✓ $456.00 • Travel</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h3 id="processing">3. Real-time Processing - Glassmorphism UI</h3>
+        <div class="wireframe">
+            <div class="wireframe-title">Document Processing with Live Updates</div>
+            
+            <div class="mockup-container">
+                <div class="mockup-body" style="background: linear-gradient(135deg, var(--off-white) 0%, var(--pure-white) 100%);">
+                    <h3 style="font-size: 2em; margin-bottom: 30px;">Processing: Starbucks_receipt.jpg</h3>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
+                        <div>
+                            <h4 style="margin-bottom: 20px;">Original Document</h4>
+                            <div style="background: var(--pure-white); padding: 30px; border-radius: 16px; text-align: center; min-height: 500px; box-shadow: var(--shadow-lg); border: 1px solid rgba(0, 0, 0, 0.06);">
+                                <img src="#" alt="Receipt preview" style="max-width: 100%; border-radius: 8px; box-shadow: var(--shadow-md);" />
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h4 style="margin-bottom: 20px; display: flex; align-items: center; gap: 15px;">
+                                Extracted Data 
+                                <span class="status-badge status-processing" style="animation: pulse 2s infinite;">AI Processing</span>
+                            </h4>
+                            <div class="glass-panel">
+                                <div style="margin-bottom: 25px;">
+                                    <label style="color: var(--gray-500); font-size: 0.9em; font-weight: 500;">Vendor</label>
+                                    <div style="padding: 14px; background: var(--pure-white); border: 2px solid var(--electric-blue); border-radius: 8px; margin-top: 8px; display: flex; justify-content: space-between; align-items: center;">
+                                        <span style="color: var(--electric-blue); font-weight: 600; font-size: 1.1em;">STARBUCKS</span>
+                                        <span style="color: var(--emerald); font-size: 0.85em; display: flex; align-items: center; gap: 5px;">
+                                            <span style="width: 8px; height: 8px; background: var(--emerald); border-radius: 50%; display: inline-block;"></span>
+                                            95% confidence
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                <div style="margin-bottom: 25px;">
+                                    <label style="color: var(--gray-500); font-size: 0.9em; font-weight: 500;">Total Amount</label>
+                                    <div style="padding: 14px; background: var(--pure-white); border: 2px solid rgba(0, 0, 0, 0.1); border-radius: 8px; margin-top: 8px; display: flex; justify-content: space-between; align-items: center;">
+                                        <span style="font-size: 1.5em; font-weight: 700; color: var(--charcoal);">$12.45</span>
+                                        <span style="color: var(--emerald); font-size: 0.85em; display: flex; align-items: center; gap: 5px;">
+                                            <span style="width: 8px; height: 8px; background: var(--emerald); border-radius: 50%; display: inline-block;"></span>
+                                            98% confidence
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                <div style="margin-bottom: 25px;">
+                                    <label style="color: var(--gray-500); font-size: 0.9em; font-weight: 500;">Date</label>
+                                    <div style="padding: 14px; background: var(--pure-white); border: 2px solid rgba(0, 0, 0, 0.1); border-radius: 8px; margin-top: 8px;">
+                                        December 15, 2024
+                                    </div>
+                                </div>
+                                
+                                <div style="margin-bottom: 25px;">
+                                    <label style="color: var(--gray-500); font-size: 0.9em; font-weight: 500;">Category</label>
+                                    <div style="padding: 14px; background: var(--pure-white); border: 2px solid rgba(0, 0, 0, 0.1); border-radius: 8px; margin-top: 8px;">
+                                        <select style="width: 100%; border: none; outline: none; background: transparent; font-size: 1em;">
+                                            <option>Meals & Entertainment</option>
+                                            <option>Office Supplies</option>
+                                            <option>Travel</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div style="margin-bottom: 25px;">
+                                    <label style="color: var(--gray-500); font-size: 0.9em; font-weight: 500;">Line Items</label>
+                                    <div style="background: var(--off-white); padding: 20px; border-radius: 8px; margin-top: 8px;">
+                                        <div style="display: flex; justify-content: space-between; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid rgba(0, 0, 0, 0.06);">
+                                            <span>Caramel Macchiato (Venti)</span>
+                                            <span style="font-weight: 600;">$6.45</span>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid rgba(0, 0, 0, 0.06);">
+                                            <span>Chocolate Croissant</span>
+                                            <span style="font-weight: 600;">$3.95</span>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between; padding-top: 12px; border-top: 2px solid rgba(0, 0, 0, 0.1);">
+                                            <span style="font-weight: 500;">Tax</span>
+                                            <span style="font-weight: 600;">$2.05</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div style="background: linear-gradient(135deg, rgba(0, 102, 255, 0.05) 0%, rgba(8, 145, 178, 0.05) 100%); padding: 20px; border-radius: 12px; margin-bottom: 25px; border: 1px solid rgba(0, 102, 255, 0.1);">
+                                    <p style="margin: 0; font-weight: 600; display: flex; align-items: center; gap: 10px;">
+                                        <span style="font-size: 1.5em;">🧠</span> Knowledge Base Match!
+                                    </p>
+                                    <p style="margin: 8px 0 0 0; color: var(--gray-500); font-size: 0.9em;">
+                                        Pattern recognized from 247 previous Starbucks receipts
+                                    </p>
+                                </div>
+                                
+                                <button style="width: 100%; padding: 16px; background: var(--electric-blue); color: white; border: none; border-radius: 8px; font-size: 1.1em; font-weight: 600; box-shadow: var(--shadow-lg); transition: all 0.3s;">
+                                    Confirm & Save
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h3 id="knowledge">4. Knowledge Base Analytics - Data Visualization</h3>
+        <div class="wireframe">
+            <div class="wireframe-title">AI Learning Analytics Dashboard</div>
+            
+            <div class="mockup-container">
+                <div class="mockup-body" style="background: var(--off-white);">
+                    <h3 style="font-size: 2em; margin-bottom: 10px;">Knowledge Base Performance</h3>
+                    <p style="color: var(--gray-500); margin-bottom: 40px;">Your AI is getting smarter every day</p>
+                    
+                    <div class="feature-grid">
+                        <div class="feature-card" style="background: linear-gradient(135deg, rgba(0, 102, 255, 0.05) 0%, rgba(0, 102, 255, 0.1) 100%); border: 1px solid rgba(0, 102, 255, 0.2);">
+                            <h4 style="color: var(--electric-blue);">Patterns Learned</h4>
+                            <p class="carbon-metric" style="font-size: 2.5em;">1,247</p>
+                            <p style="color: var(--emerald); font-size: 0.9em;">+89 this week</p>
+                            <div style="margin-top: 15px; height: 60px; background: rgba(0, 102, 255, 0.1); border-radius: 4px;">
+                                <!-- Sparkline chart would go here -->
+                            </div>
+                        </div>
+                        <div class="feature-card" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(16, 185, 129, 0.1) 100%); border: 1px solid rgba(16, 185, 129, 0.2);">
+                            <h4 style="color: var(--emerald);">Hit Rate</h4>
+                            <p style="font-size: 2.5em; font-weight: 800; color: var(--emerald);">82%</p>
+                            <p style="color: var(--gray-500); font-size: 0.9em;">↑ from 45% last month</p>
+                            <div style="margin-top: 15px;">
+                                <div class="progress-bar" style="height: 12px;">
+                                    <div class="progress-fill" style="width: 82%; background: var(--emerald);"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="feature-card" style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.05) 0%, rgba(245, 158, 11, 0.1) 100%); border: 1px solid rgba(245, 158, 11, 0.2);">
+                            <h4 style="color: var(--amber);">AI Cost Savings</h4>
+                            <p style="font-size: 2.5em; font-weight: 800; color: var(--amber);">$847</p>
+                            <p style="color: var(--gray-500); font-size: 0.9em;">This month</p>
+                            <div style="margin-top: 15px; height: 60px; background: rgba(245, 158, 11, 0.1); border-radius: 4px;">
+                                <!-- Savings chart would go here -->
+                            </div>
+                        </div>
+                        <div class="feature-card">
+                            <h4>Avg Processing Time</h4>
+                            <p style="font-size: 2.5em; font-weight: 800; color: var(--electric-blue);">0.3s</p>
+                            <p style="color: var(--gray-500); font-size: 0.9em;">vs 2.8s with AI</p>
+                            <div style="margin-top: 15px; display: flex; gap: 10px;">
+                                <div style="flex: 1; background: var(--electric-blue); height: 8px; border-radius: 4px;"></div>
+                                <div style="flex: 9; background: rgba(0, 0, 0, 0.1); height: 8px; border-radius: 4px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h4 style="margin-top: 50px; margin-bottom: 25px;">Top Vendor Patterns</h4>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Vendor</th>
+                                <th>Patterns</th>
+                                <th>Accuracy</th>
+                                <th>Time Saved</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Starbucks</strong></td>
+                                <td><span style="font-weight: 600; color: var(--electric-blue);">247</span></td>
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <div class="progress-bar" style="width: 100px;">
+                                            <div class="progress-fill" style="width: 98.5%; background: var(--emerald);"></div>
+                                        </div>
+                                        <span>98.5%</span>
+                                    </div>
+                                </td>
+                                <td>2.5s per doc</td>
+                                <td><button style="padding: 6px 16px; font-size: 0.85em;">View Pattern</button></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Amazon</strong></td>
+                                <td><span style="font-weight: 600; color: var(--electric-blue);">189</span></td>
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <div class="progress-bar" style="width: 100px;">
+                                            <div class="progress-fill" style="width: 97.2%; background: var(--emerald);"></div>
+                                        </div>
+                                        <span>97.2%</span>
+                                    </div>
+                                </td>
+                                <td>2.7s per doc</td>
+                                <td><button style="padding: 6px 16px; font-size: 0.85em;">View Pattern</button></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Uber</strong></td>
+                                <td><span style="font-weight: 600; color: var(--electric-blue);">156</span></td>
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <div class="progress-bar" style="width: 100px;">
+                                            <div class="progress-fill" style="width: 96.8%; background: var(--emerald);"></div>
+                                        </div>
+                                        <span>96.8%</span>
+                                    </div>
+                                </td>
+                                <td>2.4s per doc</td>
+                                <td><button style="padding: 6px 16px; font-size: 0.85em;">View Pattern</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <div style="margin-top: 50px; padding: 30px; background: var(--pure-white); border-radius: 16px; box-shadow: var(--shadow-md);">
+                        <h4 style="margin-bottom: 20px;">Train New Pattern</h4>
+                        <p style="color: var(--gray-500); margin-bottom: 25px;">Upload multiple receipts from the same vendor to create a new pattern</p>
+                        <div class="upload-zone" style="padding: 40px; background: linear-gradient(135deg, rgba(0, 102, 255, 0.02) 0%, rgba(8, 145, 178, 0.02) 100%);">
+                            <div style="font-size: 3em; margin-bottom: 15px;">🎯</div>
+                            <p style="font-weight: 500;">Drop vendor receipts here</p>
+                            <p style="color: var(--gray-500); font-size: 0.9em; margin-top: 10px;">Minimum 5 receipts required</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h3 id="carbon">5. Product Carbon Passport - Modern ESG Dashboard 🌱</h3>
+        <div class="wireframe">
+            <div class="wireframe-title">Carbon Footprint Calculator - Next-Gen Design</div>
+            
+            <div class="component-spec">
+                <h4>Enhanced Carbon Passport Features</h4>
+                <p><strong>Product Carbon Passport Generator</strong> - A cutting-edge ESG compliance dashboard that transforms financial data into certified carbon footprint reports, featuring real-time emission tracking, multi-scope analysis, and blockchain-verified certificates.</p>
+                
+                <h4>Key Differentiators</h4>
+                <ul style="list-style: none; padding: 0;">
+                    <li style="padding: 8px 0;">✓ <strong>Real-time Calculation</strong>: Live emission updates as invoices are processed</li>
+                    <li style="padding: 8px 0;">✓ <strong>API Integration</strong>: Connected to EPA, Ecoinvent, and transport databases</li>
+                    <li style="padding: 8px 0;">✓ <strong>Visual Analytics</strong>: Interactive Sankey diagrams and treemaps</li>
+                    <li style="padding: 8px 0;">✓ <strong>Blockchain Verification</strong>: Immutable carbon passport records</li>
+                </ul>
+            </div>
+            
+            <div class="mockup-container">
+                <div class="mockup-body" style="background: linear-gradient(180deg, var(--off-white) 0%, var(--pure-white) 100%);">
+                    <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 40px;">
+                        <div>
+                            <h3 style="font-size: 2em; margin: 0;">Generate Carbon Passport 🌱</h3>
+                            <p style="color: var(--gray-500); margin-top: 10px;">Calculate your product's complete carbon footprint and generate an official passport</p>
+                        </div>
+                        <button class="button-secondary" style="margin-left: auto;">
+                            📊 View Analytics
+                        </button>
+                    </div>
+                    
+                    <!-- Step 1: Product Selection with Enhanced UI -->
+                    <div class="glass-panel" style="margin-bottom: 30px;">
+                        <h4 style="display: flex; align-items: center; gap: 15px; margin-bottom: 25px;">
+                            <span style="background: var(--electric-blue); color: white; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600;">1</span>
+                            Select Product
+                        </h4>
+                        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px;">
+                            <div>
+                                <label style="color: var(--gray-500); font-size: 0.9em; font-weight: 500;">Choose product for carbon calculation</label>
+                                <select style="width: 100%; padding: 14px 20px; border: 2px solid rgba(0, 102, 255, 0.2); border-radius: 8px; margin-top: 10px; background: var(--pure-white); font-size: 1em;">
+                                    <option>Select a product...</option>
+                                    <option>EcoBottle 500ml - Batch #2024-Q4</option>
+                                    <option>BioCup 250ml - Batch #2024-Q4</option>
+                                    <option>GreenBox Large - Batch #2024-Q3</option>
+                                </select>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
+                                    <div>
+                                        <label style="color: var(--gray-500); font-size: 0.9em;">Manufacturing Start</label>
+                                        <input type="date" style="width: 100%; padding: 12px; border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 6px; margin-top: 8px;" value="2024-10-01">
+                                    </div>
+                                    <div>
+                                        <label style="color: var(--gray-500); font-size: 0.9em;">Manufacturing End</label>
+                                        <input type="date" style="width: 100%; padding: 12px; border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 6px; margin-top: 8px;" value="2024-12-15">
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="background: rgba(0, 102, 255, 0.05); padding: 25px; border-radius: 12px; text-align: center;">
+                                <div style="font-size: 3em; margin-bottom: 10px;">📦</div>
+                                <p style="font-weight: 600; color: var(--electric-blue);">3,000 units</p>
+                                <p style="color: var(--gray-500); font-size: 0.9em;">Production volume</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 2: Invoice Mapping with Visual Indicators -->
+                    <div style="background: var(--pure-white); border: 1px solid rgba(0, 0, 0, 0.06); padding: 30px; border-radius: 16px; margin-bottom: 30px; box-shadow: var(--shadow-md);">
+                        <h4 style="display: flex; align-items: center; gap: 15px; margin-bottom: 25px;">
+                            <span style="background: var(--electric-blue); color: white; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600;">2</span>
+                            Related Invoices & Scope Classification
+                        </h4>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px;">
+                            <div class="scope-card" style="background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%); padding: 25px;">
+                                <h5 style="color: #1976D2; margin-bottom: 10px;">Scope 1</h5>
+                                <p style="font-size: 2.5em; font-weight: 800; color: #1976D2; margin: 10px 0;">12</p>
+                                <p style="color: #546E7A; font-size: 0.9em;">Direct Emissions</p>
+                                <div style="margin-top: 15px;">
+                                    <div style="font-size: 0.8em; color: #546E7A;">15% of total</div>
+                                </div>
+                            </div>
+                            <div class="scope-card" style="background: linear-gradient(135deg, #F3E5F5 0%, #E1BEE7 100%); padding: 25px;">
+                                <h5 style="color: #7B1FA2; margin-bottom: 10px;">Scope 2</h5>
+                                <p style="font-size: 2.5em; font-weight: 800; color: #7B1FA2; margin: 10px 0;">8</p>
+                                <p style="color: #546E7A; font-size: 0.9em;">Energy Indirect</p>
+                                <div style="margin-top: 15px;">
+                                    <div style="font-size: 0.8em; color: #546E7A;">25% of total</div>
+                                </div>
+                            </div>
+                            <div class="scope-card" style="background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%); padding: 25px;">
+                                <h5 style="color: #388E3C; margin-bottom: 10px;">Scope 3</h5>
+                                <p style="font-size: 2.5em; font-weight: 800; color: #388E3C; margin: 10px 0;">45</p>
+                                <p style="color: #546E7A; font-size: 0.9em;">Other Indirect</p>
+                                <div style="margin-top: 15px;">
+                                    <div style="font-size: 0.8em; color: #546E7A;">60% of total</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="overflow-x: auto;">
+                            <table style="font-size: 0.95em;">
+                                <thead>
+                                    <tr>
+                                        <th>Invoice</th>
+                                        <th>Vendor</th>
+                                        <th>Category</th>
+                                        <th>Amount</th>
+                                        <th>Scope</th>
+                                        <th>Confidence</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td style="font-weight: 500;">INV-2024-1023</td>
+                                        <td>Regional Power Co</td>
+                                        <td>Electricity</td>
+                                        <td style="font-weight: 600;">$2,845</td>
+                                        <td><span style="background: #F3E5F5; color: #7B1FA2; padding: 6px 12px; border-radius: 6px; font-weight: 600;">Scope 2</span></td>
+                                        <td>
+                                            <div style="display: flex; align-items: center; gap: 8px;">
+                                                <div class="progress-bar" style="width: 60px;">
+                                                    <div class="progress-fill" style="width: 98%; background: var(--emerald);"></div>
+                                                </div>
+                                                <span style="color: var(--emerald); font-weight: 500;">98%</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-weight: 500;">INV-2024-1089</td>
+                                        <td>PlasticCo Materials</td>
+                                        <td>Raw Materials</td>
+                                        <td style="font-weight: 600;">$12,500</td>
+                                        <td><span style="background: #E8F5E9; color: #388E3C; padding: 6px 12px; border-radius: 6px; font-weight: 600;">Scope 3</span></td>
+                                        <td>
+                                            <div style="display: flex; align-items: center; gap: 8px;">
+                                                <div class="progress-bar" style="width: 60px;">
+                                                    <div class="progress-fill" style="width: 95%; background: var(--emerald);"></div>
+                                                </div>
+                                                <span style="color: var(--emerald); font-weight: 500;">95%</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-weight: 500;">INV-2024-1156</td>
+                                        <td>Fleet Fuel Services</td>
+                                        <td>Vehicle Fuel</td>
+                                        <td style="font-weight: 600;">$890</td>
+                                        <td><span style="background: #E3F2FD; color: #1976D2; padding: 6px 12px; border-radius: 6px; font-weight: 600;">Scope 1</span></td>
+                                        <td>
+                                            <div style="display: flex; align-items: center; gap: 8px;">
+                                                <div class="progress-bar" style="width: 60px;">
+                                                    <div class="progress-fill" style="width: 99%; background: var(--emerald);"></div>
+                                                </div>
+                                                <span style="color: var(--emerald); font-weight: 500;">99%</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div style="background: rgba(245, 158, 11, 0.1); padding: 20px; border-radius: 12px; margin-top: 25px; border: 1px solid rgba(245, 158, 11, 0.3);">
+                            <p style="margin: 0; font-weight: 600; color: var(--amber); display: flex; align-items: center; gap: 10px;">
+                                <span style="font-size: 1.5em;">⚠️</span> Missing Critical Invoices Detected
+                            </p>
+                            <ul style="margin: 15px 0 0 35px; color: #92400E;">
+                                <li>Waste management invoice for production period</li>
+                                <li>Transportation invoice for finished goods delivery</li>
+                            </ul>
+                            <button style="margin-top: 20px; padding: 10px 20px; background: var(--amber); border: none; border-radius: 6px; color: white; font-weight: 600;">
+                                Upload Missing Invoices
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 3: Calculation with API Status -->
+                    <div class="glass-panel" style="margin-bottom: 30px;">
+                        <h4 style="display: flex; align-items: center; gap: 15px; margin-bottom: 25px;">
+                            <span style="background: var(--electric-blue); color: white; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600;">3</span>
+                            Carbon Calculation
+                        </h4>
+                        
+                        <p style="color: var(--gray-500); margin-bottom: 20px;">Required emission factor APIs for calculation:</p>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+                            <div style="background: var(--pure-white); padding: 20px; border-radius: 12px; border: 1px solid rgba(0, 0, 0, 0.06); transition: all 0.3s;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span style="display: flex; align-items: center; gap: 10px;">
+                                        <span style="font-size: 1.5em;">🔌</span>
+                                        <span style="font-weight: 500;">EPA Energy Emissions API</span>
+                                    </span>
+                                    <span class="status-badge status-complete">Connected</span>
+                                </div>
+                            </div>
+                            <div style="background: var(--pure-white); padding: 20px; border-radius: 12px; border: 1px solid rgba(0, 0, 0, 0.06); transition: all 0.3s;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span style="display: flex; align-items: center; gap: 10px;">
+                                        <span style="font-size: 1.5em;">🚛</span>
+                                        <span style="font-weight: 500;">Transport Emissions Calculator</span>
+                                    </span>
+                                    <span class="status-badge status-complete">Connected</span>
+                                </div>
+                            </div>
+                            <div style="background: var(--pure-white); padding: 20px; border-radius: 12px; border: 1px solid rgba(0, 0, 0, 0.06); transition: all 0.3s;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span style="display: flex; align-items: center; gap: 10px;">
+                                        <span style="font-size: 1.5em;">🏭</span>
+                                        <span style="font-weight: 500;">Material Lifecycle Database</span>
+                                    </span>
+                                    <span class="status-badge status-complete">Connected</span>
+                                </div>
+                            </div>
+                            <div style="background: var(--pure-white); padding: 20px; border-radius: 12px; border: 1px solid rgba(0, 0, 0, 0.06); transition: all 0.3s;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span style="display: flex; align-items: center; gap: 10px;">
+                                        <span style="font-size: 1.5em;">♻️</span>
+                                        <span style="font-weight: 500;">Waste Processing Factors</span>
+                                    </span>
+                                    <span class="status-badge status-processing">Connecting...</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button style="width: 100%; padding: 18px; background: linear-gradient(135deg, var(--electric-blue) 0%, var(--teal) 100%); color: white; border: none; border-radius: 8px; margin-top: 30px; font-size: 1.1em; font-weight: 600; box-shadow: var(--shadow-lg); transition: all 0.3s;">
+                            Calculate Carbon Footprint
+                        </button>
+                    </div>
+                    
+                    <!-- Results with Enhanced Visualization -->
+                    <div class="carbon-section" style="padding: 40px;">
+                        <h4 style="color: white; margin-bottom: 30px; font-size: 1.5em;">Calculation Complete! ✅</h4>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px; margin-bottom: 40px;">
+                            <div style="text-align: center; background: rgba(255, 255, 255, 0.1); padding: 30px; border-radius: 16px; backdrop-filter: blur(10px);">
+                                <h5 style="color: white; opacity: 0.9; margin-bottom: 15px;">Total Carbon Footprint</h5>
+                                <p style="font-size: 4em; font-weight: 800; margin: 15px 0; color: white;">2,847</p>
+                                <p style="color: white; opacity: 0.8;">kg CO₂e</p>
+                            </div>
+                            <div style="text-align: center; background: rgba(255, 255, 255, 0.1); padding: 30px; border-radius: 16px; backdrop-filter: blur(10px);">
+                                <h5 style="color: white; opacity: 0.9; margin-bottom: 15px;">Per Unit</h5>
+                                <p style="font-size: 4em; font-weight: 800; margin: 15px 0; color: white;">0.95</p>
+                                <p style="color: white; opacity: 0.8;">kg CO₂e/unit</p>
+                            </div>
+                        </div>
+                        
+                        <div style="background: rgba(255, 255, 255, 0.1); padding: 30px; border-radius: 16px; margin-bottom: 30px; backdrop-filter: blur(10px);">
+                            <h5 style="color: white; margin-bottom: 20px;">Emission Breakdown</h5>
+                            <div style="margin-top: 20px;">
+                                <div style="margin-bottom: 20px;">
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px; color: white;">
+                                        <span>Scope 1 (Direct)</span>
+                                        <span style="font-weight: 600;">15% - 427 kg CO₂e</span>
+                                    </div>
+                                    <div class="progress-bar" style="background: rgba(255, 255, 255, 0.2);">
+                                        <div class="progress-fill" style="width: 15%; background: #64B5F6;"></div>
+                                    </div>
+                                </div>
+                                <div style="margin-bottom: 20px;">
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px; color: white;">
+                                        <span>Scope 2 (Energy)</span>
+                                        <span style="font-weight: 600;">25% - 712 kg CO₂e</span>
+                                    </div>
+                                    <div class="progress-bar" style="background: rgba(255, 255, 255, 0.2);">
+                                        <div class="progress-fill" style="width: 25%; background: #BA68C8;"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px; color: white;">
+                                        <span>Scope 3 (Supply Chain)</span>
+                                        <span style="font-weight: 600;">60% - 1,708 kg CO₂e</span>
+                                    </div>
+                                    <div class="progress-bar" style="background: rgba(255, 255, 255, 0.2);">
+                                        <div class="progress-fill" style="width: 60%; background: #81C784;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+                            <button style="width: 100%; padding: 16px; background: white; color: var(--forest-green); border: none; border-radius: 8px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                                <span style="font-size: 1.2em;">📄</span> Download Carbon Passport (PDF)
+                            </button>
+                            <button style="width: 100%; padding: 16px; background: transparent; color: white; border: 2px solid white; border-radius: 8px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                                <span style="font-size: 1.2em;">🔗</span> Generate Verification QR Code
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h2 id="security">Security & Privacy Implementation</h2>
+        
+        <div class="security-card">
+            <h3>Enterprise-Grade Security Architecture</h3>
+            <p>CloudCFO.ai implements bank-level security measures to protect sensitive financial data and ensure compliance with global privacy regulations.</p>
+        </div>
+
+        <h3>1. OAuth 2.0 Implementation</h3>
+        <div class="component-spec">
+            <h4>Secure Authentication Flow</h4>
+            <div class="code-block">
+// OAuth 2.0 Security Implementation
+class OAuthSecurityManager {
+  private readonly encryptionKey = process.env.OAUTH_ENCRYPTION_KEY;
+  private readonly jwtSecret = process.env.JWT_SECRET;
+  
+  // PKCE (Proof Key for Code Exchange) implementation
+  async generatePKCEChallenge(): Promise<PKCEParams> {
+    const verifier = crypto.randomBytes(32).toString('base64url');
+    const challenge = crypto
+      .createHash('sha256')
+      .update(verifier)
+      .digest('base64url');
+    
+    return { verifier, challenge };
+  }
+
+  // Secure token storage with encryption
+  async storeTokens(userId: string, tokens: OAuthTokens) {
+    const encrypted = await this.encryptTokens(tokens);
+    
+    await db.oauthTokens.create({
+      userId,
+      encryptedAccessToken: encrypted.accessToken,
+      encryptedRefreshToken: encrypted.refreshToken,
+      expiresAt: new Date(Date.now() + tokens.expiresIn * 1000),
+      scope: tokens.scope,
+      tokenType: 'Bearer'
+    });
+  }
+
+  // Token rotation for enhanced security
+  async rotateTokens(userId: string, refreshToken: string) {
+    const decrypted = await this.decryptToken(refreshToken);
+    
+    // Validate refresh token
+    if (!this.isValidRefreshToken(decrypted)) {
+      throw new SecurityError('Invalid refresh token');
+    }
+    
+    // Request new tokens
+    const newTokens = await this.requestNewTokens(decrypted);
+    
+    // Invalidate old tokens
+    await this.invalidateOldTokens(userId);
+    
+    // Store new tokens
+    await this.storeTokens(userId, newTokens);
+    
+    return newTokens;
+  }
+
+  // Encryption using AES-256-GCM
+  private async encryptTokens(tokens: OAuthTokens) {
+    const algorithm = 'aes-256-gcm';
+    const iv = crypto.randomBytes(16);
+    
+    const cipher = crypto.createCipheriv(
+      algorithm,
+      Buffer.from(this.encryptionKey, 'hex'),
+      iv
+    );
+    
+    const encrypted = {
+      accessToken: this.encryptString(tokens.accessToken, cipher),
+      refreshToken: this.encryptString(tokens.refreshToken, cipher)
+    };
+    
+    return encrypted;
+  }
+}</div>
+        </div>
+
+        <h3>2. Data Encryption & Storage</h3>
+        <div class="wireframe">
+            <div class="wireframe-title">Multi-Layer Security Architecture</div>
+            
+            <div class="mockup-container">
+                <div class="mockup-body">
+                    <h4>Security Layers</h4>
+                    
+                    <div class="feature-grid">
+                        <div class="security-card">
+                            <h5>🛡️ Access Control</h5>
+                            <ul style="list-style: none; padding: 0;">
+                                <li style="padding: 8px 0;">✓ Role-based permissions</li>
+                                <li style="padding: 8px 0;">✓ Multi-factor authentication</li>
+                                <li style="padding: 8px 0;">✓ Session management</li>
+                                <li style="padding: 8px 0;">✓ API rate limiting</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="security-card">
+                            <h5>📊 Audit & Compliance</h5>
+                            <ul style="list-style: none; padding: 0;">
+                                <li style="padding: 8px 0;">✓ SOC 2 Type II certified</li>
+                                <li style="padding: 8px 0;">✓ GDPR compliant</li>
+                                <li style="padding: 8px 0;">✓ Activity logging</li>
+                                <li style="padding: 8px 0;">✓ Regular security audits</li>
+                            </ul>
+                        </div><h5>🔐 Transport Security</h5>
+                            <ul style="list-style: none; padding: 0;">
+                                <li style="padding: 8px 0;">✓ TLS 1.3 for all connections</li>
+                                <li style="padding: 8px 0;">✓ Certificate pinning for mobile</li>
+                                <li style="padding: 8px 0;">✓ HSTS with preloading</li>
+                                <li style="padding: 8px 0;">✓ Perfect Forward Secrecy</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="security-card">
+                            <h5>🗄️ Storage Encryption</h5>
+                            <ul style="list-style: none; padding: 0;">
+                                <li style="padding: 8px 0;">✓ AES-256-GCM at rest</li>
+                                <li style="padding: 8px 0;">✓ Encrypted database fields</li>
+                                <li style="padding: 8px 0;">✓ Key rotation every 90 days</li>
+                                <li style="padding: 8px 0;">✓ Hardware Security Module</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="security-card">
+                            
