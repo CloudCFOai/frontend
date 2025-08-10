@@ -1,0 +1,1417 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CloudCFO.ai — Landing + Dashboard (EN/FR) with Carbon Passport — v4</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js">
+// Ensure Accounting charts initialize when opening the Accounting tab
+document.querySelectorAll('.sidebar .nav-item[data-sub="accounting"]').forEach(n => {
+  n.addEventListener('click', ()=>{ setTimeout(initAccountingCharts, 0); });
+});
+
+// Keep references to Accounting charts to update labels on language switch
+window._acctCharts = window._acctCharts || {};
+const _acct = window._acctCharts;
+
+// Patch initAccountingCharts to store references if not already patched
+(function patchInitAccounting(){
+  const orig = typeof initAccountingCharts === 'function' ? initAccountingCharts : null;
+  if(!orig || orig._patched) return;
+  function wrapped(){
+    const pre = Object.assign({}, _acct);
+    orig();
+    // Try to grab charts by IDs if not stored yet (Chart.js stores instances on canvases)
+    _acct.revexp = _acct.revexp || (Chart.getChart('acct_revexp') || null);
+    _acct.cash = _acct.cash || (Chart.getChart('acct_cashforecast') || null);
+    _acct.tax = _acct.tax || (Chart.getChart('acct_taxdonut') || null);
+    _acct.ar = _acct.ar || (Chart.getChart('acct_araging') || null);
+  }
+  wrapped._patched = true;
+  window.initAccountingCharts = wrapped;
+})();
+
+function updateAcctChartLabels(){
+  if(!_acct) return;
+  try{
+    if(_acct.revexp){
+      _acct.revexp.data.datasets[0].label = i18n[lang].repRevenue || 'Revenue';
+      _acct.revexp.data.datasets[1].label = i18n[lang].repExpenses || 'Expenses';
+      _acct.revexp.update();
+    }
+    if(_acct.cash){
+      _acct.cash.data.datasets[0].label = i18n[lang].acctCF || 'Cash Flow';
+      _acct.cash.update();
+    }
+    if(_acct.tax){
+      _acct.tax.data.labels = ['VAT/GST', i18n[lang].acctCorpTax, i18n[lang].acctPayrollTax];
+      _acct.tax.update();
+    }
+    if(_acct.ar){
+      // Dataset label equals heading; keep as-is or use translated
+      _acct.ar.data.datasets[0].label = i18n[lang].acctChartARAging || 'A/R Aging';
+      _acct.ar.update();
+    }
+  }catch(e){ /* no-op */ }
+}
+
+// Extend applyI18n to refresh Accounting chart labels too
+(function extendApplyI18n(){
+  const _origApply = applyI18n;
+  applyI18n = function(){
+    _origApply();
+    updateAcctChartLabels();
+  };
+})();
+
+</script>
+<style>
+    :root{
+      --primary-navy:#0A1628;
+      --electric:#0066FF;
+      --teal:#0fb6d3;
+      --emerald:#10B981;
+      --amber:#F59E0B;
+      --coral:#FF6B6B;
+      --gray-900:#0b1220;
+      --gray-800:#111827;
+      --gray-700:#374151;
+      --gray-600:#4B5563;
+      --gray-500:#6B7280;
+      --gray-400:#9CA3AF;
+      --off:#FAFBFC;
+      --white:#fff;
+      --shadow-lg:0 20px 40px rgba(10,22,40,.18);
+      --radius:16px;
+      --ease: cubic-bezier(.22,.61,.36,1);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      color:var(--gray-800);
+      background:linear-gradient(180deg,#f7f9ff, #fff);
+    }
+    /* Top App Tabs */
+    .top-tabs{display:flex; justify-content:center; gap:10px; padding:12px}
+    .pill{background:#fff; border:1px solid rgba(0,0,0,.06); padding:10px 14px; border-radius:999px; font-weight:800; cursor:pointer}
+    .pill.active{background:linear-gradient(90deg,var(--electric),#3aa3ff); color:#fff; box-shadow:0 10px 20px rgba(0,102,255,.25)}
+    /* Landing shell */
+    .app{display:grid; grid-template-columns: 280px 1fr; min-height:calc(100vh - 56px)}
+    aside{position:sticky; top:0; height:calc(100vh - 56px); background:linear-gradient(180deg, var(--primary-navy), #15223a); color:#e7efff; padding:24px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.06)}
+    .brand{display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:-.02em; font-size:20px}
+    .brand .badge{padding:4px 8px; border-radius:999px; background:rgba(255,255,255,.08); font-size:12px; font-weight:600}
+    nav{margin-top:24px}
+    .nav-item{display:flex; align-items:center; gap:12px; padding:12px 14px; border-radius:10px; cursor:pointer; transition: transform .2s var(--ease), background .2s var(--ease), box-shadow .2s var(--ease); margin-bottom:8px}
+    .nav-item:hover{transform:translateX(4px); background:rgba(255,255,255,.06)}
+    .nav-item.active{background:linear-gradient(90deg, var(--electric), #3aa3ff); color:white; box-shadow:0 10px 20px rgba(0,102,255,.25)}
+    .content{padding:0}
+    .lang-toggle{margin-top:18px; display:flex; gap:8px}
+    .lang-btn{background:rgba(255,255,255,.1); color:#fff; border:1px solid rgba(255,255,255,.25); border-radius:999px; padding:6px 10px; cursor:pointer; font-weight:700}
+    .lang-btn.active{background:#fff; color:#0a1628}
+    .section{padding:56px clamp(16px,3vw,40px)}
+    .hero{position:relative; overflow:hidden; background: radial-gradient(1200px 600px at 20% -10%,rgba(0,102,255,.25),transparent), radial-gradient(900px 500px at 100% 10%,rgba(15,182,211,.25),transparent), linear-gradient(135deg,#0a1628, #13305d 30%, #0f1c39); color:white; border-bottom-left-radius:24px; border-bottom-right-radius:24px}
+    .hero-inner{max-width:1200px; margin:0 auto; display:grid; grid-template-columns:1.1fr .9fr; gap:36px; align-items:center}
+    .hero h1{font-size: clamp(32px,4vw,56px); line-height:1.05; margin:0; letter-spacing:-.03em}
+    .hero p{opacity:.9; font-size: clamp(16px,1.2vw,20px)}
+    .cta{display:flex; gap:12px; margin-top:24px}
+    .btn{padding:14px 20px; border-radius:12px; font-weight:700; border:0; cursor:pointer; transition:transform .15s var(--ease), box-shadow .2s var(--ease), filter .2s var(--ease)}
+    .btn-primary{background:linear-gradient(135deg,var(--electric), #3aa3ff); color:white; box-shadow:0 10px 20px rgba(0,102,255,.3)}
+    .btn-secondary{background:rgba(255,255,255,.1); color:white; border:1.5px solid rgba(255,255,255,.25); backdrop-filter: blur(8px)}
+    .btn:hover{transform:translateY(-2px) scale(1.02)}
+    .btn:active{transform:translateY(0) scale(.98)}
+    .dash{background: #0d1830; border-radius:16px; padding:20px; box-shadow: var(--shadow-lg); border:1px solid rgba(255,255,255,.06)}
+    .cards{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.05)); border:1px solid rgba(255,255,255,.12); border-radius:14px; padding:14px; min-height:120px}
+    .stat{font-size:28px; font-weight:800}
+    canvas{max-width:100%}
+    .device{border-radius:24px; overflow:hidden; background:white; padding:6px}
+    .hero-floating{position:absolute; inset:auto 0 -80px auto; right:48px; width:min(520px, 42vw); transform: rotate(-2deg); filter:drop-shadow(0 30px 40px rgba(0,0,0,.4)); animation: float 6s ease-in-out infinite}
+    @keyframes float{0%,100%{transform: translateY(0) rotate(-2deg)}50%{transform: translateY(-10px) rotate(-2deg)}}
+    .section h2{font-size: clamp(28px,2.5vw,40px); margin:0 0 14px}
+    .sub{color:var(--gray-600); margin-bottom:28px}
+    .grid{display:grid; grid-template-columns: repeat(12, 1fr); gap:18px; max-width:1200px; margin:0 auto}
+    .col-6{grid-column: span 6}
+    .col-12{grid-column: span 12}
+    .glass{background:rgba(255,255,255,.7); border:1px solid rgba(10,22,40,.08); backdrop-filter: blur(10px); border-radius:16px; padding:20px}
+    .feature{display:flex; gap:12px; align-items:flex-start; padding:14px 12px; border-radius:12px; transition:transform .2s var(--ease), box-shadow .2s}
+    .feature:hover{transform:translateY(-2px); box-shadow:0 10px 20px rgba(10,22,40,.08)}
+    .badge{display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:999px; font-size:12px; font-weight:700}
+    .success{background:rgba(16,185,129,.12); color:#065f46}
+    .warning{background:rgba(245,158,11,.12); color:#92400e}
+    .accent{background:rgba(0,102,255,.12); color:#0046a3}
+    .services{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:14px}
+    .svc{background:white; border:1.5px solid rgba(0,0,0,.05); border-radius:16px; padding:18px; transition: transform .2s var(--ease), box-shadow .2s var(--ease), border .2s}
+    .svc:hover{transform:translateY(-4px) scale(1.01); box-shadow:0 16px 30px rgba(10,22,40,.08); border-color: rgba(0,102,255,.4)}
+    .svc h4{margin:8px 0 4px}
+    .svc .meta{display:flex; gap:12px; font-size:12px; color:var(--gray-600)}
+    .svc .connect{width:100%; margin-top:12px}
+    .svc.connected{border-color: rgba(16,185,129,.6); background:linear-gradient(180deg, rgba(16,185,129,.07), white)}
+    .hover-scale{transition: transform .15s var(--ease)} .hover-scale:hover{transform:scale(1.02)}
+    .skeleton{position:relative; overflow:hidden; background:#e9edf5}
+    .skeleton::after{content:''; position:absolute; inset:0; transform:translateX(-100%); background:linear-gradient(90deg, rgba(255,255,255,0) 0, rgba(255,255,255,.6) 50%, rgba(255,255,255,0) 100%); animation: shimmer 1.6s infinite}
+    @keyframes shimmer{100%{transform:translateX(100%)}}
+    .check{display:inline-flex; align-items:center; gap:8px; font-weight:700; color:var(--emerald)}
+    .panel{max-width:1200px; margin:0 auto}
+
+    /* DASHBOARD */
+    .dash-shell{display:grid; grid-template-columns:260px 1fr; gap:16px; padding:16px}
+    .sidebar{background:var(--primary-navy);color:#fff;border-radius:16px;padding:16px;min-height:640px}
+    .main{background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:16px;padding:20px;min-height:640px}
+
+    .kpi{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+    .kpi .metric{background:linear-gradient(180deg,#fff, #f7fbff);border:1px solid rgba(0,0,0,.06);border-radius:12px;padding:16px}
+    .metric .label{color:var(--gray-500);font-size:.85rem}
+    .metric .value{font-size:28px;font-weight:800;margin-top:6px}
+
+    .table{width:100%;border-collapse:separate;border-spacing:0 10px}
+    .table th{font-size:.8rem;text-transform:uppercase;letter-spacing:.04em;color:#fff;background:var(--primary-navy);padding:10px 12px}
+    .table td{background:#fff;padding:12px;border-top:1px solid #e5e7eb;border-bottom:1px solid #e5e7eb}
+
+    /* Carbon Passport widgets */
+    .cp-step{background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.06);overflow:hidden;margin-bottom:16px}
+    .cp-hd{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;background:linear-gradient(135deg,var(--primary-navy),var(--electric));color:#fff;font-weight:800}
+    .cp-body{padding:16px}
+    .row{display:flex; gap:12px; flex-wrap:wrap}
+    .input{flex:1; display:flex; flex-direction:column; gap:6px}
+    .input input, .input select{padding:10px 12px;border-radius:10px;border:1px solid #e5e7eb}
+    .api-pill{display:flex;align-items:center;gap:10px;border:1px solid #e5e7eb;border-radius:12px;padding:10px;background:#fff;min-width:260px}
+    .dot{width:10px;height:10px;border-radius:50%}
+    .ok{background:var(--emerald)} .wait{background:var(--amber)} .off{background:#9CA3AF}
+    .btn-wide{width:100%; margin-top:8px}
+    .grid3{display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap:12px}
+    .scope{background:linear-gradient(180deg,#fff,#f7fbff); border:1px solid rgba(0,0,0,.06); border-radius:12px; padding:14px; text-align:center}
+    .scope h4{margin:6px 0 0}
+    .scope .big{font-size:28px; font-weight:800; color:#0066ff}
+    .note{background:linear-gradient(135deg, rgba(245,158,11,.08), rgba(255,255,255,.8)); border-left:4px solid var(--amber); padding:12px; border-radius:12px}
+    .result{display:grid; grid-template-columns: 1.1fr .9fr; gap:14px}
+    .tile{background:linear-gradient(135deg,#0a223f,#0a1628); color:#e6f3ff; border-radius:16px; padding:18px; position:relative; overflow:hidden}
+    .tile h3{margin:0 0 8px}
+    .tile .val{font-size:44px; font-weight:800}
+    .breakdown{background:#fff; border:1px solid rgba(0,0,0,.06); border-radius:14px; padding:14px}
+    .prog{height:8px; background:#eef2ff; border-radius:999px; overflow:hidden}
+    .prog span{display:block; height:100%}
+    .actions{display:flex; gap:12px; flex-wrap:wrap; margin-top:10px}
+    .btn-ghost{background:#fff; color:#0066ff; border:2px solid #0066ff}
+    .qr{display:flex;align-items:center;gap:8px}
+
+    /* Views */
+    .view{display:none}
+    .view.active{display:block}
+
+    /* Print */
+    @media print{
+      .top-tabs{display:none}
+      .mobile-nav,.fab{display:none !important}
+      .app{grid-template-columns:1fr}
+      aside{display:none}
+      .dash-shell{grid-template-columns:1fr}
+    }
+    /* Mobile */
+    @media(max-width: 980px){
+      .app{grid-template-columns:1fr}
+      aside{display:none}
+      .hero-inner{grid-template-columns:1fr}
+      .hero-floating{position:relative; right:auto; inset:auto; width:100%; transform:none; margin-top:16px}
+      .dash-shell{grid-template-columns:1fr}
+    }
+  
+
+/* === Global topbar with language toggle === */
+.topbar{
+  position:sticky; top:0; z-index:100;
+  display:flex; align-items:center; gap:12px;
+  padding:8px 12px; background:#fff; border-bottom:1px solid rgba(0,0,0,.06);
+}
+.topbar .lang-toggle{margin:0; display:flex; gap:8px}
+.topbar .lang-btn{background:#fff; color:#0a1628; border:1px solid rgba(0,0,0,.12)}
+.topbar .lang-btn.active{background:linear-gradient(90deg, var(--electric), #3aa3ff); color:#fff}
+.topbar .top-tabs{flex:1; display:flex; justify-content:center}
+.topbar-right{width:42px}
+
+</style>
+</head>
+<body>
+<div class="topbar">
+      <div class="lang-toggle" id="globalLangToggle">
+        <button class="lang-btn" id="btnEN">EN</button>
+        <button class="lang-btn" id="btnFR">FR</button>
+      </div>
+      <div class="top-tabs">
+<button class="pill active" data-i18n="topLanding" data-tab="landing">Landing</button>
+<button class="pill" data-i18n="topDashboard" data-tab="dashboard">Dashboard</button>
+<button class="pill" data-i18n="topExport" data-tab="download">Export</button>
+</div>
+      <div class="topbar-right"></div>
+    </div><!-- VIEWS -->
+<div class="view active" id="landing">
+<div class="app">
+<aside>
+<div class="brand">CloudCFO.ai <span class="badge">Beta</span></div>
+<nav>
+<div class="nav-item active" data-i18n="navGeneral" data-target="#general">🏠 General</div>
+<div class="nav-item" data-i18n="navDiff" data-target="#differentiators">✨ Differentiators</div>
+<div class="nav-item" data-i18n="navSignup" data-target="#signup">📝 Sign‑up &amp; Integrations</div>
+</nav>
+<div style="margin-top:24px; font-size:13px; opacity:.9">
+<div class="badge success" data-i18n="badgeSoc2">SOC2‑ready</div>
+<div class="badge warning" data-i18n="badgeOcr">Sub‑second OCR</div>
+<div class="badge accent" data-i18n="badgeCarbon">Carbon Passport</div>
+</div>
+</aside>
+<main class="content">
+<section class="section hero" id="general">
+<div class="hero-inner">
+<div>
+<h1 data-i18n="heroTitle">Your AI‑Powered CFO in the Cloud</h1>
+<p data-i18n="heroSub">Connect email, drives, and chats — CloudCFO auto‑discovers receipts, extracts data in <b>&lt;500ms</b>, and turns them into real‑time insights and a 🌱 Carbon Passport.</p>
+<div class="cta">
+<button class="btn btn-primary hover-scale" data-i18n="btnConnect" id="connectBtn">🔍 Connect your accounts</button>
+<button class="btn btn-secondary hover-scale" data-i18n="btnUpload" id="uploadBtn">📤 Quick upload</button>
+</div>
+<div style="margin-top:18px; display:flex; gap:10px; align-items:center">
+<span class="badge accent" data-i18n="worksWith">Works with: Gmail · Drive · Dropbox · WhatsApp · Telegram</span>
+</div>
+</div>
+<div class="device hero-floating">
+<div class="dash">
+<div class="cards">
+<div class="card">
+<div data-i18n="metricTotalExpenses" style="font-size:12px; opacity:.8">Total Expenses</div>
+<div class="stat">$12,458</div>
+<canvas height="50" id="spark1"></canvas>
+</div>
+<div class="card">
+<div data-i18n="metricCarbon" style="font-size:12px; opacity:.8">Carbon this month</div>
+<div class="stat">2.4t CO₂e</div>
+<canvas height="50" id="spark2"></canvas>
+</div>
+<div class="card">
+<div data-i18n="metricDocs" style="font-size:12px; opacity:.8">Docs processed</div>
+<div class="stat">847</div>
+<div class="skeleton" style="height:10px; border-radius:5px; margin-top:6px"></div>
+</div>
+<div class="card">
+<div data-i18n="metricHit" style="font-size:12px; opacity:.8">Hit rate</div>
+<div class="stat">95%</div>
+<div class="check" data-i18n="metricAccSla">✓ Accuracy SLA</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="section" id="differentiators">
+<div class="panel">
+<h2 data-i18n="whyTitle">Why CloudCFO</h2>
+<p class="sub" data-i18n="whySub">AI‑first financial automation, native chat integrations, and built‑in carbon intelligence.</p>
+<div class="grid">
+<div class="col-6 glass feature">
+<div>🤖</div>
+<div>
+<h3 data-i18n="featAI">AI‑First Extraction</h3>
+<p data-i18n="featAIDesc">Advanced LLM + vision pipeline delivers <b>sub‑second</b> processing and self‑learning patterns.</p>
+</div>
+</div>
+<div class="col-6 glass feature">
+<div>💬</div>
+<div>
+<h3 data-i18n="featChat">WhatsApp &amp; Telegram Native</h3>
+<p data-i18n="featChatDesc">Send a photo, we do the rest — the fastest way to capture receipts on mobile.</p>
+</div>
+</div>
+<div class="col-6 glass feature">
+<div>🌱</div>
+<div>
+<h3 data-i18n="featCarbon">Carbon Passport</h3>
+<p data-i18n="featCarbonDesc">Automatic Scope 1/2/3 mapping from invoices with downloadable, verifiable passports.</p>
+</div>
+</div>
+<div class="col-6 glass feature">
+<div>⚡</div>
+<div>
+<h3 data-i18n="featDev">Developer‑Friendly</h3>
+<p data-i18n="featDevDesc">Clean APIs &amp; webhooks, great docs, and thoughtful defaults inspired by Stripe.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="section" id="signup">
+<div class="panel">
+<h2 data-i18n="signupTitle">Sign‑up &amp; Connect your channels</h2>
+<p class="sub" data-i18n="signupSub">Choose any intake source below. We’ll start auto‑discovering receipts instantly.</p>
+<div class="services">
+<div class="svc connected">
+<div style="font-size:28px">📧</div>
+<h4>Gmail</h4>
+<div class="meta"><span>523 <span data-i18n="found">found</span></span><span><span data-i18n="accuracy">Accuracy</span> 95%</span></div>
+<button class="btn btn-primary connect">✓ <span data-i18n="connected">Connected</span></button>
+</div>
+<div class="svc">
+<div style="font-size:28px">📮</div>
+<h4>Outlook</h4>
+<p class="sub" data-i18n="outlookDesc" style="margin:4px 0 8px">Import from Microsoft email</p>
+<button class="btn btn-primary connect" data-i18n="connect">Connect</button>
+</div>
+<div class="svc connected">
+<div style="font-size:28px">📁</div>
+<h4>Google Drive</h4>
+<div class="meta"><span>189 <span data-i18n="found">found</span></span><span>100% <span data-i18n="accuracy">Accuracy</span></span></div>
+<button class="btn btn-primary connect">✓ <span data-i18n="connected">Connected</span></button>
+</div>
+<div class="svc">
+<div style="font-size:28px">💧</div>
+<h4>Dropbox</h4>
+<p class="sub" data-i18n="dropboxDesc" style="margin:4px 0 8px">Scan selected folders</p>
+<button class="btn btn-primary connect" data-i18n="connect">Connect</button>
+</div>
+<div class="svc">
+<div style="font-size:28px">📱</div>
+<h4>WhatsApp Business</h4>
+<p class="sub" data-i18n="waDesc" style="margin:4px 0 8px">Forward photos or PDFs</p>
+<button class="btn btn-primary connect" data-i18n="connect">Connect</button>
+</div>
+<div class="svc connected">
+<div style="font-size:28px">💬</div>
+<h4>Telegram</h4>
+<div class="meta"><span>135 <span data-i18n="found">found</span></span><span>88% <span data-i18n="accuracy">Accuracy</span></span></div>
+<button class="btn btn-primary connect">✓ <span data-i18n="connected">Connected</span></button>
+</div>
+</div>
+</div>
+</section>
+</main>
+</div>
+</div>
+<!-- DASHBOARD VIEW -->
+<div class="view" id="dashboard">
+<div class="dash-shell">
+<aside class="sidebar">
+<div class="nav-item active" data-i18n="sbOverview" data-sub="overview">📊 Overview</div>
+<div class="nav-item" data-i18n="sbReports" data-sub="reports">📈 Financial Reports</div><div class="nav-item" data-i18n="sbAccountingTax" data-sub="accounting">🧾 Accounting &amp; Tax</div>
+<div class="nav-item" data-i18n="sbPassport" data-sub="passport">🌱 Carbon Passport</div>
+<div class="nav-item" data-i18n="sbBanking" data-sub="banking">🏦 Banking</div>
+<div class="nav-item" data-i18n="sbIntegrations" data-sub="integrations">🔗 Integrations</div>
+<div class="nav-item" data-i18n="sbSettings" data-sub="settings">⚙️ Settings</div>
+<div class="sub" style="margin-top:auto;padding-top:16px"><span data-i18n="sbPlan">Pro Plan</span> • <span id="sbDocsCount">1,247</span> <span data-i18n="sbDocs">docs this month</span></div>
+</aside>
+<main class="main">
+<!-- Overview -->
+<section class="subview" id="view-overview" style="display:block">
+<div class="kpi">
+<div class="metric"><div class="label" data-i18n="metricTotalExpenses">Total Expenses</div><div class="value">$12,458</div><span class="badge success">↓ 12%</span></div>
+<div class="metric"><div class="label" data-i18n="metricDocs">Docs processed</div><div class="value">847</div></div>
+<div class="metric"><div class="label" data-i18n="metricTax">Tax Deductions</div><div class="value">$3,892</div></div>
+<div class="metric"><div class="label" data-i18n="metricCO2Month">CO₂e (month)</div><div class="value">2.4t</div></div>
+</div>
+<div class="grid" style="grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-top:12px">
+<div class="cp-step">
+<div class="cp-hd" data-i18n="ovLineTitle">Monthly Revenue vs Expenses</div>
+<div class="cp-body"><canvas id="ov_line"></canvas></div>
+</div>
+<div class="cp-step">
+<div class="cp-hd" data-i18n="ovBarTitle">Monthly Users</div>
+<div class="cp-body"><canvas id="ov_bar"></canvas></div>
+</div>
+</div>
+</section>
+<!-- REPORTS -->
+<section class="subview" id="view-reports" style="display:none">
+<div class="cp-step"><div class="cp-hd" data-i18n="repPnl">P&amp;L (Monthly)</div><div class="cp-body"><canvas id="rep_pnl"></canvas></div></div>
+<div class="grid" style="grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px">
+<div class="cp-step"><div class="cp-hd" data-i18n="repTopCats">Top Categories</div><div class="cp-body"><canvas id="rep_doughnut"></canvas></div></div>
+<div class="cp-step"><div class="cp-hd" data-i18n="repCash">Cash In vs Out</div><div class="cp-body"><canvas id="rep_cash"></canvas></div></div>
+</div>
+</section>
+<!-- CARBON PASSPORT -->
+<section class="subview" id="view-passport" style="display:none">
+<div class="cp-step">
+<div class="cp-hd"><span data-i18n="cpStep1">1 • Select Product</span> <button class="btn btn-secondary" data-i18n="cpViewAnalytics" style="border-color:#fff; color:#fff; margin-left:auto">📊 View Analytics</button></div>
+<div class="cp-body">
+<div class="row">
+<div class="input">
+<label data-i18n="cpProduct">Product</label>
+<select>
+<option>EcoBottle 500ml – Batch #2024‑Q4</option>
+<option>EcoBottle 750ml – Batch #2024‑Q3</option>
+<option>Refill Pack – Batch #2024‑Q4</option>
+</select>
+</div>
+<div class="input">
+<label data-i18n="cpStart">Manufacturing Start</label>
+<input type="date" value="2024-11-18"/>
+</div>
+<div class="input">
+<label data-i18n="cpEnd">Manufacturing End</label>
+<input type="date" value="2024-12-15"/>
+</div>
+<div class="input" style="max-width:220px">
+<label data-i18n="cpVolume">Production Volume</label>
+<input type="text" value="3,000 units"/>
+</div>
+</div>
+</div>
+</div>
+<div class="cp-step">
+<div class="cp-hd" data-i18n="cpStep2">2 • Related Invoices &amp; Scope Classification</div>
+<div class="cp-body">
+<div class="grid3">
+<div class="scope"><div class="big">12</div><h4 data-i18n="scope1">Scope 1</h4><div class="sub" data-i18n="scope1desc">Direct Emissions</div></div>
+<div class="scope"><div class="big">8</div><h4 data-i18n="scope2">Scope 2</h4><div class="sub" data-i18n="scope2desc">Energy Indirect</div></div>
+<div class="scope"><div class="big">45</div><h4 data-i18n="scope3">Scope 3</h4><div class="sub" data-i18n="scope3desc">Other Indirect</div></div>
+</div>
+<table class="table" style="margin-top:8px">
+<thead><tr><th data-i18n="thInvoice">Invoice</th><th data-i18n="thVendor">Vendor</th><th data-i18n="thCategory">Category</th><th data-i18n="thAmount">Amount</th><th data-i18n="thScope">Scope</th><th data-i18n="thConfidence">Confidence</th></tr></thead>
+<tbody>
+<tr><td>INV‑2024‑1023</td><td>Regional Power Co</td><td data-i18n="catElectricity">Electricity</td><td>$2,845</td><td><span class="badge accent">Scope 2</span></td><td><span class="badge success">98%</span></td></tr>
+<tr><td>INV‑2024‑1089</td><td>PlasticCo Materials</td><td data-i18n="catRaw">Raw Materials</td><td>$12,500</td><td><span class="badge accent">Scope 3</span></td><td><span class="badge success">95%</span></td></tr>
+<tr><td>INV‑2024‑1156</td><td>Fleet Fuel Services</td><td data-i18n="catFuel">Vehicle Fuel</td><td>$890</td><td><span class="badge accent">Scope 1</span></td><td><span class="badge success">98%</span></td></tr>
+</tbody>
+</table>
+<div class="note">
+<b data-i18n="missingTitle">Missing Critical Invoices Detected</b>
+<ul style="margin:8px 0 0 18px">
+<li data-i18n="missingWaste">Waste management invoice for production period</li>
+<li data-i18n="missingTransport">Transportation invoice for finished goods delivery</li>
+</ul>
+<button class="btn btn-primary" data-i18n="btnUploadMissing" style="margin-top:8px">📤 Upload Missing Invoices</button>
+</div>
+</div>
+</div>
+<div class="cp-step">
+<div class="cp-hd" data-i18n="cpStep3">3 • Carbon Calculation</div>
+<div class="cp-body">
+<div class="row">
+<div class="api-pill"><span class="dot ok"></span><div><b data-i18n="apiEnergy">EPA Energy Emissions API</b><div class="sub" data-i18n="apiConnected">Connected</div></div></div>
+<div class="api-pill"><span class="dot ok"></span><div><b data-i18n="apiTransport">Transport Emissions Calculator</b><div class="sub" data-i18n="apiConnected">Connected</div></div></div>
+<div class="api-pill"><span class="dot wait"></span><div><b data-i18n="apiWaste">Waste Processing Factors</b><div class="sub" data-i18n="apiConnecting">Connecting…</div></div></div>
+<div class="api-pill"><span class="dot ok"></span><div><b data-i18n="apiMaterials">Material Lifecycle DB</b><div class="sub" data-i18n="apiConnected">Connected</div></div></div>
+</div>
+<button class="btn btn-primary btn-wide" data-i18n="btnCalc" id="calcBtn">⚙️ Calculate Carbon Footprint</button>
+</div>
+</div>
+<div class="cp-step" id="cpResult" style="display:none">
+<div class="cp-hd" data-i18n="calcDone">Calculation Complete ✓</div>
+<div class="cp-body">
+<div class="result">
+<div class="tile">
+<h3 data-i18n="totalCF">Total Carbon Footprint</h3>
+<div class="val" id="totalCO2">2,847</div>
+<div>kg CO₂e</div>
+</div>
+<div class="tile">
+<h3 data-i18n="perUnit">Per Unit</h3>
+<div class="val">0.95</div>
+<div>kg CO₂e / unit</div>
+</div>
+</div>
+<div class="breakdown" style="margin-top:12px">
+<h3 data-i18n="emissionBreakdown" style="margin:0 0 8px">Emission Breakdown</h3>
+<div class="sub"><span data-i18n="scope1Long">Scope 1 (Direct)</span> — 15% • 427 kg CO₂e</div>
+<div class="prog"><span style="width:15%; background:#64B5F6"></span></div>
+<div class="sub" style="margin-top:8px"><span data-i18n="scope2Long">Scope 2 (Energy)</span> — 25% • 712 kg CO₂e</div>
+<div class="prog"><span style="width:25%; background:#BA68C8"></span></div>
+<div class="sub" style="margin-top:8px"><span data-i18n="scope3Long">Scope 3 (Supply Chain)</span> — 60% • 1,708 kg CO₂e</div>
+<div class="prog"><span style="width:60%; background:#81C784"></span></div>
+<div class="actions">
+<button class="btn btn-ghost" data-i18n="btnDlPassport" id="dlPassport">⬇️ Download Carbon Passport (PDF)</button>
+<button class="btn btn-primary qr" data-i18n="btnGenQR" id="mkQR">� QR • Generate Verification</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- OTHER SECTIONS -->
+<section class="subview" id="view-banking" style="display:none">
+<div class="cp-step">
+<div class="cp-hd" data-i18n="bankingTitle">🏦 Banking Dashboard</div>
+<div class="cp-body">
+<div class="kpi">
+<div class="metric"><div class="label" data-i18n="bankTotalBalance">Total Balance</div><div class="value">$125,400</div></div>
+<div class="metric"><div class="label" data-i18n="bankIncoming">Incoming (MTD)</div><div class="value">$42,800</div></div>
+<div class="metric"><div class="label" data-i18n="bankOutgoing">Outgoing (MTD)</div><div class="value">$31,500</div></div>
+<div class="metric"><div class="label" data-i18n="bankReconciliation">Reconciliation Rate</div><div class="value">86%</div></div>
+</div>
+<div class="cp-step" style="margin-top:16px">
+<div class="cp-hd" data-i18n="bankConnections">Bank Connections</div>
+<div class="cp-body grid" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:12px">
+<div class="scope"><h4>Bank of America</h4><span class="badge success" data-i18n="connected">Connected</span><div class="sub">Last Sync: 2 hrs ago</div></div>
+<div class="scope"><h4>Wells Fargo</h4><span class="badge warning" data-i18n="pending">Pending</span><div class="sub">Last Sync: —</div></div>
+<div class="scope"><h4>Chase</h4><span class="badge" data-i18n="error" style="background:rgba(239,68,68,.15);color:#ef4444">Error</span><div class="sub">Last Sync: 1 day ago</div></div>
+</div>
+</div>
+<div class="cp-step" style="margin-top:16px">
+<div class="cp-hd" data-i18n="bankTransactions">Transactions</div>
+<div class="cp-body">
+<table class="table">
+<thead>
+<tr>
+<th data-i18n="thDate">Date</th>
+<th data-i18n="thAccount">Bank Account</th>
+<th data-i18n="thVendor">Vendor</th>
+<th data-i18n="thAmount">Amount</th>
+<th data-i18n="thStatus">Status</th>
+<th data-i18n="thInvoice">Invoice</th>
+</tr>
+</thead>
+<tbody>
+<tr><td>2025-08-01</td><td>Bank of America</td><td>Amazon</td><td>$250.00</td><td><span class="badge success" data-i18n="reconciled">Reconciled</span></td><td>INV-00123</td></tr>
+<tr><td>2025-08-02</td><td>Wells Fargo</td><td>Google Cloud</td><td>$1,200.00</td><td><span class="badge" data-i18n="mismatch" style="background:rgba(239,68,68,.15);color:#ef4444">Mismatch</span></td><td>INV-00124</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="grid" style="grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-top:16px">
+<div class="cp-step"><div class="cp-hd" data-i18n="bankChartInOut">Incoming vs Outgoing</div><div class="cp-body"><canvas id="bnk_inout"></canvas></div></div>
+<div class="cp-step"><div class="cp-hd" data-i18n="bankChartRecon">Reconciliation Progress</div><div class="cp-body"><canvas id="bnk_recon"></canvas></div></div>
+</div>
+</div>
+</div>
+</section>
+<section class="subview" id="view-integrations" style="display:none">
+<div class="grid" style="grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px">
+<div class="kpi"><div class="metric"><div class="label">Gmail</div><div class="value" data-i18n="connected">Connected</div></div></div>
+<div class="kpi"><div class="metric"><div class="label">Drive</div><div class="value" data-i18n="connected">Connected</div></div></div>
+<div class="kpi"><div class="metric"><div class="label">Telegram</div><div class="value" data-i18n="connected">Connected</div></div></div>
+</div>
+</section>
+<section class="subview" id="view-settings" style="display:none">
+<div class="cp-step"><div class="cp-hd" data-i18n="settingsProfile">Profile</div>
+<div class="cp-body">
+<div class="row">
+<div class="input"><label data-i18n="settingsName">Name</label><input placeholder="John Doe"/></div>
+<div class="input"><label data-i18n="settingsCompany">Company</label><input placeholder="Acme Inc."/></div>
+</div>
+<button class="btn btn-primary" data-i18n="settingsSave" style="margin-top:10px">Save</button>
+</div>
+</div>
+</section>
+<section class="subview" id="view-accounting" style="display:none">
+<div class="cp-step">
+<div class="cp-hd"><span data-i18n="acctTitle">🧾 Accounting &amp; Tax Dashboard</span>
+<div style="display:flex;gap:8px;margin-left:auto">
+<button class="btn btn-secondary" data-i18n="acctExportPDF">Export PDF</button>
+<button class="btn btn-secondary" data-i18n="acctExportCSV">Export CSV</button>
+<button class="btn btn-secondary" data-i18n="acctExportXLSX">Export XLSX</button>
+</div>
+</div>
+<div class="cp-body">
+<div class="kpi" id="acct-kpis">
+<div class="metric"><div class="label" data-i18n="acctRevYTD">Total Revenue (YTD)</div><div class="value">$2,450,000</div></div>
+<div class="metric"><div class="label" data-i18n="acctExpYTD">Total Expenses (YTD)</div><div class="value">$1,820,000</div></div>
+<div class="metric"><div class="label" data-i18n="acctNPM">Net Profit Margin</div><div class="value">26%</div></div>
+<div class="metric"><div class="label" data-i18n="acctCashPos">Cash Flow Position</div><div class="value">$630,000</div></div>
+</div>
+</div>
+</div>
+<div class="cp-step" id="acct-engine">
+<div class="cp-hd" data-i18n="acctEngine">⚙️ AI Engine Pipeline</div>
+<div class="cp-body services" style="grid-template-columns:repeat(auto-fit,minmax(240px,1fr))">
+<div class="scope">
+<h4 data-i18n="engOcr">OCR &amp; Parsing</h4>
+<div class="sub" data-i18n="engOcrDesc">Tesseract + PDF-Parse (+ cloud OCR fallback)</div>
+<span class="badge success" data-i18n="apiConnected">Connected</span>
+</div>
+<div class="scope">
+<h4 data-i18n="engCat">Categorization</h4>
+<div class="sub" data-i18n="engCatDesc">Baserow patterns + 20% ChatGPT‑5</div>
+<span class="badge success" data-i18n="apiConnected">Connected</span>
+</div>
+<div class="scope">
+<h4 data-i18n="engAdv">Advanced Classification</h4>
+<div class="sub" data-i18n="engAdvDesc">LangChain + RAG over Qdrant vectors</div>
+<span class="badge success" data-i18n="apiConnected">Connected</span>
+</div>
+<div class="scope">
+<h4 data-i18n="engAnom">Anomaly Detection</h4>
+<div class="sub" data-i18n="engAnomDesc">Date/amount mismatches, policy violations</div>
+<span class="badge warning" data-i18n="acctPending">Pending</span>
+</div>
+<div class="scope">
+<h4 data-i18n="engIntegrations">Accounting Platforms</h4>
+<div class="sub" data-i18n="engIntegrationsDesc">Push validated entries to QuickBooks, Xero, Odoo (via user's connection)</div>
+<span class="badge accent">API</span>
+</div>
+</div>
+<div class="note" style="margin:12px">
+<b data-i18n="engNoteTitle">Note</b> — <span data-i18n="engNoteBody">Use the client's own connection when available. A shared “CloudCFO Enterprise” account is appropriate only when CloudCFO acts as the legal bookkeeper/agent for all linked clients.</span>
+</div>
+</div>
+<div class="cp-step" id="acct-juris">
+<div class="cp-hd" data-i18n="jurisTitle">🌍 Jurisdiction Presets</div>
+<div class="cp-body">
+<div class="row">
+<div class="input" style="max-width:320px">
+<label data-i18n="jurisSelectLabel">Select jurisdiction</label>
+<select id="jurisdictionSelect">
+<option data-i18n="jurisEU" value="eu_vat">EU — VAT</option>
+<option data-i18n="jurisUK" value="uk_vat">UK — VAT</option>
+<option data-i18n="jurisMA" value="ma_tva">Morocco — TVA</option>
+<option data-i18n="jurisUS" value="us_sales">USA — Sales Tax</option></select>
+</div>
+<div class="input" style="max-width:220px; align-self:flex-end">
+<button class="btn btn-primary" data-i18n="jurisApply" id="applyJuris">Apply preset</button>
+</div>
+</div>
+<div class="note" style="margin-top:10px">
+<b data-i18n="jurisNoteTitle">What this does</b> — <span data-i18n="jurisNoteBody">Updates tax labels, filing cycles, and validation hints below. Demo only; not legal advice.</span>
+</div>
+</div>
+</div>
+<div class="grid" style="grid-template-columns:repeat(12,1fr);gap:12px">
+<div class="col-12">
+<div class="cp-step">
+<div class="cp-hd" data-i18n="acctTaxOverview">Tax Overview</div>
+<div class="cp-body services" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr))">
+<div class="scope">
+<h4><span data-i18n="acctVATGST">VAT / GST</span></h4>
+<div class="sub"><b data-i18n="acctLiability"><span data-i18n="acctLiability">Liability</span></b>: $48,900</div>
+<div class="sub"><b data-i18n="acctDue"><span data-i18n="acctDue">Due in</span></b>: 12 days</div>
+<span class="badge success" data-i18n="acctFiled">Filed</span>
+</div>
+<div class="scope">
+<h4 data-i18n="acctCorpTax">Corporate Tax</h4>
+<div class="sub"><b data-i18n="acctLiability"><span data-i18n="acctLiability">Liability</span></b>: $120,000</div>
+<div class="sub"><b data-i18n="acctDue"><span data-i18n="acctDue">Due in</span></b>: 28 days</div>
+<span class="badge warning" data-i18n="acctPending">Pending</span>
+</div>
+<div class="scope">
+<h4 data-i18n="acctPayrollTax">Payroll Taxes</h4>
+<div class="sub"><b data-i18n="acctLiability"><span data-i18n="acctLiability">Liability</span></b>: $22,300</div>
+<div class="sub"><b data-i18n="acctDue"><span data-i18n="acctDue">Due in</span></b>: 5 days</div>
+<span class="badge" data-i18n="acctOverdue" style="background:rgba(239,68,68,.15);color:#ef4444">Overdue</span>
+</div>
+</div>
+</div>
+<div class="cp-step" id="acct-validate">
+<div class="cp-hd" data-i18n="validateTitle">✅ Validation Checklist</div>
+<div class="cp-body">
+<p class="sub" data-i18n="validateSub">Automated checks based on your selected jurisdiction. Demo only; not legal advice.</p>
+<ul id="validateList" style="margin:0; padding-left:18px; display:grid; gap:8px"></ul>
+<div class="note" style="margin-top:10px">
+<b data-i18n="validateNoteTitle">Tip</b> — <span data-i18n="validateNoteBody">Click any item to view action tips.</span>
+</div>
+</div>
+</div>
+</div>
+<div class="col-6">
+<div class="cp-step">
+<div class="cp-hd" data-i18n="acctChartRevExp">Revenue vs Expenses</div>
+<div class="cp-body"><canvas id="acct_revexp"></canvas></div>
+</div>
+</div>
+<div class="col-6">
+<div class="cp-step">
+<div class="cp-hd" data-i18n="acctChartCashForecast">Cash Flow Forecast</div>
+<div class="cp-body"><canvas id="acct_cashforecast"></canvas></div>
+</div>
+</div>
+<div class="col-6">
+<div class="cp-step">
+<div class="cp-hd" data-i18n="acctChartTaxBreakdown">Tax Liability Breakdown</div>
+<div class="cp-body"><canvas id="acct_taxdonut"></canvas></div>
+</div>
+</div>
+<div class="col-6">
+<div class="cp-step">
+<div class="cp-hd" data-i18n="acctChartARAging">A/R Aging</div>
+<div class="cp-body"><canvas id="acct_araging"></canvas></div>
+</div>
+</div>
+<div class="col-12">
+<div class="cp-step" id="acct-nlq-box">
+<div class="cp-hd" data-i18n="nlqTitle">🔎 Ask your data (Natural Language)</div>
+<div class="cp-body">
+<div class="row">
+<div class="input" style="flex:2">
+<label data-i18n="nlqLabel">Query</label>
+<input data-i18n-ph="nlqPlaceholder" id="acct-nlq" placeholder="e.g. show unreconciled VAT invoices from Q2" type="text"/>
+</div>
+<div class="input" style="max-width:220px; align-self:flex-end">
+<button class="btn btn-primary" data-i18n="nlqRun" id="acct-nlq-run">Run</button>
+</div>
+</div>
+<div class="sub" data-i18n="nlqHint" style="margin-top:8px">Hint: we’ll parse keywords like VAT/GST, status (pending/overdue), and periods (Q1, Q2, last month) to filter results below (demo).</div>
+</div>
+</div>
+<div class="cp-step">
+<div class="cp-hd" data-i18n="acctReports">Reports</div>
+<div class="cp-body">
+<div style="display:flex;gap:8px;margin-bottom:10px">
+<button class="btn btn-primary" data-i18n="acctPL">P&amp;L</button>
+<button class="btn btn-primary" data-i18n="acctBS">Balance Sheet</button>
+<button class="btn btn-primary" data-i18n="acctCF">Cash Flow</button>
+<button class="btn btn-primary" data-i18n="acctTaxHistory">Tax Filing History</button>
+</div>
+<table class="table">
+<thead>
+<tr>
+<th data-i18n="thDate">Date</th>
+<th data-i18n="acctDesc">Description</th>
+<th data-i18n="thCategory">Category</th>
+<th data-i18n="thAmount">Amount</th>
+<th data-i18n="acctTaxType">Tax Type</th>
+<th data-i18n="thStatus">Status</th>
+<th data-i18n="thInvoice">Invoice</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2025-07-31</td><td><span data-i18n="acctQ3VATReturn">Q3 VAT Return</span></td><td>VAT/GST</td><td>$48,900</td>
+<td><span data-i18n="acctVAT">VAT</span></td><td><span class="badge success" data-i18n="acctFiled">Filed</span></td><td>VAT-Q3-2025.pdf</td>
+</tr>
+<tr>
+<td>2025-08-02</td><td><span data-i18n="acctMonthlyPayroll">Monthly Payroll Withholding</span></td><td><span data-i18n="acctPayroll">Payroll</span></td><td>$22,300</td>
+<td><span data-i18n="acctPayroll">Payroll</span></td><td><span class="badge warning" data-i18n="acctPending">Pending</span></td><td>PAY-0825.pdf</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+</div>
+</div>
+<!-- EXPORT VIEW -->
+<div class="view" id="download">
+<div class="section" style="text-align:center">
+<h2 data-i18n="dlTitle">Download this app</h2>
+<p class="sub" data-i18n="dlSub">Save a single HTML you can run locally.</p>
+<button class="btn btn-primary" data-i18n="dlBtn" onclick="downloadSelf()">📥 Download HTML</button>
+<p class="sub" data-i18n="dlTip" style="margin-top:10px">Tip: you can also press <b>Ctrl/Cmd + S</b>.</p>
+</div>
+</div>
+<!-- Mobile helpers -->
+<div class="mobile-nav" id="mnav" style="display:none">
+<button data-i18n="home" data-jump="#general">Home</button>
+<button data-i18n="why" data-jump="#differentiators">Why</button>
+<button data-i18n="signup" data-jump="#signup">Sign‑up</button>
+</div>
+<button class="fab" id="fab" style="display:none" title="Quick upload">＋</button>
+<script>
+  // Simple router for top tabs
+  document.querySelectorAll('.pill').forEach(p=>{
+    p.addEventListener('click', ()=>{
+      document.querySelectorAll('.pill').forEach(x=>x.classList.remove('active'));
+      p.classList.add('active');
+      const t = p.dataset.tab;
+      document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+      document.getElementById(t).classList.add('active');
+      if(t==='dashboard'){ setTimeout(initDashboardCharts, 0); }
+      if(t==='landing'){ setTimeout(initSparklines, 0); }
+    });
+  });
+
+  // Dashboard sidebar
+  document.querySelectorAll('.sidebar .nav-item').forEach(n=> n.addEventListener('click', ()=>{
+    document.querySelectorAll('.sidebar .nav-item').forEach(x=>x.classList.remove('active'));
+    n.classList.add('active');
+    const target = 'view-'+n.dataset.sub;
+    document.querySelectorAll('.subview').forEach(v=> v.style.display='none');
+    document.getElementById(target).style.display='block';
+  }));
+
+  // i18n — GLOBAL (Landing + Dashboard + Export)
+  const i18n = {
+    en: {
+      topLanding:"Landing", topDashboard:"Dashboard", topExport:"Export",
+      navGeneral:"General", navDiff:"Differentiators", navSignup:"Sign‑up & Integrations",
+      badgeSoc2:"SOC2‑ready", badgeOcr:"Sub‑second OCR", badgeCarbon:"Carbon Passport",
+      heroTitle:"Your AI‑Powered CFO in the Cloud",
+      heroSub:"Connect email, drives, and chats — CloudCFO auto‑discovers receipts, extracts data in <b>&lt;500ms</b>, and turns them into real‑time insights and a 🌱 Carbon Passport.",
+      btnConnect:"🔍 Connect your accounts", btnUpload:"📤 Quick upload",
+      worksWith:"Works with: Gmail · Drive · Dropbox · WhatsApp · Telegram",
+      metricTotalExpenses:"Total Expenses", metricCarbon:"Carbon this month", metricDocs:"Docs processed", metricHit:"Hit rate", metricAccSla:"✓ Accuracy SLA",
+      whyTitle:"Why CloudCFO", whySub:"AI‑first financial automation, native chat integrations, and built‑in carbon intelligence.",
+      featAI:"AI‑First Extraction", featAIDesc:"Advanced LLM + vision pipeline delivers <b>sub‑second</b> processing and self‑learning patterns.",
+      featChat:"WhatsApp & Telegram Native", featChatDesc:"Send a photo, we do the rest — the fastest way to capture receipts on mobile.",
+      featCarbon:"Carbon Passport", featCarbonDesc:"Automatic Scope 1/2/3 mapping from invoices with downloadable, verifiable passports.",
+      featDev:"Developer‑Friendly", featDevDesc:"Clean APIs & webhooks, great docs, and thoughtful defaults inspired by Stripe.",
+      signupTitle:"Sign‑up & Connect your channels", signupSub:"Choose any intake source below. We’ll start auto‑discovering receipts instantly.",
+      found:"found", accuracy:"Accuracy", connected:"Connected", connect:"Connect",
+      outlookDesc:"Import from Microsoft email", dropboxDesc:"Scan selected folders", waDesc:"Forward photos or PDFs",
+      home:"Home", why:"Why", signup:"Sign‑up",
+      // Dashboard Sidebar
+      sbOverview:"Overview", sbReports:"Financial Reports", sbPassport:"Carbon Passport", sbBanking:"Banking", sbIntegrations:"Integrations", sbSettings:"Settings",
+      sbPlan:"Pro Plan", sbDocs:"docs this month",
+      // Dashboard KPIs & Charts
+      metricTax:"Tax Deductions", metricCO2Month:"CO₂e (month)",
+      ovLineTitle:"Monthly Revenue vs Expenses", ovBarTitle:"Monthly Users",
+      repPnl:"P&L (Monthly)", repTopCats:"Top Categories", repCash:"Cash In vs Out",
+      // Carbon Passport
+      cpStep1:"1 • Select Product", cpViewAnalytics:"📊 View Analytics",
+      cpProduct:"Product", cpStart:"Manufacturing Start", cpEnd:"Manufacturing End", cpVolume:"Production Volume",
+      cpStep2:"2 • Related Invoices & Scope Classification",
+      scope1:"Scope 1", scope2:"Scope 2", scope3:"Scope 3",
+      scope1desc:"Direct Emissions", scope2desc:"Energy Indirect", scope3desc:"Other Indirect",
+      thInvoice:"Invoice", thVendor:"Vendor", thCategory:"Category", thAmount:"Amount", thScope:"Scope", thConfidence:"Confidence",
+      catElectricity:"Electricity", catRaw:"Raw Materials", catFuel:"Vehicle Fuel",
+      missingTitle:"Missing Critical Invoices Detected", missingWaste:"Waste management invoice for production period", missingTransport:"Transportation invoice for finished goods delivery",
+      btnUploadMissing:"📤 Upload Missing Invoices",
+      cpStep3:"3 • Carbon Calculation", apiEnergy:"EPA Energy Emissions API", apiTransport:"Transport Emissions Calculator", apiWaste:"Waste Processing Factors", apiMaterials:"Material Lifecycle DB", apiConnected:"Connected", apiConnecting:"Connecting…",
+      btnCalc:"⚙️ Calculate Carbon Footprint",
+      calcDone:"Calculation Complete ✓", totalCF:"Total Carbon Footprint", perUnit:"Per Unit", emissionBreakdown:"Emission Breakdown",
+      btnDlPassport:"⬇️ Download Carbon Passport (PDF)", btnGenQR:"� QR • Generate Verification",
+      // Banking
+      bankMain:"Main Balance", bankSavings:"Savings", bankPayroll:"Payroll", bankTaxes:"Taxes",
+      // Settings
+      settingsProfile:"Profile", settingsName:"Name", settingsCompany:"Company", settingsSave:"Save",
+      // Export
+      dlTitle:"Download this app", dlSub:"Save a single HTML you can run locally.", dlBtn:"📥 Download HTML", dlTip:"Tip: you can also press <b>Ctrl/Cmd + S</b>."
+    },
+    fr: {
+      topLanding:"Accueil", topDashboard:"Tableau de bord", topExport:"Export",
+      navGeneral:"Général", navDiff:"Différenciateurs", navSignup:"Inscription & Intégrations",
+      badgeSoc2:"Prêt pour SOC2", badgeOcr:"OCR en dessous d’1s", badgeCarbon:"Passeport Carbone",
+      heroTitle:"Votre CFO alimenté par l’IA, dans le cloud",
+      heroSub:"Connectez e‑mails, drives et messageries — CloudCFO découvre automatiquement les reçus, extrait les données en <b>&lt;500ms</b> et les transforme en insights temps réel et en 🌱 Passeport Carbone.",
+      btnConnect:"🔍 Connecter vos comptes", btnUpload:"📤 Téléversement rapide",
+      worksWith:"Fonctionne avec : Gmail · Drive · Dropbox · WhatsApp · Telegram",
+      metricTotalExpenses:"Dépenses totales", metricCarbon:"Carbone du mois", metricDocs:"Documents traités", metricHit:"Taux de réussite", metricAccSla:"✓ SLA de précision",
+      whyTitle:"Pourquoi CloudCFO", whySub:"Automatisation financière IA‑first, intégrations de messagerie natives et intelligence carbone intégrée.",
+      featAI:"Extraction IA‑First", featAIDesc:"Pipeline LLM + vision offrant un traitement <b>sub‑seconde</b> et des modèles auto‑apprenants.",
+      featChat:"Natif WhatsApp & Telegram", featChatDesc:"Envoyez une photo, on s’occupe du reste — la manière la plus rapide de capturer des reçus sur mobile.",
+      featCarbon:"Passeport Carbone", featCarbonDesc:"Cartographie automatique des Scopes 1/2/3 à partir des factures avec passeports téléchargeables et vérifiables.",
+      featDev:"Pensé pour les développeurs", featDevDesc:"APIs & webhooks clairs, excellente doc et bons défauts inspirés de Stripe.",
+      signupTitle:"Inscrivez‑vous & connectez vos canaux", signupSub:"Choisissez une source ci‑dessous. Nous commencerons la découverte des reçus immédiatement.",
+      found:"trouvés", accuracy:"Précision", connected:"Connecté", connect:"Connecter",
+      outlookDesc:"Import depuis Microsoft email", dropboxDesc:"Scanner des dossiers sélectionnés", waDesc:"Transférez des photos ou PDF",
+      home:"Accueil", why:"Pourquoi", signup:"Inscription",
+      // Dashboard Sidebar
+      sbOverview:"Vue d’ensemble", sbReports:"Rapports financiers", sbPassport:"Passeport Carbone", sbBanking:"Banque", sbIntegrations:"Intégrations", sbSettings:"Paramètres",
+      sbPlan:"Offre Pro", sbDocs:"docs ce mois‑ci",
+      // Dashboard KPIs & Charts
+      metricTax:"Déductions fiscales", metricCO2Month:"CO₂e (mois)",
+      ovLineTitle:"Revenus vs Dépenses mensuels", ovBarTitle:"Utilisateurs mensuels",
+      repPnl:"Compte de résultat (mensuel)", repTopCats:"Catégories principales", repCash:"Entrées vs Sorties de trésorerie",
+      // Carbon Passport
+      cpStep1:"1 • Sélectionner un produit", cpViewAnalytics:"📊 Voir l’analytique",
+      cpProduct:"Produit", cpStart:"Début de fabrication", cpEnd:"Fin de fabrication", cpVolume:"Volume de production",
+      cpStep2:"2 • Factures liées & classification des scopes",
+      scope1:"Scope 1", scope2:"Scope 2", scope3:"Scope 3",
+      scope1desc:"Émissions directes", scope2desc:"Énergie indirecte", scope3desc:"Autres indirectes",
+      thInvoice:"Facture", thVendor:"Fournisseur", thCategory:"Catégorie", thAmount:"Montant", thScope:"Scope", thConfidence:"Confiance",
+      catElectricity:"Électricité", catRaw:"Matières premières", catFuel:"Carburant véhicules",
+      missingTitle:"Factures critiques manquantes détectées", missingWaste:"Facture de gestion des déchets pour la période de production", missingTransport:"Facture de transport pour la livraison des produits finis",
+      btnUploadMissing:"📤 Téléverser les factures manquantes",
+      cpStep3:"3 • Calcul carbone", apiEnergy:"API des émissions d’énergie (EPA)", apiTransport:"Calculateur d’émissions de transport", apiWaste:"Facteurs de traitement des déchets", apiMaterials:"BD cycle de vie des matériaux", apiConnected:"Connecté", apiConnecting:"Connexion…",
+      btnCalc:"⚙️ Calculer l’empreinte carbone",
+      calcDone:"Calcul terminé ✓", totalCF:"Empreinte carbone totale", perUnit:"Par unité", emissionBreakdown:"Répartition des émissions",
+      btnDlPassport:"⬇️ Télécharger le Passeport Carbone (PDF)", btnGenQR:"� QR • Générer la vérification",
+      // Banking
+      bankMain:"Solde principal", bankSavings:"Épargne", bankPayroll:"Paie", bankTaxes:"Impôts",
+      // Settings
+      settingsProfile:"Profil", settingsName:"Nom", settingsCompany:"Société", settingsSave:"Enregistrer",
+      // Export
+      dlTitle:"Télécharger cette application", dlSub:"Enregistrez un seul fichier HTML exécutable en local.", dlBtn:"📥 Télécharger l’HTML", dlTip:"Astuce : vous pouvez aussi faire <b>Ctrl/Cmd + S</b>."
+    }
+  };
+  let lang='en';
+  function applyI18n(){
+    document.querySelectorAll('[data-i18n]').forEach(el=>{
+      const key = el.getAttribute('data-i18n');
+      if(i18n[lang][key]) el.innerHTML = i18n[lang][key];
+    
+  applyI18nPlaceholders();
+});
+    document.getElementById('btnEN').classList.toggle('active', lang==='en');
+    document.getElementById('btnFR').classList.toggle('active', lang==='fr');
+    document.getElementById('fab').title = lang==='en' ? 'Quick upload' : 'Téléversement rapide';
+    // Update charts with current language
+    if(window._chartsInitialized){ updateChartLabels(); }
+  }
+  document.getElementById('btnEN').onclick = ()=>{lang='en'; applyI18n();
+
+// Missing/extended keys for full FR coverage (Accounting & Tax etc.)
+i18n.en.sbAccountingTax = "Accounting & Tax";
+i18n.fr.sbAccountingTax = "Comptabilité & Impôts";
+
+i18n.en.acctCF = "Cash Flow";
+i18n.fr.acctCF = "Trésorerie";
+
+i18n.en.acctChartRevExp = "Revenue vs Expenses";
+i18n.fr.acctChartRevExp = "Revenus vs Dépenses";
+
+i18n.en.acctChartCashForecast = "Cash Flow Forecast";
+i18n.fr.acctChartCashForecast = "Prévision de trésorerie";
+
+i18n.en.acctChartTaxBreakdown = "Tax Liability Breakdown";
+i18n.fr.acctChartTaxBreakdown = "Répartition des impôts";
+
+i18n.en.acctChartARAging = "A/R Aging";
+i18n.fr.acctChartARAging = "Ancienneté des comptes clients";
+
+i18n.en.acctReports = "Reports";
+i18n.fr.acctReports = "Rapports";
+
+i18n.en.acctVAT = "VAT";
+i18n.fr.acctVAT = "TVA";
+
+i18n.en.acctPayroll = "Payroll";
+i18n.fr.acctPayroll = "Paie";
+
+i18n.en.jurisSelectLabel = i18n.en.jurisSelectLabel || "Select jurisdiction";
+i18n.fr.jurisSelectLabel = i18n.fr.jurisSelectLabel || "Sélectionner la juridiction";
+
+// Natural Language Query placeholder
+i18n.en.nlqPlaceholder = "e.g. show unreconciled VAT invoices from Q2";
+i18n.fr.nlqPlaceholder = "ex.: afficher les factures TVA non lettrées du T2";
+};
+  document.getElementById('btnFR').onclick = ()=>{lang='fr'; applyI18n();};
+
+  // Landing micro‑interactions
+  document.getElementById('connectBtn').addEventListener('click', ()=>document.querySelector('#signup').scrollIntoView({behavior:'smooth'}));
+  document.getElementById('uploadBtn').addEventListener('click', ()=>alert(lang==='en'?'Open file picker (demo).':'Ouvrir le sélecteur de fichiers (démo).'));
+
+  // Mobile helpers visibility
+  const mq = window.matchMedia('(max-width: 980px)');
+  const toggleMobile = () => {
+    const show = mq.matches;
+    document.getElementById('mnav').style.display = show ? 'flex' : 'none';
+    document.getElementById('fab').style.display = show ? 'block' : 'none';
+  };
+  toggleMobile(); mq.addEventListener('change', toggleMobile);
+
+  document.querySelectorAll('.connect').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      if(btn.textContent.includes('✓')) return;
+      btn.innerHTML = '✓ ' + (lang==='en' ? i18n.en.connected : i18n.fr.connected);
+      btn.closest('.svc').classList.add('connected');
+    });
+  });
+
+  // Sparklines on landing device
+  function initSparklines(){
+    const ctx1 = document.getElementById('spark1')?.getContext('2d');
+    const ctx2 = document.getElementById('spark2')?.getContext('2d');
+    if(!ctx1 || !ctx2) return;
+    const grad = (ctx, c1, c2)=>{ const g = ctx.createLinearGradient(0,0,0,100); g.addColorStop(0, c1); g.addColorStop(1, c2); return g; };
+    const common = {plugins:{legend:{display:false}, tooltip:{backgroundColor:'rgba(255,255,255,.6)', titleColor:'#0a1628', bodyColor:'#0a1628', borderColor:'rgba(0,0,0,.1)', borderWidth:1, padding:10}}, scales:{x:{display:false}, y:{display:false}}, elements:{line:{tension:.4, borderWidth:2}, point:{radius:0}}};
+    new Chart(ctx1, {type:'line', data:{labels:[...Array(16).keys()], datasets:[{data:[8,9,8,10,12,13,12,14,16,15,16,18,16,19,18,20], borderColor:'#7dc5ff', fill:true, backgroundColor:grad(ctx1, 'rgba(125,197,255,.5)','rgba(125,197,255,0)')} ]}, options: common});
+    new Chart(ctx2, {type:'line', data:{labels:[...Array(16).keys()], datasets:[{data:[2.8,2.6,2.5,2.7,2.4,2.3,2.5,2.2,2.1,2.3,2.2,2.0,2.1,2.0,2.4,2.4], borderColor:'#7fffd4', fill:true, backgroundColor:grad(ctx2, 'rgba(127,255,212,.45)','rgba(127,255,212,0)')}]}, options: common});
+  }
+  initSparklines();
+
+  // Dashboard charts
+  let dashInit=false;
+  let _charts = {};
+  function initDashboardCharts(){
+    if(dashInit) return; dashInit=true;
+    window._chartsInitialized = true;
+    _charts.ov_line = new Chart(document.getElementById('ov_line'),{
+      type:'line',
+      data:{labels:['Jan','Mar','May','Jul','Sep','Nov'],
+        datasets:[{label: i18n[lang].repRevenue || 'Revenue', data:[70,85,120,150,170,200], borderColor:'#0066FF',tension:.3,fill:false},
+                  {label: i18n[lang].repExpenses || 'Expenses', data:[40,50,60,70,85,95], borderColor:'#10B981',tension:.3,fill:false}]},
+      options:{plugins:{legend:{position:'bottom'}},scales:{y:{grid:{color:'rgba(0,0,0,.06)'}}}}
+    });
+    _charts.ov_bar = new Chart(document.getElementById('ov_bar'),{
+      type:'bar',
+      data:{labels:['Jan','Mar','May','Jul','Sep','Nov'],
+        datasets:[{label: i18n[lang].repActiveUsers || 'Active Users', data:[120,240,380,560,720,900],backgroundColor:'#0891B2'}]},
+      options:{plugins:{legend:{display:false}},scales:{y:{grid:{color:'rgba(0,0,0,.06)'}}}}
+    });
+    _charts.rep_pnl = new Chart(document.getElementById('rep_pnl'),{
+      type:'bar',
+      data:{labels:['Jan','Feb','Mar','Apr','May','Jun'],
+        datasets:[{label: i18n[lang].repRevenue || 'Revenue',data:[45,50,58,62,70,76],backgroundColor:'#0066FF'},
+                  {label: i18n[lang].repCogs || 'COGS',data:[18,20,21,22,25,28],backgroundColor:'#9CA3AF'},
+                  {label: i18n[lang].repOpex || 'OpEx',data:[12,13,14,15,16,17],backgroundColor:'#10B981'}]},
+      options:{plugins:{legend:{position:'bottom'}},scales:{y:{grid:{color:'rgba(0,0,0,.06)'}}}}
+    });
+    _charts.rep_doughnut = new Chart(document.getElementById('rep_doughnut'),{
+      type:'doughnut',
+      data:{labels:[i18n[lang].lblPayroll || 'Payroll', i18n[lang].lblInfra || 'Infra', i18n[lang].lblMkt || 'Marketing', i18n[lang].lblGA || 'G&A'],
+        datasets:[{data:[45,20,22,13],backgroundColor:['#0066FF','#0891B2','#10B981','#F59E0B']}]},
+      options:{plugins:{legend:{position:'bottom'}}}
+    });
+    _charts.rep_cash = new Chart(document.getElementById('rep_cash'),{
+      type:'bar',
+      data:{labels:['Jan','Feb','Mar','Apr','May','Jun'],
+        datasets:[{label: i18n[lang].lblCashIn || 'Cash In',data:[20,24,26,28,34,36],backgroundColor:'#10B981'},
+                  {label: i18n[lang].lblCashOut || 'Cash Out',data:[18,19,22,24,26,29],backgroundColor:'#FF6B6B'}]},
+      options:{plugins:{legend:{position:'bottom'}}}
+    });
+  }
+
+  // additional labels for charts
+  i18n.en.repRevenue = "Revenue"; i18n.fr.repRevenue = "Revenus";
+  i18n.en.repExpenses = "Expenses"; i18n.fr.repExpenses = "Dépenses";
+  i18n.en.repCogs = "COGS"; i18n.fr.repCogs = "Coût des ventes";
+  i18n.en.repOpex = "OpEx"; i18n.fr.repOpex = "Charges d'exploitation";
+  i18n.en.lblPayroll = "Payroll"; i18n.fr.lblPayroll = "Paie";
+  i18n.en.lblInfra = "Infra"; i18n.fr.lblInfra = "Infra";
+  i18n.en.lblMkt = "Marketing"; i18n.fr.lblMkt = "Marketing";
+  i18n.en.lblGA = "G&A"; i18n.fr.lblGA = "Frais généraux";
+  i18n.en.lblCashIn = "Cash In"; i18n.fr.lblCashIn = "Entrées";
+  i18n.en.lblCashOut = "Cash Out"; i18n.fr.lblCashOut = "Sorties";
+  i18n.en.repActiveUsers = "Active Users"; i18n.fr.repActiveUsers = "Utilisateurs actifs";
+
+  function updateChartLabels(){
+    if(!_charts.ov_line) return;
+    _charts.ov_line.data.datasets[0].label = i18n[lang].repRevenue;
+    _charts.ov_line.data.datasets[1].label = i18n[lang].repExpenses;
+    _charts.ov_line.update();
+
+    _charts.ov_bar.data.datasets[0].label = i18n[lang].repActiveUsers;
+    _charts.ov_bar.update();
+
+    _charts.rep_pnl.data.datasets[0].label = i18n[lang].repRevenue;
+    _charts.rep_pnl.data.datasets[1].label = i18n[lang].repCogs;
+    _charts.rep_pnl.data.datasets[2].label = i18n[lang].repOpex;
+    _charts.rep_pnl.update();
+
+    _charts.rep_doughnut.data.labels = [i18n[lang].lblPayroll, i18n[lang].lblInfra, i18n[lang].lblMkt, i18n[lang].lblGA];
+    _charts.rep_doughnut.update();
+
+    _charts.rep_cash.data.datasets[0].label = i18n[lang].lblCashIn;
+    _charts.rep_cash.data.datasets[1].label = i18n[lang].lblCashOut;
+    _charts.rep_cash.update();
+  }
+
+  // Carbon Passport interactions
+  document.getElementById('calcBtn').addEventListener('click', ()=>{
+    const res = document.getElementById('cpResult');
+    res.style.display='block';
+    res.scrollIntoView({behavior:'smooth'});
+  });
+  document.getElementById('dlPassport').addEventListener('click', ()=>{
+    alert(lang==='en'?'Demo: generate a PDF passport here.':'Démo : générer ici un PDF du passeport.');
+  });
+  document.getElementById('mkQR').addEventListener('click', ()=>{
+    alert(lang==='en'?'Demo: generate a verification QR code.':'Démo : générer un QR de vérification.');
+  });
+
+  // Download this HTML
+  function downloadSelf(){
+    const blob=new Blob([document.documentElement.outerHTML],{type:'text/html'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a'); a.href=url; a.download='CloudCFO-App-Bilingual-AccountingTax-FullFR_v16.html'; a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  applyI18n();
+</script>
+<script>
+// Banking dashboard charts
+function initBankingCharts(){
+  if(window._bankingChartsInitialized) return;
+  window._bankingChartsInitialized = true;
+  new Chart(document.getElementById('bnk_inout'), {
+    type: 'bar',
+    data: {
+      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+      datasets: [
+        {label: lang==='en' ? 'Incoming' : 'Entrées', data: [12000, 15000, 10000, 18000, 14000, 20000], backgroundColor: '#10B981'},
+        {label: lang==='en' ? 'Outgoing' : 'Sorties', data: [8000, 9000, 7000, 11000, 9500, 12000], backgroundColor: '#FF6B6B'}
+      ]
+    },
+    options: {plugins:{legend:{position:'bottom'}}, scales:{y:{grid:{color:'rgba(0,0,0,.06)'}}}}
+  });
+  new Chart(document.getElementById('bnk_recon'), {
+    type: 'doughnut',
+    data: {
+      labels: [lang==='en' ? 'Reconciled' : 'Lettré', lang==='en' ? 'Pending' : 'En attente', lang==='en' ? 'Mismatch' : 'Écart'],
+      datasets: [{
+        data: [86, 10, 4],
+        backgroundColor: ['#10B981', '#F59E0B', '#FF6B6B']
+      }]
+    },
+    options: {plugins:{legend:{position:'bottom'}}}
+  });
+}
+
+// Extend to call banking charts when Banking tab is opened
+document.querySelectorAll('.sidebar .nav-item[data-sub="banking"]').forEach(n => {
+  n.addEventListener('click', ()=>{ setTimeout(initBankingCharts, 0); });
+});
+
+// Extend i18n dictionary
+i18n.en.bankingTitle = "🏦 Banking Dashboard";
+i18n.fr.bankingTitle = "🏦 Tableau de bord bancaire";
+i18n.en.bankTotalBalance = "Total Balance";
+i18n.fr.bankTotalBalance = "Solde total";
+i18n.en.bankIncoming = "Incoming (MTD)";
+i18n.fr.bankIncoming = "Entrées (MTD)";
+i18n.en.bankOutgoing = "Outgoing (MTD)";
+i18n.fr.bankOutgoing = "Sorties (MTD)";
+i18n.en.bankReconciliation = "Reconciliation Rate";
+i18n.fr.bankReconciliation = "Taux de lettrage";
+i18n.en.bankConnections = "Bank Connections";
+i18n.fr.bankConnections = "Connexions bancaires";
+i18n.en.pending = "Pending";
+i18n.fr.pending = "En attente";
+i18n.en.error = "Error";
+i18n.fr.error = "Erreur";
+i18n.en.bankTransactions = "Transactions";
+i18n.fr.bankTransactions = "Transactions";
+i18n.en.thDate = "Date";
+i18n.fr.thDate = "Date";
+i18n.en.thAccount = "Bank Account";
+i18n.fr.thAccount = "Compte bancaire";
+i18n.en.thVendor = "Vendor";
+i18n.fr.thVendor = "Fournisseur";
+i18n.en.thAmount = "Amount";
+i18n.fr.thAmount = "Montant";
+i18n.en.thStatus = "Status";
+i18n.fr.thStatus = "Statut";
+i18n.en.reconciled = "Reconciled";
+i18n.fr.reconciled = "Lettré";
+i18n.en.mismatch = "Mismatch";
+i18n.fr.mismatch = "Écart";
+i18n.en.bankChartInOut = "Incoming vs Outgoing";
+i18n.fr.bankChartInOut = "Entrées vs Sorties";
+i18n.en.bankChartRecon = "Reconciliation Progress";
+i18n.fr.bankChartRecon = "Progression du lettrage";
+
+// === Accounting & Tax charts ===
+let _acctChartsInit = false;
+function initAccountingCharts(){
+  if(_acctChartsInit) return; _acctChartsInit = true;
+  // Revenue vs Expenses (line)
+  new Chart(document.getElementById('acct_revexp'), {
+    type: 'line',
+    data: {
+      labels: ['Jan','Feb','Mar','Apr','May','Jun'],
+      datasets: [
+        {label: i18n[lang].repRevenue || 'Revenue', data: [320, 360, 410, 450, 510, 560], borderColor:'#0066FF', tension:.35},
+        {label: i18n[lang].repExpenses || 'Expenses', data: [220, 240, 280, 300, 340, 380], borderColor:'#10B981', tension:.35}
+      ]
+    },
+    options: {plugins:{legend:{position:'bottom'}}, scales:{y:{grid:{color:'rgba(0,0,0,.06)'}}}, animation:{duration:1500, easing:'easeOutQuart'}}
+  });
+
+  // Cash Flow Forecast (area)
+  const ctxCF = document.getElementById('acct_cashforecast').getContext('2d');
+  const gradCF = ctxCF.createLinearGradient(0,0,0,220);
+  gradCF.addColorStop(0,'rgba(0,102,255,.35)'); gradCF.addColorStop(1,'rgba(0,102,255,0)');
+  new Chart(ctxCF, {
+    type: 'line',
+    data: { labels:['Jul','Aug','Sep','Oct','Nov','Dec'],
+      datasets:[{label: i18n[lang].acctCF || 'Cash Flow', data:[120,160,140,190,210,240], borderColor:'#0066FF', backgroundColor: gradCF, fill:true, tension:.35}]},
+    options: {plugins:{legend:{display:false}}, scales:{y:{grid:{color:'rgba(0,0,0,.06)'}}}, animation:{duration:1500, easing:'easeOutQuart'}}
+  });
+
+  // Tax Liability Breakdown (donut)
+  new Chart(document.getElementById('acct_taxdonut'), {
+    type: 'doughnut',
+    data: { labels:['VAT/GST', i18n[lang].acctCorpTax, i18n[lang].acctPayrollTax], datasets:[{data:[45,35,20], backgroundColor:['#0891B2','#F59E0B','#FF6B6B']}] },
+    options: {plugins:{legend:{position:'bottom'}}, animation:{animateRotate:true, animateScale:true, duration:1200, easing:'easeOutBounce'}}
+  });
+
+  // A/R Aging (bar)
+  new Chart(document.getElementById('acct_araging'), {
+    type: 'bar',
+    data: { labels:['0–30','31–60','61–90','90+'], datasets:[{label:i18n[lang].acctChartARAging, data:[180,120,80,40], backgroundColor:'#10B981'}] },
+    options: {plugins:{legend:{display:false}}, scales:{y:{grid:{color:'rgba(0,0,0,.06)'}}}, animation:{duration:1200, easing:'easeOutQuart'}}
+  });
+}
+
+// Animated counters for Accounting KPIs
+function animateAccountingKPIs(){
+  document.querySelectorAll('#acct-kpis .metric .value').forEach(el => {
+    const raw = el.textContent.trim();
+    const hasCurrency = raw.includes('$');
+    const hasPercent = raw.includes('%');
+    const target = parseFloat(raw.replace(/[^0-9\.]/g, '')) || 0;
+    let start = 0;
+    const duration = 1200;
+    const steps = 60;
+    const inc = target / steps;
+    let i = 0;
+    const timer = setInterval(()=>{
+      i++;
+      start += inc;
+      if(i >= steps){ start = target; clearInterval(timer); }
+      const num = Math.round(start).toLocaleString();
+      el.textContent = (hasCurrency ? '$' : '') + num + (hasPercent ? '%' : '');
+    }, duration/steps);
+  });
+}
+
+// Hook into sidebar click
+document.querySelectorAll('.sidebar .nav-item[data-sub="accounting"]').forEach(n => {
+  n.addEventListener('click', ()=>{ setTimeout(()=>{ initAccountingCharts(); animateAccountingKPIs(); }, 50); });
+});
+
+// === NLQ demo filtering for Accounting Reports ===
+document.getElementById('acct-nlq-run')?.addEventListener('click', ()=>{
+  const q = (document.getElementById('acct-nlq')?.value || '').toLowerCase();
+  const rows = document.querySelectorAll('#view-accounting table.table tbody tr');
+  rows.forEach(tr=>{
+    const txt = tr.innerText.toLowerCase();
+    tr.style.display = txt.includes(q) ? '' : 'none';
+  });
+});
+
+// Ensure accounting charts & KPI animations run when tab opens (in case not already set)
+document.querySelectorAll('.sidebar .nav-item[data-sub="accounting"]').forEach(n => {
+  n.addEventListener('click', ()=>{ setTimeout(()=>{ initAccountingCharts?.(); animateAccountingKPIs?.(); }, 50); });
+});
+
+// === Jurisdiction preset application ===
+(function(){
+  function applyJurisdictionPreset(code){
+    const cfg = (i18n[lang] && i18n[lang].juris_cfg && i18n[lang].juris_cfg[code]) || null;
+    const accView = document.getElementById('view-accounting');
+    if(!cfg || !accView) return;
+    // Update Tax Overview primary label (VAT/TVA)
+    const taxCards = accView.querySelectorAll('.cp-step .cp-body.services .scope h4');
+    if(taxCards && taxCards[0]){
+      taxCards[0].textContent = cfg.tax1; // "VAT" or "TVA"
+    }
+    // Update due cycle text inside the three tax cards
+    const dues = accView.querySelectorAll('.cp-step .cp-body.services .scope .sub b[data-i18n="acctDue"]');
+    dues.forEach(b => {
+      // Replace the following text node "Due in" or "Échéance" sibling to include cycle hint
+      const wrap = b.parentElement;
+      if(wrap){
+        const base = (lang==='fr' ? 'Échéance' : 'Due');
+        wrap.innerHTML = `<b data-i18n="acctDue">${base}</b>: ${cfg.due}`;
+      }
+    });
+    // Insert or update a helper hint below the Tax Overview block
+    let hint = accView.querySelector('#juris-hint');
+    if(!hint){
+      const taxHd = accView.querySelector('[data-i18n="acctTaxOverview"]');
+      if(taxHd){
+        hint = document.createElement('div');
+        hint.id = 'juris-hint';
+        hint.className = 'sub';
+        taxHd.parentElement.querySelector('.cp-body').prepend(hint);
+      }
+    }
+    if(hint){ hint.textContent = cfg.hint; }
+    // Persist selection on the Accounting view
+    accView.dataset.jurisdiction = code;
+    // Reapply i18n to keep everything consistent
+    if(typeof applyI18n === 'function') applyI18n();
+  }
+
+  // Hook button
+  const btn = document.getElementById('applyJuris');
+  if(btn){
+    btn.addEventListener('click', ()=>{
+      const sel = document.getElementById('jurisdictionSelect');
+      const code = sel ? sel.value : 'eu_vat';
+      applyJurisdictionPreset(code);
+    });
+  }
+
+  // Re-apply on language change (monkey-patch applyI18n if needed)
+  (function(){
+    const _apply = window.applyI18n;
+    window.applyI18n = function(){
+      if(typeof _apply === 'function') _apply();
+      const accView = document.getElementById('view-accounting');
+      if(accView && accView.dataset.jurisdiction){
+        applyJurisdictionPreset(accView.dataset.jurisdiction);
+      }
+      // Also refresh NLQ placeholder if present
+      const nlq = document.getElementById('acct-nlq');
+      if(nlq && i18n[lang] && i18n[lang].nlqPlaceholder) nlq.placeholder = i18n[lang].nlqPlaceholder;
+    };
+  })();
+
+  // If user opens Accounting tab first time, keep preset consistent
+  document.querySelectorAll('.sidebar .nav-item[data-sub="accounting"]').forEach(n => {
+    n.addEventListener('click', ()=>{
+      const accView = document.getElementById('view-accounting');
+      const current = accView?.dataset?.jurisdiction || null;
+      if(current){ applyJurisdictionPreset(current); }
+    });
+  });
+})();
+
+// === Jurisdiction-specific validation checklist (demo) ===
+(function(){
+  // Per-jurisdiction checklists (EN/FR text)
+  const checks = {
+    eu_vat: [
+      {k:'VAT number format (VIES)', status:'ok', tip:'Ensure customer VAT numbers validate in VIES for intra-EU supplies.'},
+      {k:'Reverse charge rules applied', status:'warn', tip:'Mark cross-border B2B services with reverse charge where applicable.'},
+      {k:'EC Sales List (if applicable)', status:'warn', tip:'Prepare ESL for intra-community supplies.'}
+    ],
+    uk_vat: [
+      {k:'VAT number format (GB + 9 digits)', status:'ok', tip:'Validate GB VAT numbers; include MTD submissions.'},
+      {k:'MTD submission reminder', status:'warn', tip:'Ensure digital links & API submissions comply with HMRC.'},
+      {k:'Flat Rate Scheme eligibility', status:'warn', tip:'Check turnover threshold and sector rates.'}
+    ],
+    ma_tva: [
+      {k:'TVA periodicity (mensuel/trimestriel)', status:'ok', tip:'Vérifiez la périodicité déclarative définie.'},
+      {k:'Justificatifs d’exonération', status:'warn', tip:'Conservez les preuves d’exonération ou taux réduits.'},
+      {k:'Acomptes/ régularisations', status:'warn', tip:'Contrôlez les acomptes et régularisations en fin de période.'}
+    ],
+    us_sales: [
+      {k:'Nexus & thresholds per state', status:'warn', tip:'Determine economic/physical nexus; track thresholds for each state.'},
+      {k:'Correct state/county rates', status:'ok', tip:'Apply correct combined rates (state + local).'},
+      {k:'Sales vs use tax determination', status:'warn', tip:'Accrue use tax on untaxed out-of-state purchases where required.'}
+    ]
+  };
+
+  function badgeFor(status){
+    const map = { ok: ['success', i18n[lang].stOk], warn: ['warning', i18n[lang].stWarn], err: ['', i18n[lang].stErr] };
+    return map[status] || map['warn'];
+  }
+
+  function renderChecklist(code){
+    const list = document.getElementById('validateList');
+    if(!list) return;
+    list.innerHTML = '';
+    const set = checks[code] || [];
+    set.forEach(item=>{
+      const li = document.createElement('li');
+      li.style.listStyle='disc';
+      li.style.background='#fff';
+      li.style.padding='10px';
+      li.style.border='1px solid #e5e7eb';
+      li.style.borderRadius='10px';
+      li.style.cursor='pointer';
+      const [cls, label] = badgeFor(item.status);
+      li.innerHTML = `<span class="badge ${cls}" style="margin-right:8px">${label}</span>${item.k}`;
+      li.title = item.tip;
+      li.addEventListener('click', ()=> alert(item.tip));
+      list.appendChild(li);
+    });
+  }
+
+  // Hook into preset application: patch applyJurisdictionPreset if present
+  (function(){
+    const accView = document.getElementById('view-accounting');
+    const _apply = window.applyJurisdictionPreset;
+    window.applyJurisdictionPreset = function(code){
+      if(typeof _apply === 'function') _apply(code);
+      renderChecklist(code);
+    };
+  })();
+
+  // Initial render if already selected
+  const cur = document.getElementById('view-accounting')?.dataset?.jurisdiction || 'eu_vat';
+  renderChecklist(cur);
+
+  // Also render on Accounting tab open
+  document.querySelectorAll('.sidebar .nav-item[data-sub="accounting"]').forEach(n => {
+    n.addEventListener('click', ()=>{
+      const accView = document.getElementById('view-accounting');
+      const code = accView?.dataset?.jurisdiction || 'eu_vat';
+      renderChecklist(code);
+    });
+  });
+})();
+
+document.addEventListener('DOMContentLoaded', ()=>{
+  const nlq = document.getElementById('acct-nlq');
+  if(nlq && i18n[lang] && i18n[lang].nlqPlaceholder){
+    nlq.placeholder = i18n[lang].nlqPlaceholder;
+  }
+});
+</script></body>
+</html>
