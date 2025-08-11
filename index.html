@@ -1,0 +1,1654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CloudCFO.ai — Landing + Dashboard (EN/FR) — Accounting & Tax + Carbon Passport + Banking — v18</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  :root{
+    --primary-navy:#0A1628;
+    --electric:#0066FF;
+    --teal:#0fb6d3;
+    --emerald:#10B981;
+    --amber:#F59E0B;
+    --coral:#FF6B6B;
+    --gray-900:#0b1220;
+    --gray-800:#111827;
+    --gray-700:#374151;
+    --gray-600:#4B5563;
+    --gray-500:#6B7280;
+    --gray-400:#9CA3AF;
+    --off:#FAFBFC;
+    --white:#fff;
+    --shadow-lg:0 20px 40px rgba(10,22,40,.18);
+    --radius:16px;
+    --ease: cubic-bezier(.22,.61,.36,1);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    color:var(--gray-800);
+    background:linear-gradient(180deg,#f7f9ff, #fff);
+  }
+
+  /* Global top bar (WHITE AREA) with language toggle (top-left) */
+  .topbar{
+    position:sticky; top:0; z-index:1000;
+    display:flex; align-items:center; gap:14px;
+    padding:10px 14px;
+    background:#fff; border-bottom:1px solid rgba(0,0,0,.06);
+  }
+  .lang-toggle{display:flex; gap:8px; margin-right:6px}
+  .lang-btn{background:#fff; color:#0a1628; border:1px solid rgba(0,0,0,.12); border-radius:999px; padding:6px 10px; cursor:pointer; font-weight:800}
+  .lang-btn.active{background:linear-gradient(90deg, var(--electric), #3aa3ff); color:#fff; border-color:transparent; box-shadow:0 8px 18px rgba(0,102,255,.20)}
+  .brand{display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:-.02em; font-size:18px}
+  .brand .badge{padding:4px 8px; border-radius:999px; background:rgba(0,102,255,.1); color:#0046a3; font-size:12px; font-weight:700}
+
+  /* Top App Tabs */
+  .top-tabs{display:flex; margin-left:auto; gap:8px}
+  .pill{background:#fff; border:1px solid rgba(0,0,0,.08); padding:8px 12px; border-radius:999px; font-weight:800; cursor:pointer}
+  .pill.active{background:linear-gradient(90deg,var(--electric),#3aa3ff); color:#fff; box-shadow:0 10px 20px rgba(0,102,255,.25)}
+
+  /* Layout shells */
+  .app{display:grid; grid-template-columns: 280px 1fr; min-height:calc(100vh - 56px)}
+  aside{position:sticky; top:56px; height:calc(100vh - 56px); background:linear-gradient(180deg, var(--primary-navy), #15223a); color:#e7efff; padding:24px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.06)}
+  nav{margin-top:24px}
+  .nav-item{display:flex; align-items:center; gap:12px; padding:12px 14px; border-radius:10px; cursor:pointer; transition: transform .2s var(--ease), background .2s var(--ease), box-shadow .2s var(--ease); margin-bottom:8px}
+  .nav-item:hover{transform:translateX(4px); background:rgba(255,255,255,.06)}
+  .nav-item.active{background:linear-gradient(90deg, var(--electric), #3aa3ff); color:white; box-shadow:0 10px 20px rgba(0,102,255,.25)}
+  .content{padding:0}
+
+  /* Sections */
+  .section{padding:56px clamp(16px,3vw,40px)}
+  .hero{position:relative; overflow:hidden; background: radial-gradient(1200px 600px at 20% -10%,rgba(0,102,255,.25),transparent), radial-gradient(900px 500px at 100% 10%,rgba(15,182,211,.25),transparent), linear-gradient(135deg,#0a1628, #13305d 30%, #0f1c39); color:white; border-bottom-left-radius:24px; border-bottom-right-radius:24px}
+  .hero-inner{max-width:1200px; margin:0 auto; display:grid; grid-template-columns:1.1fr .9fr; gap:36px; align-items:center}
+  .hero h1{font-size: clamp(32px,4vw,56px); line-height:1.05; margin:0; letter-spacing:-.03em}
+  .hero p{opacity:.9; font-size: clamp(16px,1.2vw,20px)}
+  .cta{display:flex; gap:12px; margin-top:24px}
+  .btn{padding:12px 16px; border-radius:12px; font-weight:700; border:0; cursor:pointer; transition:transform .15s var(--ease), box-shadow .2s var(--ease), filter .2s var(--ease)}
+  .btn-primary{background:linear-gradient(135deg,var(--electric), #3aa3ff); color:white; box-shadow:0 10px 20px rgba(0,102,255,.3)}
+  .btn-secondary{background:rgba(255,255,255,.1); color:white; border:1.5px solid rgba(255,255,255,.25); backdrop-filter: blur(8px)}
+  .btn:hover{transform:translateY(-2px) scale(1.02)}
+  .btn:active{transform:translateY(0) scale(.98)}
+  .dash{background: #0d1830; border-radius:16px; padding:20px; box-shadow: var(--shadow-lg); border:1px solid rgba(255,255,255,.06)}
+  .cards{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px}
+  .card{background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.05)); border:1px solid rgba(255,255,255,.12); border-radius:14px; padding:14px; min-height:120px}
+  .stat{font-size:28px; font-weight:800}
+  canvas{max-width:100%}
+  .device{border-radius:24px; overflow:hidden; background:white; padding:6px}
+  .hero-floating{position:absolute; inset:auto 0 -80px auto; right:48px; width:min(520px, 42vw); transform: rotate(-2deg); filter:drop-shadow(0 30px 40px rgba(0,0,0,.4)); animation: float 6s ease-in-out infinite}
+  @keyframes float{0%,100%{transform: translateY(0) rotate(-2deg)}50%{transform: translateY(-10px) rotate(-2deg)}}
+  .section h2{font-size: clamp(28px,2.5vw,40px); margin:0 0 14px}
+  .sub{color:var(--gray-600); margin-bottom:28px}
+  .grid{display:grid; grid-template-columns: repeat(12, 1fr); gap:18px; max-width:1200px; margin:0 auto}
+  .col-6{grid-column: span 6}
+  .col-12{grid-column: span 12}
+  .glass{background:rgba(255,255,255,.7); border:1px solid rgba(10,22,40,.08); backdrop-filter: blur(10px); border-radius:16px; padding:20px}
+  .feature{display:flex; gap:12px; align-items:flex-start; padding:14px 12px; border-radius:12px; transition:transform .2s var(--ease), box-shadow .2s}
+  .feature:hover{transform:translateY(-2px); box-shadow:0 10px 20px rgba(10,22,40,.08)}
+  .badge{display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:999px; font-size:12px; font-weight:700}
+  .success{background:rgba(16,185,129,.12); color:#065f46}
+  .warning{background:rgba(245,158,11,.12); color:#92400e}
+  .accent{background:rgba(0,102,255,.12); color:#0046a3}
+  .panel{max-width:1200px; margin:0 auto}
+
+  /* DASHBOARD */
+  .view{display:none}
+  .view.active{display:block}
+  .dash-shell{display:grid; grid-template-columns:260px 1fr; gap:16px; padding:16px}
+  .sidebar{background:var(--primary-navy);color:#fff;border-radius:16px;padding:16px;min-height:640px}
+  .main{background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:16px;padding:20px;min-height:640px}
+  .kpi{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+  .kpi .metric{background:linear-gradient(180deg,#fff, #f7fbff);border:1px solid rgba(0,0,0,.06);border-radius:12px;padding:16px}
+  .metric .label{color:var(--gray-500);font-size:.85rem}
+  .metric .value{font-size:28px;font-weight:800;margin-top:6px}
+  .table{width:100%;border-collapse:separate;border-spacing:0 10px}
+  .table th{font-size:.8rem;text-transform:uppercase;letter-spacing:.04em;color:#fff;background:var(--primary-navy);padding:10px 12px}
+  .table td{background:#fff;padding:12px;border-top:1px solid #e5e7eb;border-bottom:1px solid #e5e7eb}
+
+  /* Accounting & Tax widgets */
+  .at-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-top:12px}
+  .at-section{background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.06);overflow:hidden}
+  .at-hd{display:flex;align-items:center;gap:10px;padding:14px 16px;background:linear-gradient(135deg,var(--primary-navy),var(--electric));color:#fff;font-weight:800}
+  .at-body{padding:16px}
+  .prog{height:8px; background:#eef2ff; border-radius:999px; overflow:hidden}
+  .prog span{display:block; height:100%}
+
+  /* Mobile */
+  @media(max-width: 980px){
+    .app{grid-template-columns:1fr}
+    aside{display:none}
+    .hero-inner{grid-template-columns:1fr}
+    .hero-floating{position:relative; right:auto; inset:auto; width:100%; transform:none; margin-top:16px}
+    .dash-shell{grid-template-columns:1fr}
+    .kpi{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .at-grid{grid-template-columns:1fr}
+    .top-tabs{display:none}
+  }
+
+  /* Print */
+  @media print{
+    .topbar, .top-tabs, .mobile-nav, .fab{display:none !important}
+    .app{grid-template-columns:1fr}
+    aside{display:none}
+    .dash-shell{grid-template-columns:1fr}
+  }
+
+  /* --- Added for the updated Accounting & Tax view (v16-updated) --- */
+  .strip-note{background:linear-gradient(90deg,#003b95,#0a6cff);color:#fff;padding:10px 12px;border-radius:12px;font-weight:800}
+  .kpi .value small{font-weight:600;color:var(--gray-500);font-size:.85rem}
+  .pipe-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+  .pipe-item{background:linear-gradient(180deg,#fff,#f7fbff);border:1px solid rgba(0,0,0,.06);border-radius:12px;padding:12px;text-align:center}
+  .pipe-item b{display:block;margin-bottom:6px}
+  .tag{display:inline-block;border-radius:999px;padding:4px 8px;font-weight:800;font-size:.75rem}
+  .tag.ok{background:rgba(16,185,129,.18);color:#065f46}
+  .tag.warn{background:rgba(245,158,11,.18);color:#92400e}
+  .tag.info{background:rgba(0,102,255,.15);color:#0046a3}
+  .watch-note{background:#fff8ee;border:1px solid #fde4c4;color:#8a4a0a;padding:8px 12px;border-radius:8px;margin-top:8px;font-size:.85rem}
+  .mini-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+  .mini-card{background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:12px;padding:14px;text-align:center}
+  .mini-card .big{font-weight:800;font-size:20px;margin-top:4px}
+  .mini-card .due{color:var(--gray-600);font-size:.85rem;margin-top:6px}
+  .checklist{display:flex;flex-direction:column;gap:8px}
+  .checklist .item{background:#fff;border:1px solid #e8eef9;border-radius:10px;padding:10px;display:flex;align-items:center;gap:10px}
+  .chips{display:flex;gap:8px;flex-wrap:wrap}
+  .chip{background:linear-gradient(180deg,#fff,#f7fbff);border:1px solid rgba(0,0,0,.06);padding:6px 10px;border-radius:999px;font-weight:800;font-size:.8rem}
+  .nlq{display:flex;gap:8px;margin-top:8px}
+  .nlq input{flex:1;padding:10px 12px;border:1px solid #e5e7eb;border-radius:12px}
+  .nlq button{padding:10px 14px;border-radius:12px;border:0;background:linear-gradient(90deg,var(--electric),#3aa3ff);color:#fff;font-weight:800}
+  .table td .tag{transform:translateY(-1px)}
+
+
+  /* Carbon Passport — screenshot-aligned styles */
+  .cp-form-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:12px;align-items:end}
+  .cp-field label{display:block;font-weight:700;font-size:.9rem;color:var(--gray-700);margin-bottom:6px}
+  .cp-field input,.cp-field select{width:100%;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;background:#fff}
+  .cp-scope-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:12px}
+  .cp-scope-card{background:linear-gradient(180deg,#ffffff,#f7fbff);border:1px solid rgba(0,0,0,.06);border-radius:14px;padding:16px;display:flex;align-items:center;justify-content:center;gap:12px;min-height:90px;text-align:center}
+  .cp-scope-num{font-size:34px;font-weight:800;color:#0a6cff;line-height:1}
+  .cp-scope-meta{display:flex;flex-direction:column;gap:2px}
+  .cp-scope-meta .title{font-weight:800}
+  .cp-scope-meta .sub{font-size:.8rem;color:var(--gray-600)}
+  .cp-missing{background:#fff8ee;border:1px solid #fde4c4;border-radius:12px;padding:12px;margin-top:12px}
+  .cp-missing .title{font-weight:800;color:#8a4a0a;margin-bottom:6px}
+  .cp-missing ul{margin:6px 0 0 18px;color:#8a4a0a}
+  .cp-integrations{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+  .cp-integr{background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:12px;padding:12px;min-height:72px;display:flex;flex-direction:column;justify-content:center}
+  .status{display:flex;align-items:center;gap:8px;font-weight:700;font-size:.85rem;margin-top:6px}
+  .dot{width:8px;height:8px;border-radius:999px;display:inline-block}
+  .ok-dot{background:#10B981}
+  .warn-dot{background:#F59E0B}
+  .cp-wide-btn{width:100%;margin-top:12px}
+  .scope-pill{display:inline-block;border-radius:999px;padding:4px 8px;font-weight:800;font-size:.75rem;background:rgba(0,102,255,.12);color:#0046a3}
+  .conf-pill{display:inline-block;border-radius:999px;padding:4px 8px;font-weight:800;font-size:.75rem;background:rgba(16,185,129,.18);color:#065f46}
+  @media(max-width: 980px){
+    .cp-form-grid{grid-template-columns:1fr}
+    .cp-integrations{grid-template-columns:1fr 1fr}
+  }
+
+
+  /* Banking dashboard (screenshot-aligned) */
+  .bnk-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+  .bnk-card{background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:12px;padding:14px;text-align:center}
+  .bnk-name{font-weight:800;margin-bottom:6px}
+  .bnk-sync{color:var(--gray-600);font-size:.85rem;margin-top:4px}
+  .tag.err{background:rgba(239,68,68,.18);color:#7f1d1d}
+
+  /* NEW v18 — Landing extra sections */
+  .impact-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;max-width:1200px;margin:0 auto}
+  .impact-card{background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:16px;padding:24px;box-shadow:0 10px 24px rgba(0,0,0,.06)}
+  .impact-top{font-weight:800;font-size:20px;color:var(--coral);text-align:center}
+  .impact-arrow{font-size:28px;line-height:1.2;color:#10B981;text-align:center;margin:10px 0}
+  .impact-bottom{font-weight:900;font-size:22px;color:#059669;text-align:center}
+  .impact-card.full{grid-column:1 / -1}
+  .dz-wrap{display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:1200px;margin:0 auto}
+  .dropzone{border:2px dashed #7dc5ff;border-radius:16px;display:flex;align-items:center;justify-content:center;flex-direction:column;min-height:320px;background:linear-gradient(180deg,#ffffff, #f7fbff)}
+  .dropzone h3{margin:0 0 8px}
+  .dz-sub{color:var(--gray-600)}
+  .result-panel{background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:16px;min-height:320px;display:flex;align-items:center;justify-content:center;font-size:48px;box-shadow:0 10px 24px rgba(0,0,0,.06)}
+  .result-panel .result{font-size:14px;color:var(--gray-700);display:none;width:100%;padding:20px}
+  .result .title{font-weight:800;margin-bottom:8px}
+  .kv{display:grid;grid-template-columns:160px 1fr;gap:6px;margin:2px 0}
+  .pricing-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;max-width:1200px;margin:0 auto}
+  .plan{background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:18px;box-shadow:0 20px 40px rgba(0,0,0,.08);padding:24px;display:flex;flex-direction:column;gap:10px}
+  .plan h3{margin:0}
+  .price{font-size:42px;font-weight:900;color:#0a1628}
+  .per{font-size:14px;color:var(--gray-600)}
+  .features{display:flex;flex-direction:column;gap:10px;margin:12px 0}
+  .features .f{display:flex;gap:8px;align-items:flex-start}
+  .plan .btn{width:100%}
+  .plan.popular{border:2px solid #0a6cff; position:relative}
+  .popular .ribbon{position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:linear-gradient(90deg,var(--electric),#3aa3ff);color:#fff;padding:6px 12px;border-radius:999px;font-weight:800;font-size:12px;box-shadow:0 10px 20px rgba(0,102,255,.25)}
+  .faq{max-width:1000px;margin:0 auto}
+  .faq .item{background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:14px;margin-bottom:10px;overflow:hidden}
+  .faq .q{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;font-weight:800;cursor:pointer}
+  .faq .a{padding:0 18px 16px 18px;color:var(--gray-700);display:none}
+  .faq .toggle{width:28px;height:28px;border-radius:8px;border:1px solid rgba(0,0,0,.08);display:flex;align-items:center;justify-content:center}
+  .differentiators2{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+  .diff-card{background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:16px;padding:18px;box-shadow:0 10px 24px rgba(0,0,0,.06);display:flex;gap:12px;align-items:flex-start}
+  .diff-card strong{display:block;font-weight:900;margin-bottom:4px}
+  .diff-card.emph{background:linear-gradient(180deg,#edfff5,#ffffff);border:1.5px solid rgba(16,185,129,.35)}
+  .diff-card.wide{grid-column:span 2}
+</style>
+</head>
+<body>
+
+<!-- WHITE TOP BAR WITH TOGGLE ON THE FAR LEFT -->
+<div class="topbar">
+  <div class="lang-toggle">
+    <button class="lang-btn active" id="btnEN">EN</button>
+    <button class="lang-btn" id="btnFR">FR</button>
+  </div>
+  <div class="brand">CloudCFO.ai <span class="badge">Beta</span></div>
+
+  <div class="top-tabs" style="margin-left:auto">
+    <button class="pill active" data-i18n="topLanding" data-tab="landing">Landing</button>
+    <button class="pill" data-i18n="topDashboard" data-tab="dashboard">Dashboard</button>
+    <button class="pill" data-i18n="topExport" data-tab="download">Export</button>
+  </div>
+</div>
+
+<!-- VIEWS -->
+<div class="view active" id="landing">
+  <div class="app">
+    <aside>
+      <div class="brand">CloudCFO.ai <span class="badge">Beta</span></div>
+      <!-- Language toggle was moved to the top bar; intentionally removed from the sidebar -->
+      <nav>
+        <div class="nav-item active" data-i18n="navGeneral" data-target="#general">🏠 General</div>
+        <div class="nav-item" data-i18n="navDiff" data-target="#differentiators">✨ Why CloudCFO.ai?</div>
+        <div class="nav-item" data-i18n="navWhyCFO" data-target="#why-cfo">💡 Why a Cloud CFO?</div>
+        <div class="nav-item" data-i18n="navMagic" data-target="#magic">🪄 Experience the Magic</div>
+        <div class="nav-item" data-i18n="navSignup" data-target="#signup">📝 Sign‑up & Integrations</div>
+        <div class="nav-item" data-i18n="navDiff2" data-target="#why-different">🌟 Why CloudCFO.ai is Different</div>
+        <div class="nav-item" data-i18n="navPricing" data-target="#pricing">💳 Pricing</div>
+        <div class="nav-item" data-i18n="navFAQ" data-target="#faq">❓ FAQ</div>
+      </nav>
+      <div style="margin-top:24px; font-size:13px; opacity:.9">
+        <div class="badge success" data-i18n="badgeSoc2">SOC2‑ready</div>
+        <div class="badge warning" data-i18n="badgeOcr">Sub‑second OCR</div>
+        <div class="badge accent" data-i18n="badgeCarbon">Carbon Passport</div>
+      </div>
+    </aside>
+    <main class="content">
+      <section class="section hero" id="general">
+        <div class="hero-inner">
+          <div>
+            <h1 data-i18n="heroTitle">Your AI‑Powered CFO in the Cloud</h1>
+            <p data-i18n="heroSub">Connect email, drives, and chats — CloudCFO auto‑discovers receipts, extracts data in <b>&lt;500ms</b>, and turns them into real‑time insights and a 🌱 Carbon Passport.</p>
+            <div class="cta">
+              <button class="btn btn-primary hover-scale" id="connectBtn" data-i18n="btnConnect">🔍 Connect your accounts</button>
+              <button class="btn btn-secondary hover-scale" id="uploadBtn" data-i18n="btnUpload">📤 Quick upload</button>
+            </div>
+            <div style="margin-top:18px; display:flex; gap:10px; align-items:center">
+              <span class="badge accent" data-i18n="worksWith">Works with: Gmail · Drive · Dropbox · WhatsApp · Telegram</span>
+            </div>
+          </div>
+          <div class="device hero-floating">
+            <div class="dash">
+              <div class="cards">
+                <div class="card">
+                  <div style="font-size:12px; opacity:.8" data-i18n="metricTotalExpenses">Total Expenses</div>
+                  <div class="stat">$12,458</div>
+                  <canvas id="spark1" height="50"></canvas>
+                </div>
+                <div class="card">
+                  <div style="font-size:12px; opacity:.8" data-i18n="metricCarbon">Carbon this month</div>
+                  <div class="stat">2.4t CO₂e</div>
+                  <canvas id="spark2" height="50"></canvas>
+                </div>
+                <div class="card">
+                  <div style="font-size:12px; opacity:.8" data-i18n="metricDocs">Docs processed</div>
+                  <div class="stat">847</div>
+                  <div class="glass" style="height:10px; border-radius:5px; margin-top:6px"></div>
+                </div>
+                <div class="card">
+                  <div style="font-size:12px; opacity:.8" data-i18n="metricHit">Hit rate</div>
+                  <div class="stat">95%</div>
+                  <div class="badge success" data-i18n="metricAccSla">✓ Accuracy SLA</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Why CloudCFO (existing) -->
+      <section class="section" id="differentiators">
+        <div class="panel">
+          <h2 data-i18n="whyTitle">Why CloudCFO</h2>
+          <p class="sub" data-i18n="whySub">AI‑first financial automation, native chat integrations, and built‑in carbon intelligence.</p>
+          <div class="grid">
+            <div class="col-6 glass feature">
+              <div>🤖</div>
+              <div>
+                <h3 data-i18n="featAI">AI‑First Extraction</h3>
+                <p data-i18n="featAIDesc">Advanced LLM + vision pipeline delivers <b>sub‑second</b> processing and self‑learning patterns.</p>
+              </div>
+            </div>
+            <div class="col-6 glass feature">
+              <div>💬</div>
+              <div>
+                <h3 data-i18n="featChat">WhatsApp & Telegram Native</h3>
+                <p data-i18n="featChatDesc">Send a photo, we do the rest — the fastest way to capture receipts on mobile.</p>
+              </div>
+            </div>
+            <div class="col-6 glass feature">
+              <div>🌱</div>
+              <div>
+                <h3 data-i18n="featCarbon">Carbon Passport</h3>
+                <p data-i18n="featCarbonDesc">Automatic Scope 1/2/3 mapping from invoices with downloadable, verifiable passports.</p>
+              </div>
+            </div>
+            <div class="col-6 glass feature">
+              <div>⚡</div>
+              <div>
+                <h3 data-i18n="featDev">Developer‑Friendly</h3>
+                <p data-i18n="featDevDesc">Clean APIs & webhooks, great docs, and thoughtful defaults inspired by Stripe.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- NEW: Why a Cloud CFO, in the first place? -->
+      <section class="section" id="why-cfo">
+        <div class="panel">
+          <h2 data-i18n="whyCfoTitle">Why a Cloud CFO, in the first place?</h2>
+          <div class="impact-grid">
+            <div class="impact-card">
+              <div class="impact-top" data-i18n="whyCfo1Top">8+ hours/week wasted on bookkeeping</div>
+              <div class="impact-arrow">↓</div>
+              <div class="impact-bottom" data-i18n="whyCfo1Bottom">Reduced to 30 minutes</div>
+            </div>
+            <div class="impact-card">
+              <div class="impact-top" data-i18n="whyCfo2Top">$3,000+ in missed deductions annually</div>
+              <div class="impact-arrow">↓</div>
+              <div class="impact-bottom" data-i18n="whyCfo2Bottom">AI finds every deduction</div>
+            </div>
+            <div class="impact-card">
+              <div class="impact-top" data-i18n="whyCfo3Top">Shoebox full of receipts</div>
+              <div class="impact-arrow">↓</div>
+              <div class="impact-bottom" data-i18n="whyCfo3Bottom">Cloud‑based organization</div>
+            </div>
+            <div class="impact-card full">
+              <div class="impact-top" data-i18n="whyCfo4Top">Unknown carbon footprint</div>
+              <div class="impact-arrow">↓</div>
+              <div class="impact-bottom" data-i18n="whyCfo4Bottom">One‑click carbon tracking</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- NEW: Experience the Magic -->
+      <section class="section" id="magic">
+        <div class="panel">
+          <h2 data-i18n="magicTitle">Experience the Magic</h2>
+          <p class="sub" data-i18n="magicSub">See how easy it is to turn your receipts into insights. Try our live demo below—no signup required.</p>
+          <div class="dz-wrap">
+            <div class="dropzone" id="dropzone">
+              <div style="font-size:56px;margin-bottom:8px">📷</div>
+              <h3 data-i18n="dzTitle">Drop your receipt here to see the magic</h3>
+              <div class="dz-sub" data-i18n="dzOrClick">or click to browse</div>
+              <div class="dz-sub" style="margin-top:12px" data-i18n="dzSupport">Supports: PDF, JPG, PNG, HEIC • Max 10MB • Instant processing</div>
+              <input type="file" id="fileInput" accept=".pdf,.png,.jpg,.jpeg,.heic" style="display:none"/>
+            </div>
+            <div class="result-panel" id="resultPanel">
+              <div>✨🎯</div>
+              <div class="result" id="resultBox">
+                <div class="title" data-i18n="dzResultTitle">AI extraction (demo):</div>
+                <div class="kv"><strong data-i18n="kvVendor">Vendor</strong><span>Acme Supplies Ltd</span></div>
+                <div class="kv"><strong data-i18n="kvAmount">Amount</strong><span>$128.40</span></div>
+                <div class="kv"><strong data-i18n="kvDate">Date</strong><span>2025‑08‑09</span></div>
+                <div class="kv"><strong data-i18n="kvCategory">Category</strong><span>Office supplies</span></div>
+                <div class="kv"><strong data-i18n="kvTax">VAT</strong><span>$6.10</span></div>
+                <div class="kv"><strong data-i18n="kvCO2">CO₂e</strong><span>0.34 kg</span></div>
+                <div style="margin-top:10px"><span class="badge success" data-i18n="dzBadge">99% confidence • instant</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Sign up -->
+      <section class="section" id="signup">
+        <div class="panel">
+          <h2 data-i18n="signupTitle">Sign‑up & Connect your channels</h2>
+          <p class="sub" data-i18n="signupSub">Choose any intake source below. We’ll start auto‑discovering receipts instantly.</p>
+          <div class="grid" style="grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px">
+            <div class="glass"><b>Gmail</b><div class="sub"><span>523</span> <span data-i18n="found">found</span> • 95% <span data-i18n="accuracy">Accuracy</span></div><button class="btn btn-primary">✓ <span data-i18n="connected">Connected</span></button></div>
+            <div class="glass"><b>Google Drive</b><div class="sub"><span>189</span> <span data-i18n="found">found</span> • 100% <span data-i18n="accuracy">Accuracy</span></div><button class="btn btn-primary">✓ <span data-i18n="connected">Connected</span></button></div>
+            <div class="glass"><b>Telegram</b><div class="sub"><span>135</span> <span data-i18n="found">found</span> • 88% <span data-i18n="accuracy">Accuracy</span></div><button class="btn btn-primary">✓ <span data-i18n="connected">Connected</span></button></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- NEW after signup: Why CloudCFO.ai is Different -->
+      <section class="section" id="why-different">
+        <div class="panel">
+          <h2 data-i18n="whyDifferentTitle">Why CloudCFO.ai is Different</h2>
+          <p class="sub" data-i18n="whyDifferentSub">The only financial platform that combines AI intelligence with environmental consciousness.</p>
+          <div class="differentiators2">
+            <div class="diff-card wide">
+              <div style="font-size:24px">🧠</div>
+              <div><strong data-i18n="diff2AI">AI‑Powered Intelligence</strong><span data-i18n="diff2AIDesc">GPT‑4 extraction with 99%+ accuracy.</span></div>
+            </div>
+            <div class="diff-card">
+              <div style="font-size:24px">📱</div>
+              <div><strong data-i18n="diff2Channels">Multi‑Channel Capture</strong><span data-i18n="diff2ChannelsDesc">WhatsApp, Telegram, Email, Photo, API.</span></div>
+            </div>
+            <div class="diff-card">
+              <div style="font-size:24px">⚡</div>
+              <div><strong data-i18n="diff2Realtime">Real‑Time Insights</strong><span data-i18n="diff2RealtimeDesc">CFO‑level analytics updated instantly.</span></div>
+            </div>
+            <div class="diff-card emph wide">
+              <div style="font-size:24px">🌱</div>
+              <div><strong data-i18n="diff2Carbon">Carbon Accounting</strong><span data-i18n="diff2CarbonDesc">Automatic carbon footprint per transaction.</span></div>
+            </div>
+            <div class="diff-card wide">
+              <div style="font-size:24px">🔗</div>
+              <div><strong data-i18n="diff2Integrations">Seamless Integration</strong><span data-i18n="diff2IntegrationsDesc">Works with QuickBooks, Xero, and 30+ tools.</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- NEW after signup: Pricing -->
+      <section class="section" id="pricing">
+        <div class="panel">
+          <h2 data-i18n="pricingTitle">Simple, Transparent Pricing</h2>
+          <p class="sub" data-i18n="pricingSub">Choose the plan that grows with your business</p>
+          <div class="pricing-grid">
+            <div class="plan">
+              <h3 data-i18n="planStarter">CloudCFO Starter</h3>
+              <div><span class="price">$29</span><span class="per" data-i18n="perMonth">/month</span></div>
+              <div class="sub" data-i18n="planStarterTag">Perfect for New Freelancers</div>
+              <div class="features">
+                <div class="f">✅ <span data-i18n="stFeat1">50 AI‑processed documents</span></div>
+                <div class="f">✅ <span data-i18n="stFeat2">1 bank connection</span></div>
+                <div class="f">✅ <span data-i18n="stFeat3">Basic CFO insights</span></div>
+                <div class="f">✅ <span data-i18n="stFeat4">Basic carbon tracking 🌱</span></div>
+                <div class="f">✅ <span data-i18n="stFeat5">Email support</span></div>
+              </div>
+              <button class="btn btn-primary" data-i18n="startTrial">Start Free Trial</button>
+            </div>
+
+            <div class="plan popular">
+              <div class="ribbon" data-i18n="mostPopular">MOST POPULAR</div>
+              <h3 data-i18n="planPro">CloudCFO Pro</h3>
+              <div><span class="price">$79</span><span class="per" data-i18n="perMonth">/month</span></div>
+              <div class="sub" data-i18n="planProTag">Ideal for Growing Businesses</div>
+              <div class="features">
+                <div class="f">✅ <span data-i18n="proFeat1">500 AI documents</span></div>
+                <div class="f">✅ <span data-i18n="proFeat2">Unlimited banks</span></div>
+                <div class="f">✅ <span data-i18n="proFeat3">Advanced AI insights</span></div>
+                <div class="f">✅ <span data-i18n="proFeat4">Full carbon accounting 🌱</span></div>
+                <div class="f">✅ <span data-i18n="proFeat5">WhatsApp & Telegram bots</span></div>
+                <div class="f">✅ <span data-i18n="proFeat6">Priority support</span></div>
+              </div>
+              <button class="btn btn-primary" data-i18n="startTrial">Start Free Trial</button>
+            </div>
+
+            <div class="plan">
+              <h3 data-i18n="planBiz">CloudCFO Business</h3>
+              <div><span class="price">$149</span><span class="per" data-i18n="perMonth">/month</span></div>
+              <div class="sub" data-i18n="planBizTag">Built for Scaling E‑commerce</div>
+              <div class="features">
+                <div class="f">✅ <span data-i18n="bizFeat1">Unlimited AI processing</span></div>
+                <div class="f">✅ <span data-i18n="bizFeat2">Team access</span></div>
+                <div class="f">✅ <span data-i18n="bizFeat3">API access</span></div>
+                <div class="f">✅ <span data-i18n="bizFeat4">Enterprise carbon reporting 🌱</span></div>
+                <div class="f">✅ <span data-i18n="bizFeat5">ESG compliance tools 🌱</span></div>
+                <div class="f">✅ <span data-i18n="bizFeat6">Dedicated account manager</span></div>
+              </div>
+              <button class="btn btn-primary" data-i18n="startTrial">Start Free Trial</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- NEW after signup: FAQ -->
+      <section class="section" id="faq">
+        <div class="panel">
+          <h2 data-i18n="faqTitle">Frequently Asked Questions</h2>
+          <p class="sub" data-i18n="faqSub">Everything you need to know about CloudCFO.ai</p>
+          <div class="faq">
+            <div class="item">
+              <div class="q"><span data-i18n="faq1Q">How does AI processing work?</span><div class="toggle">＋</div></div>
+              <div class="a" data-i18n="faq1A">We combine OCR with a GPT‑4 vision model to extract fields like vendor, date, tax, and line items in under 500ms, with confidence scores and human‑in‑the‑loop when needed.</div>
+            </div>
+            <div class="item">
+              <div class="q"><span data-i18n="faq2Q">How do I set up WhatsApp and Telegram integration?</span><div class="toggle">＋</div></div>
+              <div class="a" data-i18n="faq2A">From the Dashboard → Integrations, connect your WhatsApp Business or Telegram bot, then forward photos or PDFs. Messages are auto‑classified to your inbox.</div>
+            </div>
+            <div class="item">
+              <div class="q"><span data-i18n="faq3Q">How does carbon accounting work? 🌱</span><div class="toggle">＋</div></div>
+              <div class="a" data-i18n="faq3A">We map each transaction to Scope 1/2/3 via vendor/category and estimate CO₂e using trusted emissions factors. You can export a verifiable Carbon Passport by product or period.</div>
+            </div>
+            <div class="item">
+              <div class="q"><span data-i18n="faq4Q">Which accounting software do you integrate with?</span><div class="toggle">＋</div></div>
+              <div class="a" data-i18n="faq4A">QuickBooks, Xero, Odoo and more via REST webhooks. We also support custom exports.</div>
+            </div>
+            <div class="item">
+              <div class="q"><span data-i18n="faq5Q">Is my data secure?</span><div class="toggle">＋</div></div>
+              <div class="a" data-i18n="faq5A">Yes — we are SOC2‑ready, encrypt data in transit and at rest, and offer fine‑grained permissions.</div>
+            </div>
+            <div class="item">
+              <div class="q"><span data-i18n="faq6Q">Can I try CloudCFO.ai before committing?</span><div class="toggle">＋</div></div>
+              <div class="a" data-i18n="faq6A">Of course! Start a free trial from the Pricing section. No credit card required for the demo.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <footer class="section" style="text-align:center; color:var(--gray-600)">
+        <div class="panel">
+          <span data-i18n="footer">Built with ❤️ — micro‑interactions, parallax, and smooth page transitions included.</span>
+        </div>
+      </footer>
+    </main>
+  </div>
+</div>
+
+<!-- DASHBOARD VIEW (unchanged from v17 except title) -->
+<div class="view" id="dashboard">
+  <div class="dash-shell">
+    <aside class="sidebar">
+      <div class="nav-item active" data-i18n="sbOverview" data-sub="overview">📊 Overview</div>
+      <div class="nav-item" data-i18n="sbReports" data-sub="reports">📈 Financial Reports</div>
+      <div class="nav-item" data-i18n="sbAccountingTax" data-sub="acctax">🧾 Accounting & Tax</div>
+      <div class="nav-item" data-i18n="sbPassport" data-sub="passport">🌱 Carbon Passport</div>
+      <div class="nav-item" data-i18n="sbBanking" data-sub="banking">🏦 Banking</div>
+      <div class="nav-item" data-i18n="sbIntegrations" data-sub="integrations">🔗 Integrations</div>
+      <div class="nav-item" data-i18n="sbSettings" data-sub="settings">⚙️ Settings</div>
+      <div class="sub" style="margin-top:auto;padding-top:16px"><span data-i18n="sbPlan">Pro Plan</span> • <span id="sbDocsCount">1,247</span> <span data-i18n="sbDocs">docs this month</span></div>
+    </aside>
+    <main class="main">
+      <!-- Overview -->
+      <section class="subview" id="view-overview" style="display:block">
+        <div class="kpi">
+          <div class="metric"><div class="label" data-i18n="metricTotalExpenses">Total Expenses</div><div class="value">$12,458</div><span class="badge success">↓ 12%</span></div>
+          <div class="metric"><div class="label" data-i18n="metricDocs">Docs processed</div><div class="value">847</div></div>
+          <div class="metric"><div class="label" data-i18n="metricTax">Tax Deductions</div><div class="value">$3,892</div></div>
+          <div class="metric"><div class="label" data-i18n="metricCO2Month">CO₂e (month)</div><div class="value">2.4t</div></div>
+        </div>
+        <div class="grid" style="grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-top:12px">
+          <div class="at-section">
+            <div class="at-hd" data-i18n="ovLineTitle">Monthly Revenue vs Expenses</div>
+            <div class="at-body"><canvas id="ov_line"></canvas></div>
+          </div>
+          <div class="at-section">
+            <div class="at-hd" data-i18n="ovBarTitle">Monthly Users</div>
+            <div class="at-body"><canvas id="ov_bar"></canvas></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- REPORTS -->
+      <section class="subview" id="view-reports" style="display:none">
+        <div class="at-section"><div class="at-hd" data-i18n="repPnl">P&L (Monthly)</div><div class="at-body"><canvas id="rep_pnl"></canvas></div></div>
+        <div class="grid" style="grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px">
+          <div class="at-section"><div class="at-hd" data-i18n="repTopCats">Top Categories</div><div class="at-body"><canvas id="rep_doughnut"></canvas></div></div>
+          <div class="at-section"><div class="at-hd" data-i18n="repCash">Cash In vs Out</div><div class="at-body"><canvas id="rep_cash"></canvas></div></div>
+        </div>
+      </section>
+
+      <!-- ACCOUNTING & TAX -->
+      <section class="subview" id="view-acctax" style="display:none">
+        <div class="at-section">
+          <div class="at-hd">🧾 <span data-i18n="atTitle">Accounting & Tax Dashboard</span></div>
+          <div class="at-body">
+
+            <!-- Top KPIs -->
+            <div class="kpi">
+              <div class="metric">
+                <div class="label" data-i18n="atTopRevenueYTD">Total Revenue (YTD)</div>
+                <div class="value">$2,450,000</div>
+              </div>
+              <div class="metric">
+                <div class="label" data-i18n="atTopExpensesYTD">Total Expenses (YTD)</div>
+                <div class="value">$1,820,000</div>
+              </div>
+              <div class="metric">
+                <div class="label" data-i18n="atTopNetMargin">Net Profit Margin</div>
+                <div class="value">26%</div>
+              </div>
+              <div class="metric">
+                <div class="label" data-i18n="atTopCashPosition">Cash Flow Position</div>
+                <div class="value">$630,000</div>
+              </div>
+            </div>
+
+            <!-- AI Intake Pipeline -->
+            <div class="at-section" style="margin-top:12px">
+              <div class="at-hd" data-i18n="atPipelineTitle">AI Intake Pipeline</div>
+              <div class="at-body">
+                <div class="pipe-grid">
+                  <div class="pipe-item">
+                    <b data-i18n="pipeOCR">OCR & Parsing</b>
+                    <div class="sub">Tesseract · PDF/Image → JSON · OCR checks</div>
+                    <div class="tag ok" data-i18n="statusConnected">Connected</div>
+                  </div>
+                  <div class="pipe-item">
+                    <b data-i18n="pipeCategorization">Categorization</b>
+                    <div class="sub">Balance mapping → P&L groups</div>
+                    <div class="tag ok" data-i18n="statusConnected">Connected</div>
+                  </div>
+                  <div class="pipe-item">
+                    <b data-i18n="pipeAdvClassif">Advanced Classification</b>
+                    <div class="sub">LLM/Vision · High‑conf invoice vectors</div>
+                    <div class="tag ok" data-i18n="statusConnected">Connected</div>
+                  </div>
+                  <div class="pipe-item">
+                    <b data-i18n="pipeAnomaly">Anomaly Detection</b>
+                    <div class="sub">Duplicates · outliers · policy violations</div>
+                    <div class="tag warn" data-i18n="statusPending">Pending</div>
+                  </div>
+                  <div class="pipe-item">
+                    <b data-i18n="pipeAcctPlatforms">Accounting Platforms</b>
+                    <div class="sub">Push validated entries to QuickBooks, Xero, Odoo (via REST)</div>
+                    <div class="tag info" data-i18n="statusAPI">API</div>
+                  </div>
+                </div>
+                <div class="watch-note" data-i18n="atWatchNote">
+                  Note — demo data for illustration. A saved “CloudCFO preset” adjusts forms & due dates by jurisdiction; not legal advice.
+                </div>
+              </div>
+            </div>
+
+            <!-- Jurisdiction + Tax Overview -->
+            <div class="at-grid">
+              <div class="at-section">
+                <div class="at-hd" data-i18n="atJurisdictionTitle">Jurisdiction Preset</div>
+                <div class="at-body">
+                  <label for="jur2" class="sub" data-i18n="atJurisdiction">Jurisdiction</label>
+                  <select id="jur2" style="padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px">
+                    <option value="eu">EU – VAT</option>
+                    <option value="us">US – Sales Tax</option>
+                    <option value="uk">UK – VAT</option>
+                  </select>
+                  <button class="btn btn-primary" style="margin-left:8px" data-i18n="btnApplyPreset">Apply preset</button>
+                  <p class="sub" style="margin-top:8px" data-i18n="atJurNote">Choosing a preset adapts forms, tax types, and due dates.</p>
+                </div>
+              </div>
+
+              <div class="at-section">
+                <div class="at-hd" data-i18n="atTaxOverview">Tax Overview</div>
+                <div class="at-body">
+                  <div class="mini-grid">
+                    <div class="mini-card">
+                      <div><b>VAT / GST</b></div>
+                      <div class="big">$48,910</div>
+                      <div class="due" data-i18n="dueIn12">Due in: 12 days</div>
+                      <div class="tag ok" style="margin-top:6px" data-i18n="statusFiled">Filed</div>
+                    </div>
+                    <div class="mini-card">
+                      <div><b data-i18n="cardCorporate">Corporate Tax</b></div>
+                      <div class="big">$120,000</div>
+                      <div class="due" data-i18n="dueIn28">Due in: 28 days</div>
+                      <div class="tag warn" style="margin-top:6px" data-i18n="statusPending">Pending</div>
+                    </div>
+                    <div class="mini-card">
+                      <div><b data-i18n="cardPayroll">Payroll Taxes</b></div>
+                      <div class="big">$22,300</div>
+                      <div class="due" data-i18n="dueIn5">Due in: 5 days</div>
+                      <div class="tag" style="background:rgba(239,68,68,.18);color:#7f1d1d;margin-top:6px" data-i18n="statusOverdue">Overdue</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Validation Checklist -->
+            <div class="at-section" style="margin-top:12px">
+              <div class="at-hd" data-i18n="atValidationTitle">Validation Checklist</div>
+              <div class="at-body">
+                <p class="sub" data-i18n="atValidationSub">Automated checks based on your selected jurisdiction. Demo only, not legal advice.</p>
+                <div class="checklist">
+                  <div class="item"><span class="tag ok" data-i18n="statusValidated">validated</span> <span data-i18n="checkVATVIES">VAT number format (VIES)</span></div>
+                  <div class="item"><span class="tag warn" data-i18n="statusUndefined">undefined</span> <span data-i18n="checkReverse">Reverse charge rules applied</span></div>
+                  <div class="item"><span class="tag warn" data-i18n="statusUndefined">undefined</span> <span data-i18n="checkECSales">EC Sales List (if applicable)</span></div>
+                </div>
+                <div class="watch-note" style="margin-top:8px" data-i18n="tipChecklist">Tip — Click any item to view action tips.</div>
+              </div>
+            </div>
+
+            <!-- Charts: Revenue vs Expenses + Cash Flow Forecast -->
+            <div class="at-grid">
+              <div class="at-section">
+                <div class="at-hd" data-i18n="atRevVsExpTitle">Revenue vs Expenses</div>
+                <div class="at-body"><canvas id="at_revexp"></canvas></div>
+              </div>
+              <div class="at-section">
+                <div class="at-hd" data-i18n="atCashFlowForecast">Cash Flow Forecast</div>
+                <div class="at-body"><canvas id="at_cash"></canvas></div>
+              </div>
+            </div>
+
+            <!-- Charts: Donut + Aging -->
+            <div class="at-grid">
+              <div class="at-section">
+                <div class="at-hd" data-i18n="atTaxBreakdown">Tax Liability Breakdown</div>
+                <div class="at-body"><canvas id="at_donut"></canvas></div>
+              </div>
+              <div class="at-section">
+                <div class="at-hd" data-i18n="atAgingTitle">Aging</div>
+                <div class="at-body"><canvas id="at_aging"></canvas></div>
+              </div>
+            </div>
+
+            <!-- Ask your data (NLQ) -->
+            <div class="at-section" style="margin-top:12px">
+              <div class="at-hd">💬 <span data-i18n="atAskTitle">Ask your data (Natural Language)</span></div>
+              <div class="at-body">
+                <div class="nlq">
+                  <input id="nlqIn" placeholder="e.g., show unreconciled VAT invoices from Q2" data-i18n-placeholder="atQueryPH"/>
+                  <button id="nlqRun" data-i18n="btnRun">Run</button>
+                </div>
+                <p class="sub" style="margin-top:6px" data-i18n="atAskHint">Hint: we’ll parse keywords like VAT/GST, status (pending/overdue), and periods (Q1, Q2, last month) to filter results below (demo).</p>
+              </div>
+            </div>
+
+            <!-- Reports table -->
+            <div class="at-section">
+              <div class="at-hd" data-i18n="atReportsTitle">Reports</div>
+              <div class="at-body">
+                <div class="chips">
+                  <span class="chip">P&L</span>
+                  <span class="chip" data-i18n="chipBS">Balance Sheet</span>
+                  <span class="chip" data-i18n="chipCF">Cash Flow</span>
+                  <span class="chip" data-i18n="chipTaxHistory">Tax Filing History</span>
+                </div>
+                <table class="table" style="margin-top:10px">
+                  <thead>
+                    <tr>
+                      <th data-i18n="atThDate">Date</th>
+                      <th data-i18n="atThDesc">Description</th>
+                      <th data-i18n="atThCategory">Category</th>
+                      <th data-i18n="atThAmount">Amount</th>
+                      <th data-i18n="atThTaxType">Tax Type</th>
+                      <th data-i18n="atThStatus">Status</th>
+                      <th data-i18n="atThInvoice">Invoice</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>2025‑07‑31</td>
+                      <td>Q3 VAT Return</td>
+                      <td>VAT/GST</td>
+                      <td>$48,910</td>
+                      <td>VAT</td>
+                      <td><span class="tag ok" data-i18n="statusFiled">Filed</span></td>
+                      <td>VAT‑Q3‑2025.pdf</td>
+                    </tr>
+                    <tr>
+                      <td>2025‑08‑02</td>
+                      <td>Monthly Payroll Withholding</td>
+                      <td>Payroll</td>
+                      <td>$22,300</td>
+                      <td>Payroll</td>
+                      <td><span class="tag warn" data-i18n="statusPending">Pending</span></td>
+                      <td>PAY‑0825.pdf</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- CARBON PASSPORT -->
+      <section class="subview" id="view-passport" style="display:none">
+        <!-- Step 1: Select Product -->
+        <div class="at-section">
+          <div class="at-hd">
+            <span data-i18n="cpStep1">1 • Select Product</span>
+            <button class="btn btn-secondary" id="cpViewAnalytics" style="margin-left:auto" data-i18n="cpViewAnalytics">📊 View Analytics</button>
+          </div>
+          <div class="at-body">
+            <div class="cp-form-grid">
+              <div class="cp-field">
+                <label data-i18n="cpProduct">Product</label>
+                <select id="cpProduct">
+                  <option>EcoBottle 500ml — Batch #2024-Q4</option>
+                  <option>EcoBottle 500ml — Batch #2024-Q3</option>
+                  <option>EcoBottle 750ml — Batch #2024-Q4</option>
+                </select>
+              </div>
+              <div class="cp-field">
+                <label data-i18n="cpStart">Manufacturing Start</label>
+                <input type="date" id="cpStart" value="2024-11-18"/>
+              </div>
+              <div class="cp-field">
+                <label data-i18n="cpEnd">Manufacturing End</label>
+                <input type="date" id="cpEnd" value="2024-12-15"/>
+              </div>
+              <div class="cp-field">
+                <label data-i18n="cpVolume">Production Volume</label>
+                <input id="cpVolumeInput" placeholder="3,000 units"/>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2: Related Invoices & Scope Classification -->
+        <div class="at-section">
+          <div class="at-hd"><span data-i18n="cpStep2">2 • Related Invoices & Scope Classification</span></div>
+          <div class="at-body">
+
+            <div class="cp-scope-cards">
+              <div class="cp-scope-card">
+                <div class="cp-scope-num">12</div>
+                <div class="cp-scope-meta"><span class="title" data-i18n="cpScope1">Scope 1</span><span class="sub" data-i18n="cpScope1Desc">Direct Emissions</span></div>
+              </div>
+              <div class="cp-scope-card">
+                <div class="cp-scope-num">8</div>
+                <div class="cp-scope-meta"><span class="title" data-i18n="cpScope2">Scope 2</span><span class="sub" data-i18n="cpScope2Desc">Energy Indirect</span></div>
+              </div>
+              <div class="cp-scope-card">
+                <div class="cp-scope-num">45</div>
+                <div class="cp-scope-meta"><span class="title" data-i18n="cpScope3">Scope 3</span><span class="sub" data-i18n="cpScope3Desc">Other Indirect</span></div>
+              </div>
+            </div>
+
+            <table class="table" style="margin-top:8px">
+              <thead>
+                <tr>
+                  <th data-i18n="cpThInvoice">Invoice</th>
+                  <th data-i18n="cpThVendor">Vendor</th>
+                  <th data-i18n="cpThCategory">Category</th>
+                  <th data-i18n="cpThAmount">Amount</th>
+                  <th data-i18n="cpThScope">Scope</th>
+                  <th data-i18n="cpThConfidence">Confidence</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>INV-2024-1023</td>
+                  <td>Regional Power Co</td>
+                  <td>Electricity</td>
+                  <td>$2,845</td>
+                  <td><span class="scope-pill" data-i18n="cpScope2">Scope 2</span></td>
+                  <td><span class="conf-pill">98%</span></td>
+                </tr>
+                <tr>
+                  <td>INV-2024-1089</td>
+                  <td>PlasticCo Materials</td>
+                  <td>Raw Materials</td>
+                  <td>$12,500</td>
+                  <td><span class="scope-pill" data-i18n="cpScope3">Scope 3</span></td>
+                  <td><span class="conf-pill">95%</span></td>
+                </tr>
+                <tr>
+                  <td>INV-2024-1156</td>
+                  <td>Fleet Fuel Services</td>
+                  <td>Vehicle Fuel</td>
+                  <td>$890</td>
+                  <td><span class="scope-pill" data-i18n="cpScope1">Scope 1</span></td>
+                  <td><span class="conf-pill">98%</span></td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div class="cp-missing">
+              <div class="title" data-i18n="cpMissingTitle">Missing Critical Invoices Detected</div>
+              <ul>
+                <li data-i18n="cpMissing1">Waste management invoice for production period</li>
+                <li data-i18n="cpMissing2">Transportation invoice for finished goods delivery</li>
+              </ul>
+              <button class="btn btn-primary" id="cpUploadMissing" style="margin-top:8px" data-i18n="cpUploadMissing">⬆️ Upload Missing Invoices</button>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Step 3: Carbon Calculation -->
+        <div class="at-section">
+          <div class="at-hd" data-i18n="cpStep3">3 • Carbon Calculation</div>
+          <div class="at-body">
+            <div class="cp-integrations">
+              <div class="cp-integr">
+                <div><b data-i18n="cpEPA">EPA Energy Emissions API</b></div>
+                <div class="status"><span class="dot ok-dot"></span><span data-i18n="cpConnected">Connected</span></div>
+              </div>
+              <div class="cp-integr">
+                <div><b data-i18n="cpTransport">Transport Emissions Calculator</b></div>
+                <div class="status"><span class="dot ok-dot"></span><span data-i18n="cpConnected">Connected</span></div>
+              </div>
+              <div class="cp-integr">
+                <div><b data-i18n="cpWaste">Waste Processing Factors</b></div>
+                <div class="status"><span class="dot warn-dot"></span><span data-i18n="cpConnecting">Connecting...</span></div>
+              </div>
+              <div class="cp-integr">
+                <div><b data-i18n="cpMLDB">Material Lifecycle DB</b></div>
+                <div class="status"><span class="dot ok-dot"></span><span data-i18n="cpConnected">Connected</span></div>
+              </div>
+            </div>
+            <button class="btn btn-primary cp-wide-btn" id="cpCalcBtn" data-i18n="cpCalc">⚙️ Calculate Carbon Footprint</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- BANKING -->
+      <section class="subview" id="view-banking" style="display:none">
+        <!-- Banking Dashboard KPIs -->
+        <div class="at-section">
+          <div class="at-hd">🏦 <span data-i18n="bankingTitle">Banking Dashboard</span></div>
+          <div class="at-body">
+            <div class="kpi">
+              <div class="metric"><div class="label" data-i18n="bankTotalBalance">Total Balance</div><div class="value">$125,400</div></div>
+              <div class="metric"><div class="label" data-i18n="bankIncoming">Incoming (MTD)</div><div class="value">$42,800</div></div>
+              <div class="metric"><div class="label" data-i18n="bankOutgoing">Outgoing (MTD)</div><div class="value">$31,500</div></div>
+              <div class="metric"><div class="label" data-i18n="bankReconciliation">Reconciliation Rate</div><div class="value">86%</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bank Connections -->
+        <div class="at-section" style="margin-top:12px">
+          <div class="at-hd" data-i18n="bankConnections">Bank Connections</div>
+          <div class="at-body">
+            <div class="bnk-cards">
+              <div class="bnk-card">
+                <div class="bnk-name">Bank of America</div>
+                <div class="tag ok" data-i18n="statusConnected">Connected</div>
+                <div class="bnk-sync">Last Sync: 2 hrs ago</div>
+              </div>
+              <div class="bnk-card">
+                <div class="bnk-name">Wells Fargo</div>
+                <div class="tag warn" data-i18n="statusPending">Pending</div>
+                <div class="bnk-sync">Last Sync: —</div>
+              </div>
+              <div class="bnk-card">
+                <div class="bnk-name">Chase</div>
+                <div class="tag err" data-i18n="statusError">Error</div>
+                <div class="bnk-sync">Last Sync: 1 day ago</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Transactions -->
+        <div class="at-section" style="margin-top:12px">
+          <div class="at-hd" data-i18n="bankTransactions">Transactions</div>
+          <div class="at-body">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th data-i18n="bnkThDate">Date</th>
+                  <th data-i18n="bnkThAccount">Bank Account</th>
+                  <th data-i18n="bnkThVendor">Vendor</th>
+                  <th data-i18n="bnkThAmount">Amount</th>
+                  <th data-i18n="bnkThStatus">Status</th>
+                  <th data-i18n="bnkThInvoice">Invoice</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>2025-08-01</td>
+                  <td>Bank of America</td>
+                  <td>Amazon</td>
+                  <td>$250.00</td>
+                  <td><span class="tag ok" data-i18n="bnkReconciled">Reconciled</span></td>
+                  <td>INV-00123</td>
+                </tr>
+                <tr>
+                  <td>2025-08-02</td>
+                  <td>Wells Fargo</td>
+                  <td>Google Cloud</td>
+                  <td>$1,200.00</td>
+                  <td><span class="tag err" data-i18n="bnkMismatch">Mismatch</span></td>
+                  <td>INV-00124</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="grid" style="grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-top:12px">
+          <div class="at-section">
+            <div class="at-hd" data-i18n="bankChartInOut">Incoming vs Outgoing</div>
+            <div class="at-body"><canvas id="bnk_inout"></canvas></div>
+          </div>
+          <div class="at-section">
+            <div class="at-hd" data-i18n="bankChartRecon">Reconciliation Progress</div>
+            <div class="at-body"><canvas id="bnk_recon"></canvas></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- INTEGRATIONS -->
+      <section class="subview" id="view-integrations" style="display:none">
+        <div class="grid" style="grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px">
+          <div class="kpi"><div class="metric"><div class="label">Gmail</div><div class="value" data-i18n="connected">Connected</div></div></div>
+          <div class="kpi"><div class="metric"><div class="label">Drive</div><div class="value" data-i18n="connected">Connected</div></div></div>
+          <div class="kpi"><div class="metric"><div class="label">Telegram</div><div class="value" data-i18n="connected">Connected</div></div></div>
+        </div>
+      </section>
+
+      <!-- SETTINGS -->
+      <section class="subview" id="view-settings" style="display:none">
+        <div class="at-section"><div class="at-hd" data-i18n="settingsProfile">Profile</div>
+          <div class="at-body">
+            <div class="grid" style="grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px">
+              <div class="glass"><label data-i18n="settingsName">Name</label><input placeholder="John Doe" style="width:100%;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px"/></div>
+              <div class="glass"><label data-i18n="settingsCompany">Company</label><input placeholder="Acme Inc." style="width:100%;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px"/></div>
+            </div>
+            <button class="btn btn-primary" style="margin-top:10px" data-i18n="settingsSave">Save</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<!-- EXPORT VIEW -->
+<div class="view" id="download">
+  <div class="section" style="text-align:center">
+    <h2 data-i18n="dlTitle">Download this app</h2>
+    <p class="sub" data-i18n="dlSub">Save a single HTML you can run locally.</p>
+    <button class="btn btn-primary" data-i18n="dlBtn" onclick="downloadSelf()">📥 Download HTML</button>
+    <p class="sub" data-i18n="dlTip" style="margin-top:10px">Tip: you can also press <b>Ctrl/Cmd + S</b>.</p>
+  </div>
+</div>
+
+<!-- Mobile helpers (optional) -->
+<div class="mobile-nav" id="mnav" style="display:none">
+  <button data-i18n="home" data-jump="#general">Home</button>
+  <button data-i18n="why" data-jump="#differentiators">Why</button>
+  <button data-i18n="signup" data-jump="#signup">Sign‑up</button>
+</div>
+<button class="fab" id="fab" style="display:none" title="Quick upload">＋</button>
+
+<script>
+  // Simple router for top tabs
+  document.querySelectorAll('.pill').forEach(p=>{
+    p.addEventListener('click', ()=>{
+      document.querySelectorAll('.pill').forEach(x=>x.classList.remove('active'));
+      p.classList.add('active');
+      const t = p.dataset.tab;
+      document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+      document.getElementById(t).classList.add('active');
+      if(t==='dashboard'){ setTimeout(initDashboardCharts, 0); }
+      if(t==='landing'){ setTimeout(initSparklines, 0); }
+    });
+  });
+
+  // Dashboard sidebar
+  document.querySelectorAll('.sidebar .nav-item').forEach(n=> n.addEventListener('click', ()=>{
+    document.querySelectorAll('.sidebar .nav-item').forEach(x=>x.classList.remove('active'));
+    n.classList.add('active');
+    const target = 'view-'+n.dataset.sub;
+    document.querySelectorAll('.subview').forEach(v=> v.style.display='none');
+    document.getElementById(target).style.display='block';
+  }));
+
+  // Landing micro‑interactions
+  document.querySelectorAll('[data-target]').forEach(i=> i.addEventListener('click', ()=>{
+    const t = i.getAttribute('data-target');
+    document.querySelector(t)?.scrollIntoView({behavior:'smooth', block:'start'});
+  }));
+  document.getElementById('connectBtn').addEventListener('click', ()=>document.querySelector('#signup').scrollIntoView({behavior:'smooth'}));
+  document.getElementById('uploadBtn').addEventListener('click', ()=>alert(lang==='en'?'Open file picker (demo).':'Ouvrir le sélecteur de fichiers (démo).'));
+
+  // Mobile helpers visibility
+  const mq = window.matchMedia('(max-width: 980px)');
+  const toggleMobile = () => {
+    const show = mq.matches;
+    document.getElementById('mnav').style.display = show ? 'flex' : 'none';
+    document.getElementById('fab').style.display = show ? 'block' : 'none';
+  };
+  toggleMobile(); mq.addEventListener('change', toggleMobile);
+
+  // i18n — GLOBAL (Landing + Dashboard + Export + Accounting & Tax)
+  const i18n = {
+    en: {
+      topLanding:"Landing", topDashboard:"Dashboard", topExport:"Export",
+      navGeneral:"General", navDiff:"Why CloudCFO.ai?", navWhyCFO:"Why a Cloud CFO?", navMagic:"Experience the Magic", navSignup:"Sign‑up & Integrations", navDiff2:"Why CloudCFO.ai is Different", navPricing:"Pricing", navFAQ:"FAQ",
+      badgeSoc2:"SOC2‑ready", badgeOcr:"Sub‑second OCR", badgeCarbon:"Carbon Passport",
+      heroTitle:"Your AI‑Powered CFO in the Cloud",
+      heroSub:"Connect email, drives, and chats — CloudCFO auto‑discovers receipts, extracts data in <b>&lt;500ms</b>, and turns them into real‑time insights and a 🌱 Carbon Passport.",
+      btnConnect:"🔍 Connect your accounts", btnUpload:"📤 Quick upload",
+      worksWith:"Works with: Gmail · Drive · Dropbox · WhatsApp · Telegram",
+      metricTotalExpenses:"Total Expenses", metricCarbon:"Carbon this month", metricDocs:"Docs processed", metricHit:"Hit rate", metricAccSla:"✓ Accuracy SLA",
+      whyTitle:"Why CloudCFO", whySub:"AI‑first financial automation, native chat integrations, and built‑in carbon intelligence.",
+      featAI:"AI‑First Extraction", featAIDesc:"Advanced LLM + vision pipeline delivers <b>sub‑second</b> processing and self‑learning patterns.",
+      featChat:"WhatsApp & Telegram Native", featChatDesc:"Send a photo, we do the rest — the fastest way to capture receipts on mobile.",
+      featCarbon:"Carbon Passport", featCarbonDesc:"Automatic Scope 1/2/3 mapping from invoices with downloadable, verifiable passports.",
+      featDev:"Developer‑Friendly", featDevDesc:"Clean APIs & webhooks, great docs, and thoughtful defaults inspired by Stripe.",
+      // New: Why a Cloud CFO
+      whyCfoTitle:"Why a Cloud CFO, in the first place?",
+      whyCfo1Top:"8+ hours/week wasted on bookkeeping", whyCfo1Bottom:"Reduced to 30 minutes",
+      whyCfo2Top:"$3,000+ in missed deductions annually", whyCfo2Bottom:"AI finds every deduction",
+      whyCfo3Top:"Shoebox full of receipts", whyCfo3Bottom:"Cloud‑based organization",
+      whyCfo4Top:"Unknown carbon footprint", whyCfo4Bottom:"One‑click carbon tracking",
+      // New: Magic
+      magicTitle:"Experience the Magic",
+      magicSub:"See how easy it is to turn your receipts into insights. Try our live demo below—no signup required.",
+      dzTitle:"Drop your receipt here to see the magic",
+      dzOrClick:"or click to browse", dzSupport:"Supports: PDF, JPG, PNG, HEIC • Max 10MB • Instant processing",
+      dzResultTitle:"AI extraction (demo):",
+      kvVendor:"Vendor", kvAmount:"Amount", kvDate:"Date", kvCategory:"Category", kvTax:"VAT", kvCO2:"CO₂e",
+      dzBadge:"99% confidence • instant",
+      // Signup
+      signupTitle:"Sign‑up & Connect your channels", signupSub:"Choose any intake source below. We’ll start auto‑discovering receipts instantly.",
+      found:"found", accuracy:"Accuracy", connected:"Connected",
+      // Why different (after signup)
+      whyDifferentTitle:"Why CloudCFO.ai is Different",
+      whyDifferentSub:"The only financial platform that combines AI intelligence with environmental consciousness.",
+      diff2AI:"AI‑Powered Intelligence", diff2AIDesc:"GPT‑4 extraction with 99%+ accuracy.",
+      diff2Channels:"Multi‑Channel Capture", diff2ChannelsDesc:"WhatsApp, Telegram, Email, Photo, API.",
+      diff2Realtime:"Real‑Time Insights", diff2RealtimeDesc:"CFO‑level analytics updated instantly.",
+      diff2Carbon:"Carbon Accounting", diff2CarbonDesc:"Automatic carbon footprint per transaction.",
+      diff2Integrations:"Seamless Integration", diff2IntegrationsDesc:"Works with QuickBooks, Xero, and 30+ tools.",
+      // Pricing
+      pricingTitle:"Simple, Transparent Pricing", pricingSub:"Choose the plan that grows with your business",
+      planStarter:"CloudCFO Starter", planPro:"CloudCFO Pro", planBiz:"CloudCFO Business", perMonth:"/month", mostPopular:"MOST POPULAR",
+      planStarterTag:"Perfect for New Freelancers", planProTag:"Ideal for Growing Businesses", planBizTag:"Built for Scaling E‑commerce",
+      stFeat1:"50 AI‑processed documents", stFeat2:"1 bank connection", stFeat3:"Basic CFO insights", stFeat4:"Basic carbon tracking 🌱", stFeat5:"Email support",
+      proFeat1:"500 AI documents", proFeat2:"Unlimited banks", proFeat3:"Advanced AI insights", proFeat4:"Full carbon accounting 🌱", proFeat5:"WhatsApp & Telegram bots", proFeat6:"Priority support",
+      bizFeat1:"Unlimited AI processing", bizFeat2:"Team access", bizFeat3:"API access", bizFeat4:"Enterprise carbon reporting 🌱", bizFeat5:"ESG compliance tools 🌱", bizFeat6:"Dedicated account manager",
+      startTrial:"Start Free Trial",
+      // FAQ
+      faqTitle:"Frequently Asked Questions", faqSub:"Everything you need to know about CloudCFO.ai",
+      faq1Q:"How does AI processing work?", faq1A:"We combine OCR with a GPT‑4 vision model to extract fields like vendor, date, tax, and line items in under 500ms, with confidence scores and human‑in‑the‑loop when needed.",
+      faq2Q:"How do I set up WhatsApp and Telegram integration?", faq2A:"From the Dashboard → Integrations, connect your WhatsApp Business or Telegram bot, then forward photos or PDFs. Messages are auto‑classified to your inbox.",
+      faq3Q:"How does carbon accounting work? 🌱", faq3A:"We map each transaction to Scope 1/2/3 via vendor/category and estimate CO₂e using trusted emissions factors. You can export a verifiable Carbon Passport by product or period.",
+      faq4Q:"Which accounting software do you integrate with?", faq4A:"QuickBooks, Xero, Odoo and more via REST webhooks. We also support custom exports.",
+      faq5Q:"Is my data secure?", faq5A:"Yes — we are SOC2‑ready, encrypt data in transit and at rest, and offer fine‑grained permissions.",
+      faq6Q:"Can I try CloudCFO.ai before committing?", faq6A:"Of course! Start a free trial from the Pricing section. No credit card required for the demo.",
+      // Mobile nav
+      home:"Home", why:"Why", signup:"Sign‑up",
+      // Dashboard Sidebar
+      sbOverview:"Overview", sbReports:"Financial Reports", sbAccountingTax:"Accounting & Tax", sbPassport:"Carbon Passport", sbBanking:"Banking", sbIntegrations:"Integrations", sbSettings:"Settings",
+      sbPlan:"Pro Plan", sbDocs:"docs this month",
+      // Dashboard KPIs & Charts
+      metricTax:"Tax Deductions", metricCO2Month:"CO₂e (month)",
+      ovLineTitle:"Monthly Revenue vs Expenses", ovBarTitle:"Monthly Users",
+      repPnl:"P&L (Monthly)", repTopCats:"Top Categories", repCash:"Cash In vs Out",
+      // Accounting & Tax
+      atTitle:"Accounting & Tax Dashboard",
+      atKpiVatDue:"VAT / Sales Tax Due",
+      atKpiCorpTax:"Corporate Tax Estimate",
+      atKpiNextDeadline:"Next Filing Deadline",
+      atKpiStatus:"Compliance Status",
+      statusOnTrack:"On track", statusDue:"Due", statusPaid:"Paid", statusPlanned:"Planned",
+      atJurisdictionTitle:"Jurisdiction Preset", atJurisdiction:"Jurisdiction", atJurNote:"Choosing a preset adapts forms, tax types, and due dates.",
+      jurEU:"EU", jurUSA:"USA", jurUK:"UK",
+      atTaxByMonth:"Tax by Month",
+      atObligationsTitle:"Obligations & Filings",
+      thPeriod:"Period", thType:"Type", thJurisdiction:"Jurisdiction", thAmount:"Amount", thDue:"Due Date", thStatus:"Status", thAction:"Action",
+      typeVAT:"VAT Return", typeCIT:"Corporate Income Tax", typePayroll:"Payroll Tax",
+      actionFile:"File now", actionView:"View", actionReceipt:"Receipt",
+      // Carbon Passport (subset)
+      cpStep3:"3 • Carbon Calculation", apiEnergy:"EPA Energy Emissions API", apiTransport:"Transport Emissions Calculator", apiMaterials:"Material Lifecycle DB", apiConnected:"Connected", btnCalc:"⚙️ Calculate Carbon Footprint",
+      // Banking
+      bankTotalBalance:"Total Balance", bankIncoming:"Incoming (MTD)", bankOutgoing:"Outgoing (MTD)", bankReconciliation:"Reconciliation Rate",
+      bankChartInOut:"Incoming vs Outgoing", bankChartRecon:"Reconciliation Progress",
+      bnkReconciled:"Reconciled", bnkMismatch:"Mismatch", statusError:"Error",
+      // Settings
+      settingsProfile:"Profile", settingsName:"Name", settingsCompany:"Company", settingsSave:"Save",
+      // Export
+      dlTitle:"Download this app", dlSub:"Save a single HTML you can run locally.", dlBtn:"📥 Download HTML", dlTip:"Tip: you can also press <b>Ctrl/Cmd + S</b>."
+    },
+    fr: {
+      topLanding:"Accueil", topDashboard:"Tableau de bord", topExport:"Export",
+      navGeneral:"Général", navDiff:"Pourquoi CloudCFO.ai ?", navWhyCFO:"Pourquoi un CFO Cloud ?", navMagic:"Découvrez la magie", navSignup:"Inscription & Intégrations", navDiff2:"Pourquoi CloudCFO.ai est différent", navPricing:"Tarifs", navFAQ:"FAQ",
+      badgeSoc2:"Prêt pour SOC2", badgeOcr:"OCR en dessous d’1s", badgeCarbon:"Passeport Carbone",
+      heroTitle:"Votre CFO alimenté par l’IA, dans le cloud",
+      heroSub:"Connectez e‑mails, drives et messageries — CloudCFO découvre automatiquement les reçus, extrait les données en <b>&lt;500ms</b> et les transforme en insights temps réel et en 🌱 Passeport Carbone.",
+      btnConnect:"🔍 Connecter vos comptes", btnUpload:"📤 Téléversement rapide",
+      worksWith:"Fonctionne avec : Gmail · Drive · Dropbox · WhatsApp · Telegram",
+      metricTotalExpenses:"Dépenses totales", metricCarbon:"Carbone du mois", metricDocs:"Documents traités", metricHit:"Taux de réussite", metricAccSla:"✓ SLA de précision",
+      whyTitle:"Pourquoi CloudCFO", whySub:"Automatisation financière IA‑first, intégrations de messagerie natives et intelligence carbone intégrée.",
+      featAI:"Extraction IA‑First", featAIDesc:"Pipeline LLM + vision offrant un traitement <b>sub‑seconde</b> et des modèles auto‑apprenants.",
+      featChat:"Natif WhatsApp & Telegram", featChatDesc:"Envoyez une photo, on s’occupe du reste — la manière la plus rapide de capturer des reçus sur mobile.",
+      featCarbon:"Passeport Carbone", featCarbonDesc:"Cartographie automatique des Scopes 1/2/3 à partir des factures avec passeports téléchargeables et vérifiables.",
+      featDev:"Pensé pour les développeurs", featDevDesc:"APIs & webhooks clairs, excellente doc et bons défauts inspirés de Stripe.",
+      // New: Why a Cloud CFO
+      whyCfoTitle:"Pourquoi un CFO Cloud, au juste ?",
+      whyCfo1Top:"8+ h/semaine perdues en tenue comptable", whyCfo1Bottom:"Réduit à 30 minutes",
+      whyCfo2Top:"3 000 $+ de déductions manquées/an", whyCfo2Bottom:"L’IA trouve chaque déduction",
+      whyCfo3Top:"Boîte à chaussures pleine de reçus", whyCfo3Bottom:"Organisation dans le cloud",
+      whyCfo4Top:"Empreinte carbone inconnue", whyCfo4Bottom:"Suivi carbone en un clic",
+      // New: Magic
+      magicTitle:"Découvrez la magie",
+      magicSub:"Voyez comme il est simple de transformer vos reçus en insights. Testez la démo ci‑dessous — sans inscription.",
+      dzTitle:"Déposez votre reçu ici pour voir la magie",
+      dzOrClick:"ou cliquez pour parcourir", dzSupport:"Formats : PDF, JPG, PNG, HEIC • Max 10 Mo • Traitement instantané",
+      dzResultTitle:"Extraction IA (démo) :",
+      kvVendor:"Fournisseur", kvAmount:"Montant", kvDate:"Date", kvCategory:"Catégorie", kvTax:"TVA", kvCO2:"CO₂e",
+      dzBadge:"Confiance 99 % • instantané",
+      // Signup
+      signupTitle:"Inscrivez‑vous & connectez vos canaux", signupSub:"Choisissez une source ci‑dessous. Nous commencerons la découverte des reçus immédiatement.",
+      found:"trouvés", accuracy:"Précision", connected:"Connecté",
+      // Why different (after signup)
+      whyDifferentTitle:"Pourquoi CloudCFO.ai est différent",
+      whyDifferentSub:"La seule plateforme financière qui combine intelligence IA et conscience environnementale.",
+      diff2AI:"Intelligence alimentée par l’IA", diff2AIDesc:"Extraction GPT‑4 avec 99 %+ de précision.",
+      diff2Channels:"Capture multi‑canal", diff2ChannelsDesc:"WhatsApp, Telegram, Email, Photo, API.",
+      diff2Realtime:"Insights en temps réel", diff2RealtimeDesc:"Analytique de niveau CFO, mise à jour instantanément.",
+      diff2Carbon:"Comptabilité carbone", diff2CarbonDesc:"Empreinte carbone automatique par transaction.",
+      diff2Integrations:"Intégrations fluides", diff2IntegrationsDesc:"Fonctionne avec QuickBooks, Xero et 30+ outils.",
+      // Pricing
+      pricingTitle:"Tarification simple et transparente", pricingSub:"Choisissez l’offre qui grandit avec votre entreprise",
+      planStarter:"CloudCFO Starter", planPro:"CloudCFO Pro", planBiz:"CloudCFO Business", perMonth:"/mois", mostPopular:"LE PLUS POPULAIRE",
+      planStarterTag:"Parfait pour les nouveaux freelances", planProTag:"Idéal pour les entreprises en croissance", planBizTag:"Conçu pour l’e‑commerce à l’échelle",
+      stFeat1:"50 documents traités par l’IA", stFeat2:"1 connexion bancaire", stFeat3:"Aperçus CFO basiques", stFeat4:"Suivi carbone basique 🌱", stFeat5:"Support e‑mail",
+      proFeat1:"500 documents IA", proFeat2:"Banques illimitées", proFeat3:"Insights IA avancés", proFeat4:"Comptabilité carbone complète 🌱", proFeat5:"Bots WhatsApp & Telegram", proFeat6:"Support prioritaire",
+      bizFeat1:"Traitement IA illimité", bizFeat2:"Accès équipe", bizFeat3:"Accès API", bizFeat4:"Reporting carbone entreprise 🌱", bizFeat5:"Outils conformité ESG 🌱", bizFeat6:"Gestionnaire de compte dédié",
+      startTrial:"Commencer l’essai gratuit",
+      // FAQ
+      faqTitle:"Questions fréquentes", faqSub:"Tout ce qu’il faut savoir sur CloudCFO.ai",
+      faq1Q:"Comment fonctionne le traitement par IA ?", faq1A:"Nous combinons l’OCR avec un modèle de vision GPT‑4 pour extraire fournisseur, date, taxe et lignes en moins de 500 ms, avec scores de confiance et relecture humaine si besoin.",
+      faq2Q:"Comment configurer l’intégration WhatsApp et Telegram ?", faq2A:"Depuis Tableau de bord → Intégrations, connectez votre WhatsApp Business ou votre bot Telegram, puis transférez des photos ou PDF. Les messages sont auto‑classés.",
+      faq3Q:"Comment fonctionne la comptabilité carbone ? 🌱", faq3A:"Nous rattachons chaque transaction aux Scopes 1/2/3 via fournisseur/catégorie et estimons le CO₂e avec des facteurs reconnus. Export possible d’un Passeport Carbone vérifiable.",
+      faq4Q:"Avec quels logiciels comptables vous intégrez‑vous ?", faq4A:"QuickBooks, Xero, Odoo et plus via webhooks REST. Exports personnalisés pris en charge.",
+      faq5Q:"Mes données sont‑elles sécurisées ?", faq5A:"Oui — nous sommes prêts SOC2, chiffrons les données en transit et au repos, et proposons des permissions fines.",
+      faq6Q:"Puis‑je essayer CloudCFO.ai avant de m’engager ?", faq6A:"Bien sûr ! Lancez un essai gratuit depuis la section Tarifs. Carte bancaire non requise pour la démo.",
+      // Mobile nav
+      home:"Accueil", why:"Pourquoi", signup:"Inscription",
+      // Dashboard Sidebar
+      sbOverview:"Vue d’ensemble", sbReports:"Rapports financiers", sbAccountingTax:"Comptabilité & Fiscalité", sbPassport:"Passeport Carbone", sbBanking:"Banque", sbIntegrations:"Intégrations", sbSettings:"Paramètres",
+      sbPlan:"Offre Pro", sbDocs:"docs ce mois‑ci",
+      // Dashboard KPIs & Charts
+      metricTax:"Déductions fiscales", metricCO2Month:"CO₂e (mois)",
+      ovLineTitle:"Revenus vs Dépenses mensuels", ovBarTitle:"Utilisateurs mensuels",
+      repPnl:"Compte de résultat (mensuel)", repTopCats:"Catégories principales", repCash:"Entrées vs Sorties de trésorerie",
+      // Accounting & Tax
+      atTitle:"Tableau Comptabilité & Fiscalité",
+      atKpiVatDue:"TVA / Taxe à la consommation due",
+      atKpiCorpTax:"Estimation de l’impôt sur les sociétés",
+      atKpiNextDeadline:"Prochaine échéance de dépôt",
+      atKpiStatus:"Statut de conformité",
+      statusOnTrack:"À l’heure", statusDue:"À payer", statusPaid:"Payé", statusPlanned:"Planifié",
+      atJurisdictionTitle:"Préréglage de juridiction", atJurisdiction:"Juridiction", atJurNote:"Le préréglage adapte les formulaires, types d’impôts et échéances.",
+      jurEU:"UE", jurUSA:"USA", jurUK:"Royaume‑Uni",
+      atTaxByMonth:"Impôts par mois",
+      atObligationsTitle:"Obligations & Déclarations",
+      thPeriod:"Période", thType:"Type", thJurisdiction:"Juridiction", thAmount:"Montant", thDue:"Échéance", thStatus:"Statut", thAction:"Action",
+      typeVAT:"Déclaration de TVA", typeCIT:"Impôt sur les sociétés", typePayroll:"Charges sociales",
+      actionFile:"Déposer maintenant", actionView:"Voir", actionReceipt:"Reçu",
+      // Carbon Passport (subset)
+      cpStep3:"3 • Calcul carbone", apiEnergy:"API des émissions d’énergie (EPA)", apiTransport:"Calculateur d’émissions de transport", apiMaterials:"BD cycle de vie des matériaux", apiConnected:"Connecté", btnCalc:"⚙️ Calculer l’empreinte carbone",
+      // Banking
+      bankTotalBalance:"Solde total", bankIncoming:"Entrées (MTD)", bankOutgoing:"Sorties (MTD)", bankReconciliation:"Taux de rapprochement",
+      bankChartInOut:"Entrées vs Sorties", bankChartRecon:"Progression du rapprochement",
+      bnkReconciled:"Rapproché", bnkMismatch:"Écart", statusError:"Erreur",
+      // Settings
+      settingsProfile:"Profil", settingsName:"Nom", settingsCompany:"Société", settingsSave:"Enregistrer",
+      // Export
+      dlTitle:"Télécharger cette application", dlSub:"Enregistrez un seul fichier HTML exécutable en local.", dlBtn:"📥 Télécharger l’HTML", dlTip:"Astuce : vous pouvez aussi faire <b>Ctrl/Cmd + S</b>."
+    }
+  };
+
+  // Extend i18n with Accounting & Tax strings not yet present (from previous version)
+  Object.assign(i18n.en, {
+    atTopRevenueYTD:"Total Revenue (YTD)",
+    atTopExpensesYTD:"Total Expenses (YTD)",
+    atTopNetMargin:"Net Profit Margin",
+    atTopCashPosition:"Cash Flow Position",
+    atPipelineTitle:"AI Intake Pipeline",
+    pipeOCR:"OCR & Parsing",
+    pipeCategorization:"Categorization",
+    pipeAdvClassif:"Advanced Classification",
+    pipeAnomaly:"Anomaly Detection",
+    pipeAcctPlatforms:"Accounting Platforms",
+    statusConnected:"Connected",
+    statusPending:"Pending",
+    statusAPI:"API",
+    atWatchNote:"Note — demo data for illustration. A saved “CloudCFO preset” adjusts forms & due dates by jurisdiction; not legal advice.",
+    btnApplyPreset:"Apply preset",
+    atTaxOverview:"Tax Overview",
+    dueIn12:"Due in: 12 days",
+    dueIn28:"Due in: 28 days",
+    dueIn5:"Due in: 5 days",
+    statusFiled:"Filed",
+    statusOverdue:"Overdue",
+    atValidationTitle:"Validation Checklist",
+    atValidationSub:"Automated checks based on your selected jurisdiction. Demo only, not legal advice.",
+    statusValidated:"validated",
+    statusUndefined:"undefined",
+    checkVATVIES:"VAT number format (VIES)",
+    checkReverse:"Reverse charge rules applied",
+    checkECSales:"EC Sales List (if applicable)",
+    tipChecklist:"Tip — Click any item to view action tips.",
+    atRevVsExpTitle:"Revenue vs Expenses",
+    atCashFlowForecast:"Cash Flow Forecast",
+    atTaxBreakdown:"Tax Liability Breakdown",
+    atAgingTitle:"Aging",
+    atAskTitle:"Ask your data (Natural Language)",
+    atQueryPH:"e.g., show unreconciled VAT invoices from Q2",
+    btnRun:"Run",
+    atAskHint:"Hint: we’ll parse keywords like VAT/GST, status (pending/overdue), and periods (Q1, Q2, last month) to filter results below (demo).",
+    atReportsTitle:"Reports",
+    chipBS:"Balance Sheet",
+    chipCF:"Cash Flow",
+    chipTaxHistory:"Tax Filing History",
+    atThDate:"Date", atThDesc:"Description", atThCategory:"Category", atThAmount:"Amount", atThTaxType:"Tax Type", atThStatus:"Status", atThInvoice:"Invoice",
+    cardCorporate:"Corporate Tax", cardPayroll:"Payroll Taxes"
+  });
+  Object.assign(i18n.fr, {
+    atTopRevenueYTD:"Chiffre d’affaires total (YTD)",
+    atTopExpensesYTD:"Dépenses totales (YTD)",
+    atTopNetMargin:"Marge nette",
+    atTopCashPosition:"Position de trésorerie",
+    atPipelineTitle:"Pipeline d’ingestion IA",
+    pipeOCR:"OCR & Parsing",
+    pipeCategorization:"Catégorisation",
+    pipeAdvClassif:"Classification avancée",
+    pipeAnomaly:"Détection d’anomalies",
+    pipeAcctPlatforms:"Plateformes comptables",
+    statusConnected:"Connecté",
+    statusPending:"En attente",
+    statusAPI:"API",
+    atWatchNote:"Note — données de démonstration. Un « preset CloudCFO » adapte formulaires et échéances selon la juridiction ; ceci n’est pas un conseil juridique.",
+    btnApplyPreset:"Appliquer le préréglage",
+    atTaxOverview:"Vue fiscale",
+    dueIn12:"Échéance : 12 jours",
+    dueIn28:"Échéance : 28 jours",
+    dueIn5:"Échéance : 5 jours",
+    statusFiled:"Déposé",
+    statusOverdue:"En retard",
+    atValidationTitle:"Liste de validation",
+    atValidationSub:"Contrôles automatisés selon la juridiction choisie. Démo, pas un avis juridique.",
+    statusValidated:"validé",
+    statusUndefined:"indéfini",
+    checkVATVIES:"Format du numéro de TVA (VIES)",
+    checkReverse:"Règles d’autoliquidation appliquées",
+    checkECSales:"Déclaration d’échanges de biens (si applicable)",
+    tipChecklist:"Astuce — cliquez sur un élément pour voir les actions.",
+    atRevVsExpTitle:"Revenus vs Dépenses",
+    atCashFlowForecast:"Prévision de trésorerie",
+    atTaxBreakdown:"Répartition des impôts",
+    atAgingTitle:"Ancienneté",
+    atAskTitle:"Interrogez vos données (langage naturel)",
+    atQueryPH:"ex. afficher les factures TVA non rapprochées du T2",
+    btnRun:"Lancer",
+    atAskHint:"Astuce : nous analysons des mots‑clés comme TVA/VAT, statut (en attente/en retard) et périodes (T1, T2, dernier mois) pour filtrer ci‑dessous (démo).",
+    atReportsTitle:"Rapports",
+    chipBS:"Bilan",
+    chipCF:"Flux de trésorerie",
+    chipTaxHistory:"Historique des dépôts fiscaux",
+    atThDate:"Date", atThDesc:"Description", atThCategory:"Catégorie", atThAmount:"Montant", atThTaxType:"Type d’impôt", atThStatus:"Statut", atThInvoice:"Pièce",
+    cardCorporate:"Impôt sur les sociétés", cardPayroll:"Charges sociales"
+  });
+
+  let lang='en';
+  function applyI18n(){
+    document.querySelectorAll('[data-i18n]').forEach(el=>{
+      const key = el.getAttribute('data-i18n');
+      if(i18n[lang] && i18n[lang][key]) el.innerHTML = i18n[lang][key];
+      // Update Carbon Passport placeholders
+      const cpVol = document.getElementById('cpVolumeInput');
+      if(cpVol && i18n[lang] && i18n[lang].cpVolPH){ cpVol.placeholder = i18n[lang].cpVolPH; }
+    });
+    document.getElementById('btnEN').classList.toggle('active', lang==='en');
+    document.getElementById('btnFR').classList.toggle('active', lang==='fr');
+    document.getElementById('fab').title = lang==='en' ? 'Quick upload' : 'Téléversement rapide';
+    // Update dynamic chart labels if already initialized
+    if(window._chartsInitialized){ updateChartLabels(); }
+
+    // Update placeholders
+    const ph = document.querySelector('[data-i18n-placeholder="atQueryPH"]');
+    if(ph && i18n[lang] && i18n[lang].atQueryPH){ ph.placeholder = i18n[lang].atQueryPH; }
+  }
+  document.getElementById('btnEN').onclick = ()=>{lang='en'; applyI18n();};
+  document.getElementById('btnFR').onclick = ()=>{lang='fr'; applyI18n();};
+
+  // Sparklines on landing device
+  function initSparklines(){
+    const ctx1 = document.getElementById('spark1')?.getContext('2d');
+    const ctx2 = document.getElementById('spark2')?.getContext('2d');
+    if(!ctx1 || !ctx2) return;
+    const grad = (ctx, c1, c2)=>{ const g = ctx.createLinearGradient(0,0,0,100); g.addColorStop(0, c1); g.addColorStop(1, c2); return g; };
+    const common = {plugins:{legend:{display:false}, tooltip:{backgroundColor:'rgba(255,255,255,.6)', titleColor:'#0a1628', bodyColor:'#0a1628', borderColor:'rgba(0,0,0,.1)', borderWidth:1, padding:10}}, scales:{x:{display:false}, y:{display:false}}, elements:{line:{tension:.4, borderWidth:2}, point:{radius:0}}};
+    new Chart(ctx1, {type:'line', data:{labels:[...Array(16).keys()], datasets:[{data:[8,9,8,10,12,13,12,14,16,15,16,18,16,19,18,20], borderColor:'#7dc5ff', fill:true, backgroundColor:grad(ctx1, 'rgba(125,197,255,.5)','rgba(125,197,255,0)')} ]}, options: common});
+    new Chart(ctx2, {type:'line', data:{labels:[...Array(16).keys()], datasets:[{data:[2.8,2.6,2.5,2.7,2.4,2.3,2.5,2.2,2.1,2.3,2.2,2.0,2.1,2.0,2.4,2.4], borderColor:'#7fffd4', fill:true, backgroundColor:grad(ctx2, 'rgba(127,255,212,.45)','rgba(127,255,212,0)')}]}, options: common});
+  }
+  initSparklines();
+
+  // Dashboard charts
+  let dashInit=false;
+  let _charts = {};
+  
+  function initDashboardCharts(){
+    if(dashInit) return; dashInit=true;
+    window._chartsInitialized = true;
+    _charts = {};
+    const el = (id)=>document.getElementById(id);
+
+    if(el('ov_line')){
+      _charts.ov_line = new Chart(el('ov_line'),{
+        type:'line',
+        data:{labels:['Jan','Mar','May','Jul','Sep','Nov'],
+          datasets:[{label: (i18n[lang].repRevenue || 'Revenue'), data:[70,85,120,150,170,200], borderColor:'#0066FF',tension:.3,fill:false},
+                    {label: (i18n[lang].repExpenses || 'Expenses'), data:[40,50,60,70,85,95], borderColor:'#10B981',tension:.3,fill:false}]},
+        options:{plugins:{legend:{position:'bottom'}},scales:{y:{grid:{color:'rgba(0,0,0,.06)'}}}}
+      });
+    }
+    if(el('ov_bar')){
+      _charts.ov_bar = new Chart(el('ov_bar'),{
+        type:'bar',
+        data:{labels:['Jan','Mar','May','Jul','Sep','Nov'],
+          datasets:[{label: (i18n[lang].repActiveUsers || 'Active Users'), data:[120,240,380,560,720,900],backgroundColor:'#0891B2'}]},
+        options:{plugins:{legend:{display:false}},scales:{y:{grid:{color:'rgba(0,0,0,.06)'}}}}
+      });
+    }
+    if(el('rep_pnl')){
+      _charts.rep_pnl = new Chart(el('rep_pnl'),{
+        type:'bar',
+        data:{labels:['Jan','Feb','Mar','Apr','May','Jun'],
+          datasets:[{label: (i18n[lang].repRevenue || 'Revenue'),data:[45,50,58,62,70,76],backgroundColor:'#0066FF'},
+                    {label: (i18n[lang].repCogs || 'COGS'),data:[18,20,21,22,25,28],backgroundColor:'#9CA3AF'},
+                    {label: (i18n[lang].repOpex || 'OpEx'),data:[12,13,14,16,18,19],backgroundColor:'#10B981'}]},
+        options:{plugins:{legend:{position:'bottom'}},scales:{y:{grid:{color:'rgba(0,0,0,.06)'}}}}
+      });
+    }
+    if(el('rep_doughnut')){
+      _charts.rep_doughnut = new Chart(el('rep_doughnut'),{
+        type:'doughnut',
+        data:{labels:['Ops','Marketing','G&A','R&D'], datasets:[{data:[42,26,18,14]}]},
+        options:{plugins:{legend:{position:'right'}}}
+      });
+    }
+    if(el('rep_cash')){
+      _charts.rep_cash = new Chart(el('rep_cash'),{
+        type:'line',
+        data:{labels:['Jan','Feb','Mar','Apr','May','Jun'],
+          datasets:[{label:(i18n[lang].repCash || 'Cash In vs Out'), data:[-12,10,15,-5,22,18], borderColor:'#7dc5ff', fill:false, tension:.3}]},
+        options:{plugins:{legend:{display:false}},scales:{y:{grid:{color:'rgba(0,0,0,.06)'}}}}
+      });
+    }
+
+    // New ACCOUNTING & TAX charts
+    if(el('at_revexp')){
+      _charts.at_revexp = new Chart(el('at_revexp'),{
+        type:'line',
+        data:{labels:['Jan','Feb','Mar','Apr','May','Jun'],
+          datasets:[{label:(i18n[lang].repRevenue || 'Revenue'), data:[250,310,380,430,520,600], borderColor:'#0066FF', tension:.35, fill:false},
+                    {label:(i18n[lang].repExpenses || 'Expenses'), data:[180,200,260,290,320,360], borderColor:'#10B981', tension:.35, fill:false}]},
+        options:{plugins:{legend:{position:'bottom'}}, scales:{y:{grid:{color:'rgba(0,0,0,.06)'}}}}
+      });
+    }
+    if(el('at_cash')){
+      _charts.at_cash = new Chart(el('at_cash'),{
+        type:'line',
+        data:{labels:['Jan','Feb','Mar','Apr','May','Jun'],
+          datasets:[{label:(i18n[lang].atCashFlowForecast || 'Cash Flow Forecast'), data:[-40,20,60,-10,90,150], borderColor:'#3aa3ff', tension:.35, fill:false}]},
+        options:{plugins:{legend:{display:false}}, scales:{y:{grid:{color:'rgba(0,0,0,.06)'}}}}
+      });
+    }
+    if(el('at_donut')){
+      _charts.at_donut = new Chart(el('at_donut'),{
+        type:'doughnut',
+        data:{labels:['VAT/GST','Corporate Tax','Payroll'], datasets:[{data:[49,120,22]}]},
+        options:{plugins:{legend:{position:'right'}}}
+      });
+    }
+    if(el('at_aging')){
+      _charts.at_aging = new Chart(el('at_aging'),{
+        type:'bar',
+        data:{labels:['0–30d','31–60d','61–90d','90d+'],
+          datasets:[{label:(i18n[lang].atAgingTitle || 'Aging'), data:[120,90,60,30], backgroundColor:'#10B981'}]},
+        options:{plugins:{legend:{display:false}}, scales:{y:{grid:{color:'rgba(0,0,0,.06)'}}}}
+      });
+    }
+
+    // Banking charts
+    if(el('bnk_inout')){
+      _charts.bnk_inout = new Chart(el('bnk_inout'),{
+        type:'bar',
+        data:{labels:['W1','W2','W3','W4'],
+          datasets:[{label:'In', data:[12,14,9,8], backgroundColor:'#10B981'},
+                    {label:'Out', data:[9,10,12,11], backgroundColor:'#EF4444'}]},
+        options:{plugins:{legend:{position:'bottom'}}}
+      });
+    }
+    if(el('bnk_recon')){
+      _charts.bnk_recon = new Chart(el('bnk_recon'),{
+        type:'doughnut',
+        data:{labels:[i18n[lang].bnkReconciled || 'Reconciled', i18n[lang].statusPending || 'Pending', i18n[lang].bnkMismatch || 'Mismatch'],
+              datasets:[{data:[86,8,6]}]},
+        options:{plugins:{legend:{position:'right'}}}
+      });
+    }
+  }
+
+  function updateChartLabels(){
+    if(!_charts) return;
+    if(_charts.ov_line){
+      _charts.ov_line.data.datasets[0].label = i18n[lang].repRevenue || 'Revenue';
+      _charts.ov_line.data.datasets[1].label = i18n[lang].repExpenses || 'Expenses';
+    }
+    if(_charts.ov_bar){
+      _charts.ov_bar.data.datasets[0].label = i18n[lang].repActiveUsers || 'Active Users';
+    }
+    if(_charts.rep_cash){
+      _charts.rep_cash.data.datasets[0].label = i18n[lang].repCash || 'Cash In vs Out';
+    }
+    if(_charts.at_revexp){
+      _charts.at_revexp.data.datasets[0].label = i18n[lang].repRevenue || 'Revenue';
+      _charts.at_revexp.data.datasets[1].label = i18n[lang].repExpenses || 'Expenses';
+    }
+    if(_charts.at_cash){
+      _charts.at_cash.data.datasets[0].label = i18n[lang].atCashFlowForecast || 'Cash Flow Forecast';
+    }
+    if(_charts.at_aging){
+      _charts.at_aging.data.datasets[0].label = i18n[lang].atAgingTitle || 'Aging';
+    }
+    if(_charts.bnk_recon){
+      _charts.bnk_recon.data.labels = [i18n[lang].bnkReconciled || 'Reconciled', i18n[lang].statusPending || 'Pending', i18n[lang].bnkMismatch || 'Mismatch'];
+    }
+    Object.values(_charts).forEach(c=> c.update && c.update());
+  }
+
+  // Carbon Passport demo interactions
+  function initCPDemo(){
+    const calc = document.getElementById('cpCalcBtn');
+    if(calc && !calc._bound){
+      calc._bound = true;
+      calc.addEventListener('click', ()=>{
+        const product = document.getElementById('cpProduct')?.value || 'Batch';
+        const vol = document.getElementById('cpVolumeInput')?.value || (i18n[lang]?.cpVolPH || '3,000 units');
+        alert((lang==='fr' ? 'Estimation (démo) — ' : 'Estimate (demo) — ') + product + '\\n' +
+              (lang==='fr' ? 'Volume : ' : 'Volume: ') + vol + '\\nCO₂e ≈ 5.8 t (S1: 1.2 • S2: 0.9 • S3: 3.7)');
+      });
+    }
+    const up = document.getElementById('cpUploadMissing');
+    if(up && !up._bound){
+      up._bound = true;
+      up.addEventListener('click', ()=> alert(lang==='fr' ? 'Ouvrir le téléversement (démo).' : 'Open upload (demo).'));
+    }
+    const va = document.getElementById('cpViewAnalytics');
+    if(va && !va._bound){
+      va._bound = true;
+      va.addEventListener('click', ()=> alert(lang==='fr' ? 'Ouvrir l’analytique (démo).' : 'Open analytics (demo).'));
+    }
+  }
+  // Run once on load
+  setTimeout(initCPDemo, 0);
+
+  // Export current app to HTML
+  function downloadSelf(){
+    const blob = new Blob([document.documentElement.outerHTML], {type:'text/html;charset=utf-8'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'CloudCFO-App-Bilingual-AccountingTax-FullFR_v18_updated-CarbonPassport-Banking.html';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
+  }
+
+  // Minimal demo behaviour for NLQ filter
+  setTimeout(()=>{
+    const run = document.getElementById('nlqRun');
+    const input = document.getElementById('nlqIn');
+    const table = document.querySelector('#view-acctax table.table tbody');
+    if(!run || !input || !table) return;
+    const rows = Array.from(table.querySelectorAll('tr'));
+    const applyFilter = () => {
+      const q = (input.value||'').toLowerCase();
+      rows.forEach(r => r.style.display = '');
+      if(q.includes('vat') || q.includes('gst')){
+        rows[1].style.display = 'none';
+      }else if(q.includes('payroll')){
+        rows[0].style.display = 'none';
+      }
+      if(q.includes('pending') || q.includes('overdue')){
+        rows[0].style.display = 'none';
+      }
+      if(q.includes('filed')){
+        rows[1].style.display = 'none';
+      }
+    };
+    run.addEventListener('click', applyFilter);
+    input.addEventListener('keydown', e=>{ if(e.key==='Enter') applyFilter(); });
+  }, 0);
+
+  // FAQ accordion
+  document.querySelectorAll('.faq .item .q').forEach(q => {
+    q.addEventListener('click', ()=>{
+      const a = q.parentElement.querySelector('.a');
+      const t = q.querySelector('.toggle');
+      const open = a.style.display === 'block';
+      a.style.display = open ? 'none' : 'block';
+      t.textContent = open ? '＋' : '–';
+    });
+  });
+
+  // Dropzone demo
+  const dz = document.getElementById('dropzone');
+  const fileInput = document.getElementById('fileInput');
+  const panel = document.getElementById('resultPanel');
+  const box = document.getElementById('resultBox');
+  dz.addEventListener('click', ()=> fileInput.click());
+  dz.addEventListener('dragover', (e)=>{ e.preventDefault(); dz.style.filter='brightness(1.02)'; });
+  dz.addEventListener('dragleave', ()=> dz.style.filter='');
+  dz.addEventListener('drop', (e)=>{
+    e.preventDefault();
+    handleFile(e.dataTransfer.files[0]);
+    dz.style.filter='';
+  });
+  fileInput.addEventListener('change', ()=>{
+    const f = fileInput.files[0];
+    if(f) handleFile(f);
+  });
+  function handleFile(f){
+    panel.firstElementChild.style.display='none';
+    box.style.display='block';
+  }
+
+  // Apply initial language
+  applyI18n();
+</script>
+</body>
+</html>
