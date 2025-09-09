@@ -1,0 +1,1761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CloudCFO.ai — AI Financial Intelligence Platform | Enterprise Dashboard Suite</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  :root{
+    --primary-navy:#0A1628;
+    --electric:#0066FF;
+    --electric-light:#3385ff;
+    --teal:#0fb6d3;
+    --emerald:#10B981;
+    --amber:#F59E0B;
+    --coral:#FF6B6B;
+    --purple:#8B5CF6;
+    --gray-900:#0b1220;
+    --gray-800:#111827;
+    --gray-700:#374151;
+    --gray-600:#4B5563;
+    --gray-500:#6B7280;
+    --gray-400:#9CA3AF;
+    --off:#FAFBFC;
+    --white:#fff;
+    --glass: rgba(255, 255, 255, 0.1);
+    --glass-border: rgba(255, 255, 255, 0.2);
+    --shadow-xl:0 20px 40px rgba(10,22,40,.15);
+    --shadow-2xl:0 25px 50px rgba(10,22,40,.2);
+    --shadow-glow:0 0 40px rgba(0,102,255,.3);
+    --radius:20px;
+    --radius-lg:24px;
+    --ease: cubic-bezier(.22,.61,.36,1);
+    --spring: cubic-bezier(.68,-.55,.265,1.55);
+  }
+  
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;padding:0}
+  body{
+    font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    color:var(--gray-800);
+    background: #000;
+    overflow-x: hidden;
+  }
+
+  /* Premium Background */
+  .premium-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+      radial-gradient(circle at 20% 50%, rgba(0,102,255,0.15) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(139,92,246,0.1) 0%, transparent 50%),
+      radial-gradient(circle at 40% 20%, rgba(16,185,129,0.1) 0%, transparent 50%),
+      linear-gradient(180deg, #0a0e1a 0%, #0f1823 50%, #0a0e1a 100%);
+    z-index: -1;
+  }
+
+  /* Animated Grid Background */
+  .grid-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+      linear-gradient(rgba(0,102,255,0.1) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,102,255,0.1) 1px, transparent 1px);
+    background-size: 50px 50px;
+    animation: grid-move 20s linear infinite;
+    z-index: -1;
+    opacity: 0.3;
+  }
+
+  @keyframes grid-move {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(50px, 50px); }
+  }
+
+  /* Premium Glass Topbar */
+  .topbar{
+    position:sticky; 
+    top:0; 
+    z-index:1000;
+    display:flex; 
+    align-items:center; 
+    gap:16px;
+    padding:12px 20px;
+    background: rgba(10,14,26,0.8);
+    backdrop-filter: blur(20px);
+    border-bottom:1px solid rgba(255,255,255,.1);
+  }
+
+  /* Language Toggle */
+  .lang-toggle{
+    display:flex; 
+    gap:8px; 
+    margin-right:12px
+  }
+  .lang-btn{
+    background:rgba(255,255,255,0.05); 
+    color:#fff; 
+    border:1px solid rgba(255,255,255,.1); 
+    border-radius:999px; 
+    padding:6px 12px; 
+    cursor:pointer; 
+    font-weight:600;
+    transition: all 0.3s var(--ease);
+  }
+  .lang-btn:hover{
+    background:rgba(255,255,255,0.1);
+    transform: translateY(-1px);
+  }
+  .lang-btn.active{
+    background:linear-gradient(135deg, var(--electric), var(--electric-light)); 
+    color:#fff; 
+    border-color:transparent; 
+    box-shadow:var(--shadow-glow);
+  }
+
+  /* Brand */
+  .brand{
+    display:flex; 
+    align-items:center; 
+    gap:12px; 
+    font-weight:800; 
+    letter-spacing:-.02em; 
+    font-size:20px;
+    color: #fff;
+  }
+  .brand .badge{
+    padding:4px 10px; 
+    border-radius:999px; 
+    background:linear-gradient(135deg, var(--purple), #a78bfa); 
+    color:#fff; 
+    font-size:11px; 
+    font-weight:700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  /* Live Status */
+  .live-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+    padding: 8px 16px;
+    background: rgba(16,185,129,0.1);
+    border: 1px solid rgba(16,185,129,0.3);
+    border-radius: 999px;
+    color: #10B981;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    background: #10B981;
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.2); }
+  }
+
+  /* Navigation Pills */
+  .nav-pills{
+    display:flex; 
+    gap:8px;
+    margin-left: 20px;
+  }
+  .pill{
+    background:rgba(255,255,255,0.05); 
+    border:1px solid rgba(255,255,255,.1); 
+    padding:8px 16px; 
+    border-radius:999px; 
+    font-weight:600; 
+    cursor:pointer;
+    color: rgba(255,255,255,0.7);
+    transition: all 0.3s var(--ease);
+  }
+  .pill:hover{
+    background:rgba(255,255,255,0.1);
+    color: #fff;
+    transform: translateY(-1px);
+  }
+  .pill.active{
+    background:linear-gradient(135deg, var(--electric), var(--electric-light)); 
+    color:#fff; 
+    box-shadow:var(--shadow-glow);
+    border-color: transparent;
+  }
+
+  /* App Layout */
+  .app{
+    min-height:calc(100vh - 60px);
+    position: relative;
+  }
+
+  /* Hero Section */
+  .hero{
+    position:relative; 
+    overflow:hidden; 
+    padding: 80px 20px 120px;
+    background: transparent;
+  }
+
+  .hero-inner{
+    max-width:1400px; 
+    margin:0 auto; 
+    display:grid; 
+    grid-template-columns:1.2fr 0.8fr; 
+    gap:60px; 
+    align-items:center;
+  }
+
+  .hero h1{
+    font-size: clamp(40px,5vw,72px); 
+    line-height:1.05; 
+    margin:0 0 20px; 
+    letter-spacing:-.03em;
+    background: linear-gradient(135deg, #fff, #cbd5e1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 900;
+  }
+
+  .hero-subtitle{
+    font-size: clamp(18px,1.5vw,24px);
+    color: rgba(255,255,255,0.8);
+    margin-bottom: 30px;
+    line-height: 1.5;
+  }
+
+  /* Performance Badge */
+  .perf-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+    background: linear-gradient(135deg, rgba(0,102,255,0.2), rgba(0,102,255,0.1));
+    border: 1px solid rgba(0,102,255,0.3);
+    border-radius: 999px;
+    margin-bottom: 30px;
+  }
+  .perf-metric {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #fff;
+  }
+  .perf-metric strong {
+    color: var(--electric-light);
+    font-size: 20px;
+  }
+
+  /* CTA Buttons */
+  .cta{
+    display:flex; 
+    gap:16px; 
+    margin-top:30px;
+    flex-wrap: wrap;
+  }
+  .btn{
+    padding:14px 24px; 
+    border-radius:12px; 
+    font-weight:700; 
+    border:0; 
+    cursor:pointer; 
+    transition:all 0.3s var(--ease);
+    font-size: 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .btn-primary{
+    background:linear-gradient(135deg, var(--electric), var(--electric-light)); 
+    color:white; 
+    box-shadow:0 10px 30px rgba(0,102,255,.3);
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+  }
+  .btn-primary:hover::before {
+    left: 100%;
+  }
+  .btn-primary:hover{
+    transform:translateY(-2px);
+    box-shadow:0 15px 40px rgba(0,102,255,.4);
+  }
+  .btn-secondary{
+    background:rgba(255,255,255,0.1); 
+    color:white; 
+    border:1px solid rgba(255,255,255,.2); 
+    backdrop-filter: blur(10px);
+  }
+  .btn-secondary:hover{
+    background:rgba(255,255,255,0.15);
+    transform:translateY(-2px);
+  }
+
+  /* Dashboard Selector */
+  .dashboard-selector {
+    max-width: 1200px;
+    margin: 80px auto;
+    padding: 0 20px;
+  }
+  
+  .dashboard-selector h2 {
+    font-size: 48px;
+    font-weight: 900;
+    text-align: center;
+    margin-bottom: 20px;
+    background: linear-gradient(135deg, #fff, #cbd5e1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  .dashboard-selector p {
+    text-align: center;
+    color: rgba(255,255,255,0.7);
+    font-size: 20px;
+    margin-bottom: 60px;
+  }
+  
+  .dashboard-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 30px;
+  }
+  
+  .dashboard-card {
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 24px;
+    padding: 40px;
+    text-align: center;
+    transition: all 0.3s var(--ease);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .dashboard-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--electric), transparent);
+    animation: shimmer 3s ease-in-out infinite;
+  }
+  
+  .dashboard-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 30px 60px rgba(0,102,255,0.3);
+    border-color: var(--electric);
+  }
+  
+  .dashboard-icon {
+    font-size: 64px;
+    margin-bottom: 20px;
+  }
+  
+  .dashboard-title {
+    font-size: 28px;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 12px;
+  }
+  
+  .dashboard-desc {
+    color: rgba(255,255,255,0.7);
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+  
+  .dashboard-btn {
+    background: linear-gradient(135deg, var(--electric), var(--electric-light));
+    color: #fff;
+    padding: 12px 32px;
+    border: none;
+    border-radius: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s var(--ease);
+  }
+  
+  .dashboard-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 30px rgba(0,102,255,0.4);
+  }
+
+  /* Dashboard Container */
+  .dashboard-container {
+    display: none;
+    padding: 40px 20px;
+    max-width: 1600px;
+    margin: 0 auto;
+  }
+  
+  .dashboard-container.active {
+    display: block;
+    animation: fadeIn 0.5s var(--ease);
+  }
+  
+  .dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+  }
+  
+  .dashboard-header h2 {
+    font-size: 36px;
+    font-weight: 900;
+    background: linear-gradient(135deg, #fff, #cbd5e1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin: 0;
+  }
+  
+  .btn-back {
+    padding: 10px 20px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 12px;
+    color: rgba(255,255,255,0.8);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s var(--ease);
+  }
+  
+  .btn-back:hover {
+    background: rgba(255,255,255,0.15);
+    transform: translateY(-2px);
+  }
+
+  /* KPI Grid */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+  }
+  
+  .kpi-card {
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: var(--radius);
+    padding: 24px;
+    transition: all 0.3s var(--ease);
+  }
+  
+  .kpi-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 20px 40px rgba(0,102,255,0.15);
+  }
+  
+  .kpi-label {
+    color: rgba(255,255,255,0.6);
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+  
+  .kpi-value {
+    font-size: 32px;
+    font-weight: 900;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+  
+  .kpi-trend {
+    font-size: 14px;
+    font-weight: 600;
+  }
+  
+  .kpi-trend.positive {
+    color: var(--emerald);
+  }
+  
+  .kpi-trend.negative {
+    color: var(--coral);
+  }
+
+  /* Section Cards */
+  .section-card {
+    background: rgba(255,255,255,0.03);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+  
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .section-card h3 {
+    color: #fff;
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0 0 20px 0;
+  }
+
+  /* Data Tables */
+  .table-wrapper {
+    overflow-x: auto;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .data-table th {
+    background: rgba(0,102,255,0.1);
+    padding: 14px;
+    text-align: left;
+    font-weight: 600;
+    color: rgba(255,255,255,0.8);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  
+  .data-table td {
+    padding: 14px;
+    color: rgba(255,255,255,0.7);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  
+  .data-table tr:hover td {
+    background: rgba(255,255,255,0.02);
+  }
+
+  /* Badges */
+  .badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+  
+  .badge-success {
+    background: rgba(16,185,129,0.2);
+    color: var(--emerald);
+  }
+  
+  .badge-warning {
+    background: rgba(245,158,11,0.2);
+    color: var(--amber);
+  }
+  
+  .badge-error {
+    background: rgba(255,107,107,0.2);
+    color: var(--coral);
+  }
+
+  /* Live Demo Card */
+  .live-demo {
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: var(--radius-lg);
+    padding: 30px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+
+  /* Command Center Widgets */
+  .command-center{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    padding: 20px;
+  }
+  
+  .widget{
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: var(--radius);
+    padding: 20px;
+    position: relative;
+  }
+  
+  .widget-header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    color: #fff;
+    font-weight: 700;
+  }
+
+  /* View transitions */
+  .view{
+    display: none;
+  }
+  .view.active{
+    display: block;
+    animation: fadeIn 0.5s var(--ease);
+  }
+  @keyframes fadeIn{
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Chart Grid */
+  .chart-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 24px;
+  }
+
+  /* Bank Cards */
+  .bank-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+  }
+  
+  .bank-card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: var(--radius);
+    padding: 20px;
+    text-align: center;
+    transition: all 0.3s var(--ease);
+  }
+  
+  .bank-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+  }
+
+  /* Status Indicators */
+  .status-dot-green,
+  .status-dot-yellow,
+  .status-dot-red {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  
+  .status-dot-green {
+    background: var(--emerald);
+    box-shadow: 0 0 8px rgba(16,185,129,0.5);
+  }
+  
+  .status-dot-yellow {
+    background: var(--amber);
+    box-shadow: 0 0 8px rgba(245,158,11,0.5);
+  }
+  
+  .status-dot-red {
+    background: var(--coral);
+    box-shadow: 0 0 8px rgba(255,107,107,0.5);
+  }
+
+  /* AI Assistant Widget */
+  .ai-assistant{
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, var(--electric), var(--purple));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 10px 30px rgba(0,102,255,0.3);
+    transition: all 0.3s var(--ease);
+    z-index: 999;
+  }
+  
+  .ai-assistant:hover{
+    transform: scale(1.1);
+    box-shadow: 0 15px 40px rgba(0,102,255,0.4);
+  }
+
+  /* Footer */
+  .footer{
+    padding: 40px 20px;
+    text-align: center;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.5);
+  }
+
+  /* Mobile Responsive */
+  @media(max-width: 980px){
+    .hero-inner{
+      grid-template-columns: 1fr;
+      text-align: center;
+    }
+    .nav-pills{
+      display: none;
+    }
+    .live-status{
+      display: none;
+    }
+    .dashboard-cards{
+      grid-template-columns: 1fr;
+    }
+    .kpi-grid{
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Animated Counter */
+  .counter {
+    font-size: 48px;
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--electric), var(--teal));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Particle Effect */
+  .particles{
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  
+  .particle{
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: var(--electric);
+    border-radius: 50%;
+    animation: rise 10s linear infinite;
+  }
+  
+  @keyframes rise{
+    0% { transform: translateY(100vh) scale(0); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { transform: translateY(-100vh) scale(1); opacity: 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="premium-bg"></div>
+<div class="grid-bg"></div>
+
+<!-- Premium Glass Topbar -->
+<div class="topbar">
+  <div class="lang-toggle">
+    <button class="lang-btn active" id="btnEN">EN</button>
+    <button class="lang-btn" id="btnFR">FR</button>
+  </div>
+  
+  <div class="brand">
+    CloudCFO.ai 
+    <span class="badge">AI Engine™</span>
+  </div>
+
+  <div class="nav-pills">
+    <button class="pill active" data-tab="landing">Platform</button>
+    <button class="pill" data-tab="command">Command Center</button>
+    <button class="pill" data-tab="dashboards">Dashboards</button>
+    <button class="pill" data-tab="demo">Live Demo</button>
+  </div>
+
+  <div class="live-status">
+    <span class="status-dot"></span>
+    <span>All Systems Operational</span>
+    <span style="margin-left: 8px; opacity: 0.7;">99.99% Uptime</span>
+  </div>
+</div>
+
+<!-- LANDING VIEW -->
+<div class="view active" id="landing">
+  <div class="app">
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="hero-inner">
+        <div>
+          <h1>Your 24/7 AI CFO<br/>Not Just Another<br/>Accounting Tool</h1>
+          
+          <div class="hero-subtitle">
+            While others make you upload manually, CloudCFO discovers everything automatically.<br/>
+            While others take minutes, we deliver in milliseconds.<br/>
+            While others show you data, we deliver actionable intelligence.
+          </div>
+
+          <div class="perf-badge">
+            <div class="perf-metric">
+              <span>⚡</span>
+              <strong>&lt;500ms</strong>
+              <span>Processing Time</span>
+            </div>
+            <div class="perf-metric">
+              <span>🔍</span>
+              <strong>100%</strong>
+              <span>Auto-Discovery</span>
+            </div>
+            <div class="perf-metric">
+              <span>🎯</span>
+              <strong>99.9%</strong>
+              <span>Accuracy</span>
+            </div>
+          </div>
+
+          <div class="cta">
+            <button class="btn btn-primary" id="startTrialBtn">
+              ⚡ Start Free Trial - First Insight in 60 Seconds
+            </button>
+            <button class="btn btn-secondary" id="watchDemoBtn">
+              ▶️ Watch 2-Min Demo of Auto-Discovery Magic
+            </button>
+          </div>
+
+          <div style="margin-top: 20px; color: rgba(255,255,255,0.6); font-size: 14px;">
+            ✓ Cancel anytime • ✓ Your data never leaves our secure cloud • ✓ SOC2 Type II Certified
+          </div>
+        </div>
+
+        <div class="live-demo">
+          <div style="text-align: center; margin-bottom: 20px;">
+            <div style="color: rgba(255,255,255,0.8); font-size: 14px; margin-bottom: 8px;">
+              DOCUMENTS PROCESSED TODAY
+            </div>
+            <div class="counter" id="docCounter">12,847</div>
+          </div>
+          
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 20px;">
+            <div style="text-align: center;">
+              <div style="color: var(--emerald); font-size: 24px; font-weight: 800;">$3.2M</div>
+              <div style="color: rgba(255,255,255,0.6); font-size: 12px;">Tax Savings Found</div>
+            </div>
+            <div style="text-align: center;">
+              <div style="color: var(--teal); font-size: 24px; font-weight: 800;">8,420</div>
+              <div style="color: rgba(255,255,255,0.6); font-size: 12px;">Hours Saved</div>
+            </div>
+          </div>
+
+          <canvas id="liveChart" style="margin-top: 20px; max-height: 150px;"></canvas>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- COMMAND CENTER VIEW -->
+<div class="view" id="command">
+  <div class="app">
+    <div class="command-center">
+      <div class="widget">
+        <div class="widget-header">
+          <span>📊 Revenue Insights</span>
+        </div>
+        <canvas id="revenueChart"></canvas>
+      </div>
+
+      <div class="widget">
+        <div class="widget-header">
+          <span>💰 Cash Flow Forecast</span>
+        </div>
+        <canvas id="cashflowChart"></canvas>
+      </div>
+
+      <div class="widget">
+        <div class="widget-header">
+          <span>🎯 Tax Opportunities</span>
+        </div>
+        <div style="padding: 20px;">
+          <div style="color: var(--emerald); font-size: 32px; font-weight: 900;">$4,892</div>
+          <div style="color: rgba(255,255,255,0.6); margin-top: 8px;">Potential savings detected</div>
+          <button class="btn btn-primary" style="margin-top: 16px;">View Details</button>
+        </div>
+      </div>
+
+      <div class="widget">
+        <div class="widget-header">
+          <span>🌱 Carbon Footprint</span>
+        </div>
+        <canvas id="carbonChart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DASHBOARDS VIEW -->
+<div class="view" id="dashboards">
+  <div class="app">
+    <!-- Dashboard Selector -->
+    <div class="dashboard-selector" id="dashboardSelector">
+      <h2>Financial Intelligence Dashboards</h2>
+      <p>Select a dashboard to access real-time financial insights and analytics</p>
+      
+      <div class="dashboard-cards">
+        <div class="dashboard-card" onclick="openDashboard('banking')">
+          <div class="dashboard-icon">🏦</div>
+          <div class="dashboard-title">Banking Dashboard</div>
+          <div class="dashboard-desc">
+            Real-time bank connections, transaction monitoring, and reconciliation tracking
+          </div>
+          <button class="dashboard-btn">Open Dashboard</button>
+        </div>
+        
+        <div class="dashboard-card" onclick="openDashboard('accounting')">
+          <div class="dashboard-icon">📊</div>
+          <div class="dashboard-title">Accounting & Tax</div>
+          <div class="dashboard-desc">
+            AI-powered tax optimization, compliance tracking, and financial analytics
+          </div>
+          <button class="dashboard-btn">Open Dashboard</button>
+        </div>
+        
+        <div class="dashboard-card" onclick="openDashboard('carbon')">
+          <div class="dashboard-icon">🌱</div>
+          <div class="dashboard-title">Carbon Passport</div>
+          <div class="dashboard-desc">
+            Environmental impact tracking, scope classification, and carbon calculations
+          </div>
+          <button class="dashboard-btn">Open Dashboard</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Banking Dashboard -->
+    <div class="dashboard-container" id="dashboard-banking">
+      <div class="dashboard-header">
+        <h2>Banking Dashboard</h2>
+        <button class="btn-back" onclick="closeDashboard()">← Back to Dashboards</button>
+      </div>
+
+      <!-- Banking KPIs -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">Total Balance</div>
+          <div class="kpi-value">$125,400</div>
+          <div class="kpi-trend positive">↑ 5.2%</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Monthly Income</div>
+          <div class="kpi-value">$42,800</div>
+          <div class="kpi-trend positive">↑ 12%</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Monthly Expenses</div>
+          <div class="kpi-value">$31,500</div>
+          <div class="kpi-trend negative">↑ 3%</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Reconciliation Rate</div>
+          <div class="kpi-value">86%</div>
+        </div>
+      </div>
+
+      <!-- Bank Connections -->
+      <div class="section-card">
+        <h3>Bank Connections</h3>
+        <div class="bank-grid">
+          <div class="bank-card">
+            <div style="font-size: 32px; margin-bottom: 12px;">🏦</div>
+            <div style="color: #fff; font-size: 18px; font-weight: 700; margin-bottom: 12px;">Bank of America</div>
+            <div style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; background: rgba(16,185,129,0.2); color: var(--emerald); font-size: 14px; font-weight: 600;">
+              <span class="status-dot-green"></span> Connected
+            </div>
+            <div style="color: rgba(255,255,255,0.5); font-size: 12px; margin-top: 8px;">Last sync: 2 mins ago</div>
+          </div>
+          <div class="bank-card">
+            <div style="font-size: 32px; margin-bottom: 12px;">🏦</div>
+            <div style="color: #fff; font-size: 18px; font-weight: 700; margin-bottom: 12px;">Wells Fargo</div>
+            <div style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; background: rgba(245,158,11,0.2); color: var(--amber); font-size: 14px; font-weight: 600;">
+              <span class="status-dot-yellow"></span> Pending
+            </div>
+            <div style="color: rgba(255,255,255,0.5); font-size: 12px; margin-top: 8px;">Syncing...</div>
+          </div>
+          <div class="bank-card">
+            <div style="font-size: 32px; margin-bottom: 12px;">🏦</div>
+            <div style="color: #fff; font-size: 18px; font-weight: 700; margin-bottom: 12px;">Chase</div>
+            <div style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; background: rgba(255,107,107,0.2); color: var(--coral); font-size: 14px; font-weight: 600;">
+              <span class="status-dot-red"></span> Error
+            </div>
+            <div style="color: rgba(255,255,255,0.5); font-size: 12px; margin-top: 8px;">Connection failed</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Transactions Table -->
+      <div class="section-card">
+        <h3>Recent Transactions</h3>
+        <div class="table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Bank Account</th>
+                <th>Vendor</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Invoice</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>2025-08-01</td>
+                <td>Bank of America</td>
+                <td>Amazon Web Services</td>
+                <td>$2,240.00</td>
+                <td><span class="badge badge-success">Reconciled</span></td>
+                <td>INV-00123</td>
+              </tr>
+              <tr>
+                <td>2025-08-02</td>
+                <td>Wells Fargo</td>
+                <td>Google Cloud</td>
+                <td>$1,210.00</td>
+                <td><span class="badge badge-warning">Pending</span></td>
+                <td>INV-00124</td>
+              </tr>
+              <tr>
+                <td>2025-08-03</td>
+                <td>Chase</td>
+                <td>Microsoft Azure</td>
+                <td>$890.00</td>
+                <td><span class="badge badge-error">Mismatch</span></td>
+                <td>INV-00125</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Banking Charts -->
+      <div class="chart-grid">
+        <div class="section-card">
+          <h3>Incoming vs Outgoing</h3>
+          <canvas id="bankingBarChart"></canvas>
+        </div>
+        <div class="section-card">
+          <h3>Reconciliation Progress</h3>
+          <canvas id="bankingDonutChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Accounting & Tax Dashboard -->
+    <div class="dashboard-container" id="dashboard-accounting">
+      <div class="dashboard-header">
+        <h2>Accounting & Tax Dashboard</h2>
+        <button class="btn-back" onclick="closeDashboard()">← Back to Dashboards</button>
+      </div>
+
+      <!-- Accounting KPIs -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">Revenue YTD</div>
+          <div class="kpi-value">$2,450,000</div>
+          <div class="kpi-trend positive">↑ 26%</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Expenses YTD</div>
+          <div class="kpi-value">$1,820,000</div>
+          <div class="kpi-trend negative">↑ 15%</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Net Profit Margin</div>
+          <div class="kpi-value">26%</div>
+          <div class="kpi-trend positive">↑ 3.2%</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Cash Flow Position</div>
+          <div class="kpi-value">$630,000</div>
+          <div class="kpi-trend positive">Healthy</div>
+        </div>
+      </div>
+
+      <!-- Tax Overview -->
+      <div class="section-card">
+        <h3>Tax Obligations</h3>
+        <div class="bank-grid">
+          <div class="bank-card">
+            <div style="color: rgba(255,255,255,0.6); font-size: 14px;">VAT/GST</div>
+            <div style="color: #fff; font-size: 28px; font-weight: 900; margin: 8px 0;">$48,910</div>
+            <div style="color: rgba(255,255,255,0.5); font-size: 14px; margin-bottom: 12px;">Due in: 12 days</div>
+            <span class="badge badge-success">Filed</span>
+          </div>
+          <div class="bank-card">
+            <div style="color: rgba(255,255,255,0.6); font-size: 14px;">Corporate Tax</div>
+            <div style="color: #fff; font-size: 28px; font-weight: 900; margin: 8px 0;">$120,000</div>
+            <div style="color: rgba(255,255,255,0.5); font-size: 14px; margin-bottom: 12px;">Due in: 28 days</div>
+            <span class="badge badge-warning">Pending</span>
+          </div>
+          <div class="bank-card">
+            <div style="color: rgba(255,255,255,0.6); font-size: 14px;">Payroll Taxes</div>
+            <div style="color: #fff; font-size: 28px; font-weight: 900; margin: 8px 0;">$22,300</div>
+            <div style="color: rgba(255,255,255,0.5); font-size: 14px; margin-bottom: 12px;">Due in: 5 days</div>
+            <span class="badge badge-error">Overdue</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Accounting Charts -->
+      <div class="chart-grid">
+        <div class="section-card">
+          <h3>Revenue vs Expenses</h3>
+          <canvas id="accountingLineChart"></canvas>
+        </div>
+        <div class="section-card">
+          <h3>Cash Flow Forecast</h3>
+          <canvas id="cashFlowChart"></canvas>
+        </div>
+        <div class="section-card">
+          <h3>Tax Liability Breakdown</h3>
+          <canvas id="taxDonutChart"></canvas>
+        </div>
+        <div class="section-card">
+          <h3>Aging Analysis</h3>
+          <canvas id="agingChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Carbon Passport Dashboard -->
+    <div class="dashboard-container" id="dashboard-carbon">
+      <div class="dashboard-header">
+        <h2>Carbon Passport</h2>
+        <button class="btn-back" onclick="closeDashboard()">← Back to Dashboards</button>
+      </div>
+
+      <!-- Scope Classification -->
+      <div class="section-card">
+        <h3>Emissions Scope Classification</h3>
+        <div class="bank-grid">
+          <div class="bank-card" style="background: rgba(139,92,246,0.1); border-color: rgba(139,92,246,0.3);">
+            <div style="font-size: 48px; font-weight: 900; color: #a78bfa;">12</div>
+            <div style="color: #fff; font-size: 18px; font-weight: 700;">Scope 1</div>
+            <div style="color: rgba(255,255,255,0.6); font-size: 14px;">Direct Emissions</div>
+          </div>
+          <div class="bank-card" style="background: rgba(0,102,255,0.1); border-color: rgba(0,102,255,0.3);">
+            <div style="font-size: 48px; font-weight: 900; color: var(--electric-light);">8</div>
+            <div style="color: #fff; font-size: 18px; font-weight: 700;">Scope 2</div>
+            <div style="color: rgba(255,255,255,0.6); font-size: 14px;">Energy Indirect</div>
+          </div>
+          <div class="bank-card" style="background: rgba(15,182,211,0.1); border-color: rgba(15,182,211,0.3);">
+            <div style="font-size: 48px; font-weight: 900; color: var(--teal);">45</div>
+            <div style="color: #fff; font-size: 18px; font-weight: 700;">Scope 3</div>
+            <div style="color: rgba(255,255,255,0.6); font-size: 14px;">Other Indirect</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Invoice Classification Table -->
+      <div class="section-card">
+        <h3>Invoice Carbon Classification</h3>
+        <div class="table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Invoice #</th>
+                <th>Vendor</th>
+                <th>Category</th>
+                <th>Amount</th>
+                <th>Scope</th>
+                <th>CO₂e Impact</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>INV-2024-1023</td>
+                <td>Regional Power Co</td>
+                <td>Electricity</td>
+                <td>$2,845</td>
+                <td><span class="badge" style="background: rgba(0,102,255,0.2); color: var(--electric-light);">Scope 2</span></td>
+                <td>0.92t CO₂e</td>
+              </tr>
+              <tr>
+                <td>INV-2024-1089</td>
+                <td>PlasticCo Materials</td>
+                <td>Raw Materials</td>
+                <td>$12,500</td>
+                <td><span class="badge" style="background: rgba(15,182,211,0.2); color: var(--teal);">Scope 3</span></td>
+                <td>3.4t CO₂e</td>
+              </tr>
+              <tr>
+                <td>INV-2024-1156</td>
+                <td>Fleet Fuel Services</td>
+                <td>Vehicle Fuel</td>
+                <td>$890</td>
+                <td><span class="badge" style="background: rgba(139,92,246,0.2); color: #a78bfa;">Scope 1</span></td>
+                <td>0.28t CO₂e</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Carbon Charts -->
+      <div class="chart-grid">
+        <div class="section-card">
+          <h3>Emissions Breakdown</h3>
+          <canvas id="carbonDonutChart"></canvas>
+        </div>
+        <div class="section-card">
+          <h3>Monthly Carbon Trend</h3>
+          <canvas id="carbonTrendChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LIVE DEMO VIEW -->
+<div class="view" id="demo">
+  <div class="app" style="padding: 40px 20px;">
+    <h2 style="text-align: center; margin-bottom: 40px; color: #fff;">Live Processing Demo</h2>
+    
+    <div style="max-width: 800px; margin: 0 auto;">
+      <div class="section-card" style="text-align: center; padding: 60px;">
+        <div style="font-size: 80px; margin-bottom: 20px;">🚀</div>
+        <h3 style="color: #fff; font-size: 28px; margin-bottom: 16px;">
+          Watch CloudCFO Process Documents in Real-Time
+        </h3>
+        <p style="color: rgba(255,255,255,0.7); margin-bottom: 30px;">
+          Connect your Gmail to see instant auto-discovery and processing
+        </p>
+        <button class="btn btn-primary" onclick="alert('Demo starting... Processing documents in real-time!')">
+          Start Live Demo
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<div class="footer">
+  <p>© 2025 CloudCFO.ai - Powered by proprietary CloudCFO AI Engine™</p>
+  <p style="margin-top: 8px; font-size: 14px;">
+    Every receipt is an insight. Don't leave deductions or carbon impact hidden.
+  </p>
+</div>
+
+<!-- AI Assistant Widget -->
+<div class="ai-assistant" onclick="alert('CloudCFO AI Assistant: How can I help you optimize your finances today?')">
+  <span style="color: #fff; font-size: 24px;">💬</span>
+</div>
+
+<!-- Particles Background -->
+<div class="particles" id="particles"></div>
+
+<script>
+// Navigation
+document.querySelectorAll('.pill').forEach(pill => {
+  pill.addEventListener('click', () => {
+    document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
+    
+    const tabName = pill.dataset.tab;
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    const view = document.getElementById(tabName);
+    if (view) {
+      view.classList.add('active');
+      
+      // Initialize charts when entering specific views
+      if (tabName === 'command' && !window.commandChartsInit) {
+        setTimeout(initCommandCharts, 100);
+        window.commandChartsInit = true;
+      }
+    }
+  });
+});
+
+// Dashboard Navigation
+function openDashboard(dashboardName) {
+  document.getElementById('dashboardSelector').style.display = 'none';
+  document.querySelectorAll('.dashboard-container').forEach(d => {
+    d.classList.remove('active');
+  });
+  
+  const dashboard = document.getElementById(`dashboard-${dashboardName}`);
+  if (dashboard) {
+    dashboard.classList.add('active');
+    
+    // Initialize charts for this dashboard
+    if (!window[`${dashboardName}ChartsInit`]) {
+      setTimeout(() => initDashboardCharts(dashboardName), 100);
+      window[`${dashboardName}ChartsInit`] = true;
+    }
+  }
+}
+
+function closeDashboard() {
+  document.querySelectorAll('.dashboard-container').forEach(d => {
+    d.classList.remove('active');
+  });
+  document.getElementById('dashboardSelector').style.display = 'block';
+}
+
+// Initialize Charts
+function initCommandCharts() {
+  const chartConfig = {
+    type: 'line',
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false }
+      },
+      scales: {
+        x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: 'rgba(255,255,255,0.5)' } },
+        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: 'rgba(255,255,255,0.5)' } }
+      }
+    }
+  };
+
+  // Revenue Chart
+  const revenueCtx = document.getElementById('revenueChart');
+  if (revenueCtx) {
+    new Chart(revenueCtx, {
+      ...chartConfig,
+      data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+        datasets: [{
+          data: [30, 45, 55, 65, 75, 90],
+          borderColor: '#0066FF',
+          backgroundColor: 'rgba(0,102,255,0.1)',
+          tension: 0.4,
+          fill: true
+        }]
+      }
+    });
+  }
+
+  // Cash Flow Chart
+  const cashflowCtx = document.getElementById('cashflowChart');
+  if (cashflowCtx) {
+    new Chart(cashflowCtx, {
+      ...chartConfig,
+      data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+        datasets: [{
+          data: [20, 35, 25, 45, 40, 55],
+          borderColor: '#10B981',
+          backgroundColor: 'rgba(16,185,129,0.1)',
+          tension: 0.4,
+          fill: true
+        }]
+      }
+    });
+  }
+
+  // Carbon Chart
+  const carbonCtx = document.getElementById('carbonChart');
+  if (carbonCtx) {
+    new Chart(carbonCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Scope 1', 'Scope 2', 'Scope 3'],
+        datasets: [{
+          data: [30, 25, 45],
+          backgroundColor: ['#0066FF', '#10B981', '#8B5CF6']
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: { color: 'rgba(255,255,255,0.7)' }
+          }
+        }
+      }
+    });
+  }
+}
+
+function initDashboardCharts(dashboard) {
+  const chartConfig = {
+    type: 'line',
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { 
+          display: true,
+          labels: { color: 'rgba(255,255,255,0.7)' }
+        }
+      },
+      scales: {
+        x: { 
+          grid: { color: 'rgba(255,255,255,0.05)' }, 
+          ticks: { color: 'rgba(255,255,255,0.5)' } 
+        },
+        y: { 
+          grid: { color: 'rgba(255,255,255,0.05)' }, 
+          ticks: { color: 'rgba(255,255,255,0.5)' } 
+        }
+      }
+    }
+  };
+
+  if (dashboard === 'banking') {
+    // Banking Bar Chart
+    const bankingBarCtx = document.getElementById('bankingBarChart');
+    if (bankingBarCtx) {
+      new Chart(bankingBarCtx, {
+        type: 'bar',
+        data: {
+          labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+          datasets: [
+            {
+              label: 'Incoming',
+              data: [12000, 14000, 9000, 16000],
+              backgroundColor: 'rgba(16,185,129,0.8)',
+            },
+            {
+              label: 'Outgoing',
+              data: [8000, 10000, 12000, 11000],
+              backgroundColor: 'rgba(255,107,107,0.8)',
+            }
+          ]
+        },
+        options: chartConfig.options
+      });
+    }
+
+    // Banking Donut Chart
+    const bankingDonutCtx = document.getElementById('bankingDonutChart');
+    if (bankingDonutCtx) {
+      new Chart(bankingDonutCtx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Reconciled', 'Pending', 'Mismatch'],
+          datasets: [{
+            data: [86, 8, 6],
+            backgroundColor: ['#10B981', '#F59E0B', '#FF6B6B']
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'right',
+              labels: { color: 'rgba(255,255,255,0.7)' }
+            }
+          }
+        }
+      });
+    }
+  }
+
+  if (dashboard === 'accounting') {
+    // Revenue vs Expenses Line Chart
+    const accountingLineCtx = document.getElementById('accountingLineChart');
+    if (accountingLineCtx) {
+      new Chart(accountingLineCtx, {
+        ...chartConfig,
+        data: {
+          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+          datasets: [
+            {
+              label: 'Revenue',
+              data: [250000, 310000, 380000, 430000, 520000, 600000],
+              borderColor: '#0066FF',
+              backgroundColor: 'rgba(0,102,255,0.1)',
+              tension: 0.4,
+              fill: false
+            },
+            {
+              label: 'Expenses',
+              data: [180000, 200000, 260000, 290000, 320000, 360000],
+              borderColor: '#10B981',
+              backgroundColor: 'rgba(16,185,129,0.1)',
+              tension: 0.4,
+              fill: false
+            }
+          ]
+        }
+      });
+    }
+
+    // Cash Flow Forecast
+    const cashFlowCtx = document.getElementById('cashFlowChart');
+    if (cashFlowCtx) {
+      new Chart(cashFlowCtx, {
+        ...chartConfig,
+        data: {
+          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'],
+          datasets: [{
+            label: 'Cash Flow Forecast',
+            data: [-40000, 20000, 60000, -10000, 90000, 150000, 180000, 220000, 250000],
+            borderColor: '#3aa3ff',
+            backgroundColor: 'rgba(58,163,255,0.1)',
+            tension: 0.4,
+            fill: true
+          }]
+        }
+      });
+    }
+
+    // Tax Donut Chart
+    const taxDonutCtx = document.getElementById('taxDonutChart');
+    if (taxDonutCtx) {
+      new Chart(taxDonutCtx, {
+        type: 'doughnut',
+        data: {
+          labels: ['VAT/GST', 'Corporate Tax', 'Payroll'],
+          datasets: [{
+            data: [48910, 120000, 22300],
+            backgroundColor: ['#0066FF', '#8B5CF6', '#F59E0B']
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'right',
+              labels: { color: 'rgba(255,255,255,0.7)' }
+            }
+          }
+        }
+      });
+    }
+
+    // Aging Chart
+    const agingCtx = document.getElementById('agingChart');
+    if (agingCtx) {
+      new Chart(agingCtx, {
+        type: 'bar',
+        data: {
+          labels: ['0-30 days', '31-60 days', '61-90 days', '90+ days'],
+          datasets: [{
+            label: 'Outstanding Amount',
+            data: [120000, 90000, 60000, 30000],
+            backgroundColor: 'rgba(16,185,129,0.8)'
+          }]
+        },
+        options: {
+          ...chartConfig.options,
+          plugins: {
+            legend: { display: false }
+          }
+        }
+      });
+    }
+  }
+
+  if (dashboard === 'carbon') {
+    // Carbon Donut Chart
+    const carbonDonutCtx = document.getElementById('carbonDonutChart');
+    if (carbonDonutCtx) {
+      new Chart(carbonDonutCtx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Scope 1 - Direct', 'Scope 2 - Energy', 'Scope 3 - Other'],
+          datasets: [{
+            data: [12, 8, 45],
+            backgroundColor: ['#8B5CF6', '#0066FF', '#0fb6d3']
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: { color: 'rgba(255,255,255,0.7)' }
+            }
+          }
+        }
+      });
+    }
+
+    // Carbon Trend Chart
+    const carbonTrendCtx = document.getElementById('carbonTrendChart');
+    if (carbonTrendCtx) {
+      new Chart(carbonTrendCtx, {
+        ...chartConfig,
+        data: {
+          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+          datasets: [{
+            label: 'CO₂ Emissions (tons)',
+            data: [5.2, 4.8, 5.5, 4.2, 3.8, 3.5],
+            borderColor: '#10B981',
+            backgroundColor: 'rgba(16,185,129,0.1)',
+            tension: 0.4,
+            fill: true
+          }]
+        }
+      });
+    }
+  }
+}
+
+// Animated Counter
+function animateCounter(id, start, end, duration, prefix = '', suffix = '') {
+  const element = document.getElementById(id);
+  if (!element) return;
+  
+  let startTime = null;
+  const step = (timestamp) => {
+    if (!startTime) startTime = timestamp;
+    const progress = Math.min((timestamp - startTime) / duration, 1);
+    const current = Math.floor(progress * (end - start) + start);
+    
+    if (prefix === '$') {
+      element.textContent = prefix + current.toLocaleString() + suffix;
+    } else {
+      element.textContent = prefix + current.toLocaleString() + suffix;
+    }
+    
+    if (progress < 1) {
+      window.requestAnimationFrame(step);
+    }
+  };
+  window.requestAnimationFrame(step);
+}
+
+// Initialize on page load
+window.addEventListener('DOMContentLoaded', () => {
+  // Initialize live counters
+  setInterval(() => {
+    const counter = document.getElementById('docCounter');
+    if (counter) {
+      const current = parseInt(counter.textContent.replace(/,/g, ''));
+      counter.textContent = (current + Math.floor(Math.random() * 3) + 1).toLocaleString();
+    }
+  }, 3000);
+
+  // Initialize Live Chart in Hero section
+  const liveCtx = document.getElementById('liveChart');
+  if (liveCtx) {
+    new Chart(liveCtx, {
+      type: 'line',
+      data: {
+        labels: ['6am', '9am', '12pm', '3pm', '6pm', '9pm'],
+        datasets: [{
+          data: [120, 340, 580, 720, 890, 1050],
+          borderColor: '#0fb6d3',
+          backgroundColor: 'rgba(15,182,211,0.1)',
+          tension: 0.4,
+          fill: true
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          x: { display: false },
+          y: { display: false }
+        }
+      }
+    });
+  }
+
+  // Create particles
+  const container = document.getElementById('particles');
+  if (container) {
+    for (let i = 0; i < 20; i++) {
+      const particle = document.createElement('div');
+      particle.className = 'particle';
+      particle.style.left = Math.random() * 100 + '%';
+      particle.style.animationDelay = Math.random() * 10 + 's';
+      particle.style.animationDuration = (10 + Math.random() * 10) + 's';
+      container.appendChild(particle);
+    }
+  }
+});
+
+// Language Toggle
+const i18n = {
+  en: {
+    heroTitle: "Your 24/7 AI CFO<br/>Not Just Another<br/>Accounting Tool",
+    startTrial: "⚡ Start Free Trial - First Insight in 60 Seconds",
+    watchDemo: "▶️ Watch 2-Min Demo of Auto-Discovery Magic"
+  },
+  fr: {
+    heroTitle: "Votre CFO IA 24/7<br/>Pas Juste Un Autre<br/>Outil Comptable",
+    startTrial: "⚡ Essai Gratuit - Premier Aperçu en 60 Secondes",
+    watchDemo: "▶️ Démo 2 Min de la Magie Auto-Discovery"
+  }
+};
+
+let currentLang = 'en';
+document.getElementById('btnEN')?.addEventListener('click', () => {
+  currentLang = 'en';
+  document.getElementById('btnEN')?.classList.add('active');
+  document.getElementById('btnFR')?.classList.remove('active');
+  updateLanguage();
+});
+
+document.getElementById('btnFR')?.addEventListener('click', () => {
+  currentLang = 'fr';
+  document.getElementById('btnFR')?.classList.add('active');
+  document.getElementById('btnEN')?.classList.remove('active');
+  updateLanguage();
+});
+
+function updateLanguage() {
+  const h1 = document.querySelector('.hero h1');
+  if (h1) h1.innerHTML = i18n[currentLang].heroTitle;
+  
+  const startBtn = document.getElementById('startTrialBtn');
+  if (startBtn) startBtn.textContent = i18n[currentLang].startTrial;
+  
+  const demoBtn = document.getElementById('watchDemoBtn');
+  if (demoBtn) demoBtn.textContent = i18n[currentLang].watchDemo;
+}
+
+// Download functionality
+function downloadHTML() {
+  const htmlContent = document.documentElement.outerHTML;
+  const blob = new Blob([htmlContent], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'CloudCFO-AI-Platform-Complete.html';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+</script>
+
+</body>
+</html>
