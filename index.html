@@ -1,0 +1,1400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CloudCFO - AI-Powered Financial Intelligence Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif; }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .card-shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(-100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-slide-in {
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        .circular-chart {
+            position: relative;
+            width: 400px;
+            height: 400px;
+        }
+        
+        .chart-segment {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            clip-path: polygon(50% 50%, 50% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 0%, 50% 0%);
+        }
+        
+        .hover-scale {
+            transition: transform 0.2s ease;
+        }
+        
+        .hover-scale:hover {
+            transform: scale(1.05);
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .alert-banner {
+            background: linear-gradient(90deg, #f97316 0%, #fb923c 100%);
+        }
+
+        .kpi-trend-line {
+            stroke: #667eea;
+            stroke-width: 2;
+            fill: none;
+        }
+
+        .module-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .module-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .insight-card {
+            border-left: 4px solid #667eea;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .progress-ring {
+            transform: rotate(-90deg);
+        }
+
+        .nav-link {
+            position: relative;
+            transition: color 0.2s ease;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #667eea;
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after,
+        .nav-link.active::after {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef, useCallback, useMemo } = React;
+
+        // Utility functions
+        const formatCurrency = (amount) => {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0,
+            }).format(amount);
+        };
+
+        const formatNumber = (num) => {
+            if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+            if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+            return num.toString();
+        };
+
+        // Mock data
+        const mockKPIs = {
+            new: {
+                documentsProcessed: 0,
+                taxSavings: 0,
+                co2Tracked: 0,
+                processingTime: 482,
+                accuracy: 99.9
+            },
+            returning: {
+                documentsProcessed: 1515,
+                taxSavings: 4200,
+                co2Tracked: 2.4,
+                processingTime: 482,
+                accuracy: 99.9
+            }
+        };
+
+        const mockActivities = [
+            { id: 1, type: 'Gmail', time: '10:05, 09:44 AM', status: 'listening' },
+            { id: 2, type: 'Whatsapp', time: '11:05, 11:23 AM', status: 'listening' },
+            { id: 3, type: 'Drive', time: '12:05, 10:35 AM', status: 'listening' }
+        ];
+
+        const mockIntegrations = [
+            { id: 1, name: 'Bookkeeping', connected: false },
+            { id: 2, name: 'Carbon', connected: false },
+            { id: 3, name: 'Quickbooks', connected: true },
+            { id: 4, name: 'Xero', connected: true }
+        ];
+
+        const mockInsights = [
+            {
+                id: 1,
+                category: 'Critical',
+                title: 'Tax Deduction Opportunity',
+                description: 'We found $12,840 in potential deductions across 156 uncategorized Q3 transactions',
+                impact: '$12,840',
+                confidence: 92
+            },
+            {
+                id: 2,
+                category: 'Opportunity',
+                title: 'Cash Flow Optimization',
+                description: 'Your receivables aging shows $89,500 overdue from 4 clients',
+                impact: '$89,500',
+                confidence: 88
+            },
+            {
+                id: 3,
+                category: 'Trend',
+                title: 'Supply Chain Emissions',
+                description: 'Carbon emissions increased 23% driven by Carrier XYZ freight',
+                impact: '15 tons CO2e',
+                confidence: 95
+            }
+        ];
+
+        // Components
+        const Icon = ({ name, size = 20, color = 'currentColor' }) => {
+            useEffect(() => {
+                lucide.createIcons();
+            }, []);
+            return <i data-lucide={name} style={{ width: size, height: size, color }}></i>;
+        };
+
+        const Navbar = ({ user, onLogout, currentPage, setCurrentPage }) => {
+            return (
+                <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="flex justify-between items-center h-16">
+                            <div className="flex items-center space-x-8">
+                                <div className="flex items-center space-x-2">
+                                    <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-lg"></div>
+                                    <span className="font-bold text-xl">CloudCFO</span>
+                                </div>
+                                {user && (
+                                    <div className="hidden md:flex space-x-6">
+                                        <button 
+                                            onClick={() => setCurrentPage('dashboard')}
+                                            className={`nav-link text-gray-600 hover:text-gray-900 ${currentPage === 'dashboard' ? 'active text-gray-900' : ''}`}
+                                        >
+                                            Dashboard
+                                        </button>
+                                        <button 
+                                            onClick={() => setCurrentPage('intelligence')}
+                                            className={`nav-link text-gray-600 hover:text-gray-900 ${currentPage === 'intelligence' ? 'active text-gray-900' : ''}`}
+                                        >
+                                            Intelligence
+                                        </button>
+                                        <button 
+                                            onClick={() => setCurrentPage('accounting')}
+                                            className={`nav-link text-gray-600 hover:text-gray-900 ${currentPage === 'accounting' ? 'active text-gray-900' : ''}`}
+                                        >
+                                            Accounting & Tax
+                                        </button>
+                                        <button 
+                                            onClick={() => setCurrentPage('banking')}
+                                            className={`nav-link text-gray-600 hover:text-gray-900 ${currentPage === 'banking' ? 'active text-gray-900' : ''}`}
+                                        >
+                                            Banking
+                                        </button>
+                                        <button 
+                                            onClick={() => setCurrentPage('esg')}
+                                            className={`nav-link text-gray-600 hover:text-gray-900 ${currentPage === 'esg' ? 'active text-gray-900' : ''}`}
+                                        >
+                                            ESG
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                            <div className="flex items-center space-x-4">
+                                {user ? (
+                                    <>
+                                        <button className="p-2 text-gray-400 hover:text-gray-600">
+                                            <Icon name="bell" size={20} />
+                                        </button>
+                                        <button className="p-2 text-gray-400 hover:text-gray-600">
+                                            <Icon name="settings" size={20} />
+                                        </button>
+                                        <button 
+                                            onClick={onLogout}
+                                            className="flex items-center space-x-2 text-gray-700 hover:text-gray-900"
+                                        >
+                                            <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
+                                                <span className="text-sm font-medium text-indigo-600">
+                                                    {user.name.charAt(0)}
+                                                </span>
+                                            </div>
+                                            <span className="hidden md:block text-sm">{user.name}</span>
+                                        </button>
+                                    </>
+                                ) : (
+                                    <div className="flex items-center space-x-4">
+                                        <a href="#" className="text-gray-600 hover:text-gray-900">Login</a>
+                                        <button className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
+                                            Get Started
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </nav>
+            );
+        };
+
+        const KPICard = ({ title, value, change, trend, icon, color = 'indigo' }) => {
+            const trendData = [65, 59, 80, 81, 56, 55, 70, 80, 90, 100];
+            
+            return (
+                <div className="bg-white rounded-xl p-6 card-shadow hover-scale">
+                    <div className="flex justify-between items-start mb-4">
+                        <div>
+                            <p className="text-gray-500 text-sm mb-1">{title}</p>
+                            <h3 className="text-2xl font-bold text-gray-900">{value}</h3>
+                        </div>
+                        {icon && (
+                            <div className={`p-2 bg-${color}-100 rounded-lg`}>
+                                <Icon name={icon} size={20} color={`var(--${color}-600)`} />
+                            </div>
+                        )}
+                    </div>
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                            <Icon name={change >= 0 ? "trending-up" : "trending-down"} size={16} color={change >= 0 ? "#10b981" : "#ef4444"} />
+                            <span className={`text-sm font-medium ${change >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                {Math.abs(change)}%
+                            </span>
+                            <span className="text-gray-500 text-sm">this month</span>
+                        </div>
+                    </div>
+                    <div className="mt-4 h-12">
+                        <svg width="100%" height="100%" viewBox="0 0 200 50">
+                            <polyline
+                                className="kpi-trend-line"
+                                points={trendData.map((val, i) => `${i * 20},${50 - (val / 2)}`).join(' ')}
+                            />
+                        </svg>
+                    </div>
+                </div>
+            );
+        };
+
+        const CircularDashboard = ({ onModuleClick }) => {
+            const modules = [
+                { id: 'intelligence', name: 'Intelligence', color: '#86efac', icon: 'brain' },
+                { id: 'accounting', name: 'Accounting', color: '#fde047', icon: 'calculator' },
+                { id: 'banking', name: 'Banking & Payments', color: '#c7d2fe', icon: 'credit-card' },
+                { id: 'esg', name: 'ESG', color: '#e0e7ff', icon: 'leaf' }
+            ];
+
+            return (
+                <div className="flex items-center justify-center p-8">
+                    <div className="relative w-96 h-96">
+                        {modules.map((module, index) => {
+                            const angle = (index * 90) - 45;
+                            const rotation = `rotate(${angle}deg)`;
+                            const reverseRotation = `rotate(${-angle}deg)`;
+                            
+                            return (
+                                <div
+                                    key={module.id}
+                                    className="absolute w-48 h-48 cursor-pointer transition-all hover:scale-110"
+                                    style={{
+                                        top: '50%',
+                                        left: '50%',
+                                        transform: `translate(-50%, -50%) ${rotation} translateY(-60px)`,
+                                        transformOrigin: 'center'
+                                    }}
+                                    onClick={() => onModuleClick(module.id)}
+                                >
+                                    <div
+                                        className="w-full h-full rounded-2xl flex flex-col items-center justify-center p-4"
+                                        style={{
+                                            backgroundColor: module.color,
+                                            transform: reverseRotation
+                                        }}
+                                    >
+                                        <Icon name={module.icon} size={32} />
+                                        <span className="mt-2 text-sm font-semibold text-gray-800 text-center">
+                                            {module.name}
+                                        </span>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-white rounded-full shadow-lg flex items-center justify-center">
+                            <div className="text-center">
+                                <div className="text-2xl font-bold text-gray-900">CFO</div>
+                                <div className="text-xs text-gray-500">AI Engine</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const AIAssistant = () => {
+            const [query, setQuery] = useState('');
+            const [messages, setMessages] = useState([]);
+            const [isTyping, setIsTyping] = useState(false);
+
+            const exampleQueries = [
+                "Show me unusual expenses this month",
+                "What's my biggest tax deduction opportunity?",
+                "Project cash flow for next 6 months",
+                "Compare Q3 to last year"
+            ];
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                if (!query.trim()) return;
+
+                setMessages([...messages, { type: 'user', text: query }]);
+                setQuery('');
+                setIsTyping(true);
+
+                setTimeout(() => {
+                    setMessages(prev => [...prev, {
+                        type: 'assistant',
+                        text: `Based on your data, ${query.toLowerCase().includes('expense') ? 
+                            'I found 23 unusual transactions totaling $3,467 that deviate from your normal spending patterns.' :
+                            'I\'ll analyze that for you. Processing your request...'}`
+                    }]);
+                    setIsTyping(false);
+                }, 1500);
+            };
+
+            return (
+                <div className="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl p-6 text-white">
+                    <div className="flex items-center space-x-3 mb-4">
+                        <div className="p-2 bg-white/20 rounded-lg">
+                            <Icon name="sparkles" size={24} color="white" />
+                        </div>
+                        <div>
+                            <h3 className="text-lg font-semibold">Ask CloudCFO AI</h3>
+                            <p className="text-sm text-blue-100">Set up your AI Engine in 3 Simple Steps</p>
+                        </div>
+                    </div>
+
+                    <div className="bg-white/10 rounded-lg p-4 mb-4 max-h-40 overflow-y-auto">
+                        {messages.length === 0 ? (
+                            <div className="text-blue-100 text-sm">
+                                <p className="mb-2">More precise questions work better. Try searching for:</p>
+                                <ul className="space-y-1">
+                                    {exampleQueries.map((example, i) => (
+                                        <li key={i} className="flex items-start">
+                                            <span className="mr-2">•</span>
+                                            <span className="italic">{example}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        ) : (
+                            <div className="space-y-3">
+                                {messages.map((msg, i) => (
+                                    <div key={i} className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}>
+                                        <div className={`max-w-xs px-3 py-2 rounded-lg text-sm ${
+                                            msg.type === 'user' ? 'bg-white text-gray-900' : 'bg-white/20 text-white'
+                                        }`}>
+                                            {msg.text}
+                                        </div>
+                                    </div>
+                                ))}
+                                {isTyping && (
+                                    <div className="flex justify-start">
+                                        <div className="bg-white/20 px-3 py-2 rounded-lg">
+                                            <div className="flex space-x-1">
+                                                <div className="w-2 h-2 bg-white rounded-full animate-bounce"></div>
+                                                <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                                                <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
+
+                    <form onSubmit={handleSubmit} className="flex space-x-2">
+                        <input
+                            type="text"
+                            value={query}
+                            onChange={(e) => setQuery(e.target.value)}
+                            placeholder="Ask CloudCFO a question..."
+                            className="flex-1 px-4 py-2 bg-white/20 border border-white/30 rounded-lg text-white placeholder-blue-200 focus:outline-none focus:border-white/50"
+                        />
+                        <button
+                            type="submit"
+                            className="px-4 py-2 bg-white text-indigo-600 rounded-lg hover:bg-blue-50 transition"
+                        >
+                            <Icon name="arrow-up" size={20} />
+                        </button>
+                    </form>
+                </div>
+            );
+        };
+
+        const Dashboard = ({ user, isReturning, setCurrentPage }) => {
+            const [showAlert, setShowAlert] = useState(isReturning);
+            const kpis = isReturning ? mockKPIs.returning : mockKPIs.new;
+
+            return (
+                <div className="min-h-screen bg-gray-50">
+                    {showAlert && (
+                        <div className="alert-banner text-white px-4 py-3 flex items-center justify-between animate-slide-in">
+                            <div className="flex items-center space-x-3">
+                                <Icon name="alert-triangle" size={20} />
+                                <span>CloudCFO AI identified marketing spend that is 45% higher than usual</span>
+                            </div>
+                            <div className="flex items-center space-x-3">
+                                <button className="text-white hover:text-orange-100">View report</button>
+                                <button onClick={() => setShowAlert(false)} className="text-white hover:text-orange-100">
+                                    <Icon name="x" size={20} />
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                        <div className="mb-8 animate-fade-in">
+                            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                                {isReturning ? `Welcome back, ${user.name}!` : `Welcome to CFO, ${user.name}!`}
+                            </h1>
+                            <p className="text-gray-600">Bring your own bookkeeping and supercharge it</p>
+
+                            <div className="flex items-center space-x-8 mt-4 text-sm">
+                                <div className="flex items-center space-x-2">
+                                    <span className="text-gray-500">AI Processing</span>
+                                    <span className="font-semibold text-green-600">{kpis.processingTime}ms</span>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <span className="text-gray-500">2-way sync</span>
+                                    <span className="font-semibold text-green-600">Real-time</span>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <span className="text-gray-500">Accuracy</span>
+                                    <span className="font-semibold text-green-600">{kpis.accuracy}%</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {!isReturning && (
+                            <div className="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl p-6 text-white mb-8 animate-fade-in">
+                                <h2 className="text-xl font-semibold mb-2">Discover CloudCFO</h2>
+                                <p className="mb-4">Connect your tools once. We'll handle the rest — in under 500ms.</p>
+                                <div className="flex space-x-4">
+                                    <button className="bg-white text-indigo-600 px-4 py-2 rounded-lg hover:bg-gray-100">
+                                        Connect now
+                                    </button>
+                                    <button className="bg-white/20 text-white px-4 py-2 rounded-lg hover:bg-white/30 flex items-center space-x-2">
+                                        <span>See how it works</span>
+                                        <Icon name="external-link" size={16} />
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="mb-8">
+                            <div className="flex justify-between items-center mb-4">
+                                <h2 className="text-lg font-semibold text-gray-900">KPIs</h2>
+                                <button className="text-sm text-gray-500 hover:text-gray-700 flex items-center space-x-1">
+                                    <Icon name="sliders" size={16} />
+                                    <span>Customize range</span>
+                                </button>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                <KPICard 
+                                    title="Documents processed" 
+                                    value={formatNumber(kpis.documentsProcessed)}
+                                    change={15}
+                                    icon="file-text"
+                                    color="blue"
+                                />
+                                <KPICard 
+                                    title="Tax Savings Found" 
+                                    value={formatCurrency(kpis.taxSavings)}
+                                    change={43}
+                                    icon="dollar-sign"
+                                    color="green"
+                                />
+                                <KPICard 
+                                    title="CO2 tracked" 
+                                    value={`${kpis.co2Tracked}t`}
+                                    change={-10}
+                                    icon="leaf"
+                                    color="emerald"
+                                />
+                                <KPICard 
+                                    title="CO2 tracked" 
+                                    value={`${kpis.co2Tracked}t`}
+                                    change={-10}
+                                    icon="trending-down"
+                                    color="amber"
+                                />
+                            </div>
+                            {!isReturning && (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                                    <button className="bg-white p-4 rounded-lg border border-gray-200 hover:border-indigo-300 transition">
+                                        <span className="text-gray-700 font-medium">Connect your software</span>
+                                    </button>
+                                    <button className="bg-white p-4 rounded-lg border border-gray-200 hover:border-indigo-300 transition">
+                                        <span className="text-gray-700 font-medium">Start saving your taxes</span>
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            <div className="lg:col-span-2 space-y-6">
+                                <div className="bg-white rounded-xl p-6 card-shadow">
+                                    <CircularDashboard onModuleClick={setCurrentPage} />
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="bg-white rounded-xl p-6 card-shadow">
+                                        <div className="flex justify-between items-center mb-4">
+                                            <h3 className="font-semibold text-gray-900">Auto-discovery activity</h3>
+                                            <button className="text-gray-400 hover:text-gray-600">
+                                                <Icon name="arrow-right" size={20} />
+                                            </button>
+                                        </div>
+                                        <div className="space-y-3">
+                                            {mockActivities.map((activity) => (
+                                                <div key={activity.id} className="flex items-center justify-between">
+                                                    <div className="flex items-center space-x-3">
+                                                        <Icon name="mail" size={16} color="#667eea" />
+                                                        <div>
+                                                            <p className="text-sm font-medium text-gray-900">{activity.type}</p>
+                                                            <p className="text-xs text-gray-500">{activity.time}</p>
+                                                        </div>
+                                                    </div>
+                                                    <span className="text-xs text-green-600 bg-green-50 px-2 py-1 rounded">
+                                                        <Icon name="headphones" size={12} /> Listening
+                                                    </span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                        {isReturning && (
+                                            <div className="mt-4 pt-4 border-t border-gray-100">
+                                                <p className="text-sm text-indigo-600 font-medium">
+                                                    3 new receipts processed in the last 10 min →
+                                                </p>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div className="bg-white rounded-xl p-6 card-shadow">
+                                        <div className="flex justify-between items-center mb-4">
+                                            <h3 className="font-semibold text-gray-900">Integrations</h3>
+                                            <button className="text-gray-400 hover:text-gray-600">
+                                                <Icon name="arrow-right" size={20} />
+                                            </button>
+                                        </div>
+                                        <p className="text-sm text-gray-500 mb-4">
+                                            Set up your AI Engine in 3 Simple Steps
+                                        </p>
+                                        <div className="space-y-3">
+                                            <div className="flex space-x-2">
+                                                <button className="px-3 py-1 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200">
+                                                    Bookkeeping
+                                                </button>
+                                                <button className="px-3 py-1 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200">
+                                                    Carbon
+                                                </button>
+                                            </div>
+                                            {mockIntegrations.map((integration) => (
+                                                <div key={integration.id} className="flex items-center justify-between">
+                                                    <div className="flex items-center space-x-2">
+                                                        <Icon name="box" size={16} color="#667eea" />
+                                                        <span className="text-sm text-gray-700">{integration.name}</span>
+                                                    </div>
+                                                    <button className={`px-3 py-1 text-xs rounded-lg ${
+                                                        integration.connected 
+                                                            ? 'bg-green-50 text-green-600' 
+                                                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                                    }`}>
+                                                        {integration.connected ? 'Connected' : 'Connect'}
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="space-y-6">
+                                {isReturning && (
+                                    <div className="bg-purple-50 rounded-xl p-6">
+                                        <h3 className="font-semibold text-gray-900 mb-4">For you</h3>
+                                        <div className="space-y-3">
+                                            <div className="bg-white rounded-lg p-4">
+                                                <h4 className="font-medium text-gray-900 mb-2">Insights</h4>
+                                                <p className="text-2xl font-bold text-indigo-600">$4,892</p>
+                                                <p className="text-sm text-gray-600">of this month's savings identified</p>
+                                            </div>
+                                            <div className="bg-white rounded-lg p-4">
+                                                <h4 className="font-medium text-gray-900 mb-2">What to do</h4>
+                                                <button className="w-full text-left text-sm text-indigo-600 hover:text-indigo-700">
+                                                    Push to Quickbooks →
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <button className="w-full mt-4 text-center text-sm text-gray-500 hover:text-gray-700">
+                                            View all
+                                        </button>
+                                    </div>
+                                )}
+
+                                <AIAssistant />
+
+                                <div className="bg-white rounded-xl p-6 card-shadow">
+                                    <div className="flex items-center justify-between mb-4">
+                                        <h3 className="font-semibold text-gray-900">Things to do on CloudCFO</h3>
+                                        <Icon name="chevron-down" size={20} />
+                                    </div>
+                                    <div className="text-sm text-gray-500 mb-2">2 of 3 completed</div>
+                                    <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
+                                        <div className="bg-gradient-to-r from-indigo-500 to-purple-600 h-2 rounded-full" style={{width: '66%'}}></div>
+                                    </div>
+                                    <div className="space-y-3">
+                                        <div className="flex items-center space-x-3">
+                                            <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+                                                <Icon name="check" size={12} color="white" />
+                                            </div>
+                                            <span className="text-sm text-gray-700 line-through">Connect your bank account</span>
+                                        </div>
+                                        <div className="flex items-center space-x-3">
+                                            <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+                                                <Icon name="check" size={12} color="white" />
+                                            </div>
+                                            <span className="text-sm text-gray-700 line-through">Upload first receipt</span>
+                                        </div>
+                                        <div className="flex items-center space-x-3">
+                                            <div className="w-5 h-5 border-2 border-gray-300 rounded-full"></div>
+                                            <span className="text-sm text-gray-700">Complete tax profile</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const IntelligenceDashboard = () => {
+            const [selectedInsight, setSelectedInsight] = useState(null);
+            const [timeRange, setTimeRange] = useState('30d');
+            const [showRecommendations, setShowRecommendations] = useState(true);
+
+            return (
+                <div className="min-h-screen bg-gray-50">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                        <div className="mb-8">
+                            <h1 className="text-2xl font-bold text-gray-900 mb-2">Financial Intelligence</h1>
+                            <p className="text-gray-600">AI-powered insights and predictions for your business</p>
+                        </div>
+
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            <div className="lg:col-span-2 space-y-6">
+                                <div className="bg-white rounded-xl p-6 card-shadow">
+                                    <div className="flex justify-between items-center mb-6">
+                                        <h2 className="text-lg font-semibold text-gray-900">AI Insights</h2>
+                                        <select 
+                                            value={timeRange}
+                                            onChange={(e) => setTimeRange(e.target.value)}
+                                            className="px-3 py-1 border border-gray-300 rounded-lg text-sm"
+                                        >
+                                            <option value="7d">Last 7 days</option>
+                                            <option value="30d">Last 30 days</option>
+                                            <option value="90d">Last 90 days</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div className="space-y-4">
+                                        {mockInsights.map((insight) => (
+                                            <div
+                                                key={insight.id}
+                                                onClick={() => setSelectedInsight(insight)}
+                                                className={`insight-card p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition ${
+                                                    selectedInsight?.id === insight.id ? 'ring-2 ring-indigo-500' : ''
+                                                }`}
+                                            >
+                                                <div className="flex justify-between items-start mb-2">
+                                                    <div className="flex items-center space-x-2">
+                                                        <span className={`px-2 py-1 text-xs rounded-full font-medium ${
+                                                            insight.category === 'Critical' ? 'bg-red-100 text-red-700' :
+                                                            insight.category === 'Opportunity' ? 'bg-green-100 text-green-700' :
+                                                            'bg-blue-100 text-blue-700'
+                                                        }`}>
+                                                            {insight.category}
+                                                        </span>
+                                                        <h3 className="font-medium text-gray-900">{insight.title}</h3>
+                                                    </div>
+                                                    <div className="flex items-center space-x-1">
+                                                        <span className="text-xs text-gray-500">Confidence:</span>
+                                                        <span className="text-sm font-semibold text-gray-700">{insight.confidence}%</span>
+                                                    </div>
+                                                </div>
+                                                <p className="text-sm text-gray-600 mb-3">{insight.description}</p>
+                                                <div className="flex justify-between items-center">
+                                                    <span className="text-lg font-bold text-indigo-600">{insight.impact}</span>
+                                                    <div className="flex space-x-2">
+                                                        <button className="px-3 py-1 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700">
+                                                            Apply
+                                                        </button>
+                                                        <button className="px-3 py-1 bg-gray-200 text-gray-700 text-sm rounded-lg hover:bg-gray-300">
+                                                            Dismiss
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="bg-white rounded-xl p-6 card-shadow">
+                                    <h2 className="text-lg font-semibold text-gray-900 mb-4">Predictive Analytics</h2>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div className="bg-gradient-to-br from-indigo-50 to-blue-50 p-4 rounded-lg">
+                                            <h3 className="font-medium text-gray-900 mb-2">Revenue Forecast</h3>
+                                            <p className="text-2xl font-bold text-indigo-600">$125,400</p>
+                                            <p className="text-sm text-gray-600">Next 30 days</p>
+                                            <div className="mt-2 text-xs text-gray-500">85% confidence</div>
+                                        </div>
+                                        <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-4 rounded-lg">
+                                            <h3 className="font-medium text-gray-900 mb-2">Cash Flow Runway</h3>
+                                            <p className="text-2xl font-bold text-green-600">4.2 months</p>
+                                            <p className="text-sm text-gray-600">At current burn rate</p>
+                                            <div className="mt-2 text-xs text-gray-500">Updated daily</div>
+                                        </div>
+                                        <div className="bg-gradient-to-br from-amber-50 to-orange-50 p-4 rounded-lg">
+                                            <h3 className="font-medium text-gray-900 mb-2">Risk Score</h3>
+                                            <p className="text-2xl font-bold text-amber-600">Medium</p>
+                                            <p className="text-sm text-gray-600">3 factors identified</p>
+                                            <div className="mt-2 text-xs text-gray-500">View details →</div>
+                                        </div>
+                                        <div className="bg-gradient-to-br from-purple-50 to-pink-50 p-4 rounded-lg">
+                                            <h3 className="font-medium text-gray-900 mb-2">Tax Savings</h3>
+                                            <p className="text-2xl font-bold text-purple-600">$18,750</p>
+                                            <p className="text-sm text-gray-600">Potential this quarter</p>
+                                            <div className="mt-2 text-xs text-gray-500">12 opportunities</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="space-y-6">
+                                <div className="bg-white rounded-xl p-6 card-shadow">
+                                    <h3 className="font-semibold text-gray-900 mb-4">Recommendation Tracker</h3>
+                                    <div className="space-y-3">
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-sm text-gray-600">Implemented</span>
+                                            <span className="font-semibold">8/12</span>
+                                        </div>
+                                        <div className="w-full bg-gray-200 rounded-full h-2">
+                                            <div className="bg-green-500 h-2 rounded-full" style={{width: '66%'}}></div>
+                                        </div>
+                                        <div className="pt-2 border-t">
+                                            <p className="text-sm text-gray-600 mb-2">Total ROI from recommendations:</p>
+                                            <p className="text-2xl font-bold text-green-600">$34,200</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl p-6 text-white">
+                                    <h3 className="font-semibold mb-4">Quick Actions</h3>
+                                    <div className="space-y-3">
+                                        <button className="w-full bg-white/20 hover:bg-white/30 p-3 rounded-lg text-left transition">
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-sm">Generate Monthly Report</span>
+                                                <Icon name="file-text" size={16} />
+                                            </div>
+                                        </button>
+                                        <button className="w-full bg-white/20 hover:bg-white/30 p-3 rounded-lg text-left transition">
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-sm">Run Scenario Analysis</span>
+                                                <Icon name="trending-up" size={16} />
+                                            </div>
+                                        </button>
+                                        <button className="w-full bg-white/20 hover:bg-white/30 p-3 rounded-lg text-left transition">
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-sm">Schedule Report Delivery</span>
+                                                <Icon name="calendar" size={16} />
+                                            </div>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const AccountingDashboard = () => {
+            const [activeTab, setActiveTab] = useState('expenses');
+            
+            return (
+                <div className="min-h-screen bg-gray-50">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                        <div className="mb-8">
+                            <h1 className="text-2xl font-bold text-gray-900 mb-2">Accounting & Tax</h1>
+                            <p className="text-gray-600">Expense analytics, vendor analysis, and tax optimization</p>
+                        </div>
+
+                        <div className="bg-white rounded-xl shadow-lg">
+                            <div className="border-b border-gray-200">
+                                <nav className="flex space-x-8 px-6">
+                                    {['expenses', 'vendors', 'vat', 'tax', 'reports'].map((tab) => (
+                                        <button
+                                            key={tab}
+                                            onClick={() => setActiveTab(tab)}
+                                            className={`py-4 px-1 border-b-2 font-medium text-sm capitalize ${
+                                                activeTab === tab
+                                                    ? 'border-indigo-500 text-indigo-600'
+                                                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                            }`}
+                                        >
+                                            {tab}
+                                        </button>
+                                    ))}
+                                </nav>
+                            </div>
+
+                            <div className="p-6">
+                                {activeTab === 'expenses' && (
+                                    <div className="space-y-6">
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-4 rounded-lg">
+                                                <h3 className="text-sm text-gray-600 mb-1">Total Expenses</h3>
+                                                <p className="text-2xl font-bold text-indigo-600">$47,329</p>
+                                                <p className="text-sm text-gray-500 mt-1">This month</p>
+                                            </div>
+                                            <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-4 rounded-lg">
+                                                <h3 className="text-sm text-gray-600 mb-1">Categorized</h3>
+                                                <p className="text-2xl font-bold text-green-600">94%</p>
+                                                <p className="text-sm text-gray-500 mt-1">156 of 166 transactions</p>
+                                            </div>
+                                            <div className="bg-gradient-to-br from-amber-50 to-orange-50 p-4 rounded-lg">
+                                                <h3 className="text-sm text-gray-600 mb-1">Pending Review</h3>
+                                                <p className="text-2xl font-bold text-amber-600">10</p>
+                                                <p className="text-sm text-gray-500 mt-1">Requires attention</p>
+                                            </div>
+                                        </div>
+
+                                        <div className="bg-gray-50 rounded-lg p-6">
+                                            <h3 className="font-semibold text-gray-900 mb-4">Expense Breakdown by Category</h3>
+                                            <div className="space-y-3">
+                                                {[
+                                                    { name: 'Marketing & Advertising', amount: 12500, percent: 26 },
+                                                    { name: 'Software & Tools', amount: 8750, percent: 18 },
+                                                    { name: 'Contractors', amount: 15300, percent: 32 },
+                                                    { name: 'Office & Supplies', amount: 3200, percent: 7 },
+                                                    { name: 'Travel & Entertainment', amount: 7579, percent: 16 }
+                                                ].map((category, i) => (
+                                                    <div key={i}>
+                                                        <div className="flex justify-between text-sm mb-1">
+                                                            <span className="text-gray-700">{category.name}</span>
+                                                            <span className="font-medium">{formatCurrency(category.amount)}</span>
+                                                        </div>
+                                                        <div className="w-full bg-gray-200 rounded-full h-2">
+                                                            <div 
+                                                                className="bg-gradient-to-r from-indigo-500 to-purple-600 h-2 rounded-full"
+                                                                style={{width: `${category.percent}%`}}
+                                                            ></div>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {activeTab === 'tax' && (
+                                    <div className="space-y-6">
+                                        <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-lg p-6">
+                                            <h3 className="font-semibold text-gray-900 mb-4">Tax Optimization Opportunities</h3>
+                                            <div className="space-y-4">
+                                                {[
+                                                    { title: 'Home Office Deduction', savings: 3200, status: 'Available' },
+                                                    { title: 'Vehicle Mileage', savings: 4500, status: 'Pending' },
+                                                    { title: 'R&D Tax Credit', savings: 12000, status: 'Eligible' },
+                                                    { title: 'Equipment Depreciation', savings: 2800, status: 'Available' }
+                                                ].map((opp, i) => (
+                                                    <div key={i} className="bg-white rounded-lg p-4 flex justify-between items-center">
+                                                        <div>
+                                                            <h4 className="font-medium text-gray-900">{opp.title}</h4>
+                                                            <p className="text-sm text-gray-500">Potential savings</p>
+                                                        </div>
+                                                        <div className="text-right">
+                                                            <p className="text-lg font-bold text-green-600">{formatCurrency(opp.savings)}</p>
+                                                            <span className={`text-xs px-2 py-1 rounded-full ${
+                                                                opp.status === 'Available' ? 'bg-green-100 text-green-700' :
+                                                                opp.status === 'Pending' ? 'bg-yellow-100 text-yellow-700' :
+                                                                'bg-blue-100 text-blue-700'
+                                                            }`}>
+                                                                {opp.status}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                            <button className="w-full mt-4 bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition">
+                                                Generate Tax Report
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const BankingDashboard = () => {
+            const [showReconciliation, setShowReconciliation] = useState(false);
+            
+            return (
+                <div className="min-h-screen bg-gray-50">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                        <div className="mb-8">
+                            <h1 className="text-2xl font-bold text-gray-900 mb-2">Banking & Payments</h1>
+                            <p className="text-gray-600">Account reconciliation and transaction management</p>
+                        </div>
+
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            <div className="lg:col-span-2 space-y-6">
+                                <div className="bg-white rounded-xl p-6 card-shadow">
+                                    <h2 className="text-lg font-semibold text-gray-900 mb-4">Connected Accounts</h2>
+                                    <div className="space-y-4">
+                                        {[
+                                            { name: 'Business Checking', bank: 'Chase', balance: 45670, status: 'synced' },
+                                            { name: 'Business Savings', bank: 'Chase', balance: 125000, status: 'synced' },
+                                            { name: 'Credit Card', bank: 'Amex', balance: -8750, status: 'pending' }
+                                        ].map((account, i) => (
+                                            <div key={i} className="border border-gray-200 rounded-lg p-4">
+                                                <div className="flex justify-between items-start">
+                                                    <div>
+                                                        <h3 className="font-medium text-gray-900">{account.name}</h3>
+                                                        <p className="text-sm text-gray-500">{account.bank}</p>
+                                                    </div>
+                                                    <div className="text-right">
+                                                        <p className={`text-lg font-bold ${account.balance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                                            {formatCurrency(Math.abs(account.balance))}
+                                                        </p>
+                                                        <span className={`text-xs px-2 py-1 rounded-full ${
+                                                            account.status === 'synced' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
+                                                        }`}>
+                                                            {account.status}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="bg-white rounded-xl p-6 card-shadow">
+                                    <div className="flex justify-between items-center mb-4">
+                                        <h2 className="text-lg font-semibold text-gray-900">Recent Transactions</h2>
+                                        <button 
+                                            onClick={() => setShowReconciliation(!showReconciliation)}
+                                            className="text-sm text-indigo-600 hover:text-indigo-700"
+                                        >
+                                            {showReconciliation ? 'Hide' : 'Show'} Reconciliation
+                                        </button>
+                                    </div>
+                                    
+                                    {showReconciliation && (
+                                        <div className="mb-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                                            <div className="flex items-center justify-between mb-2">
+                                                <span className="font-medium text-amber-900">Unreconciled Transactions</span>
+                                                <span className="text-amber-700">3 items</span>
+                                            </div>
+                                            <button className="text-sm text-amber-700 hover:text-amber-800">
+                                                Start Reconciliation →
+                                            </button>
+                                        </div>
+                                    )}
+
+                                    <div className="space-y-2">
+                                        {[
+                                            { date: 'Dec 5', desc: 'AWS Services', amount: -1250, category: 'Software' },
+                                            { date: 'Dec 5', desc: 'Client Payment - Invoice #1234', amount: 15000, category: 'Income' },
+                                            { date: 'Dec 4', desc: 'Google Ads', amount: -750, category: 'Marketing' },
+                                            { date: 'Dec 4', desc: 'Office Rent', amount: -3500, category: 'Office' },
+                                            { date: 'Dec 3', desc: 'Contractor Payment', amount: -2500, category: 'Contractors' }
+                                        ].map((tx, i) => (
+                                            <div key={i} className="flex justify-between items-center p-3 hover:bg-gray-50 rounded-lg">
+                                                <div className="flex items-center space-x-4">
+                                                    <div className="text-xs text-gray-500 w-12">{tx.date}</div>
+                                                    <div>
+                                                        <p className="text-sm font-medium text-gray-900">{tx.desc}</p>
+                                                        <p className="text-xs text-gray-500">{tx.category}</p>
+                                                    </div>
+                                                </div>
+                                                <span className={`font-medium ${tx.amount >= 0 ? 'text-green-600' : 'text-gray-900'}`}>
+                                                    {formatCurrency(Math.abs(tx.amount))}
+                                                </span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="space-y-6">
+                                <div className="bg-white rounded-xl p-6 card-shadow">
+                                    <h3 className="font-semibold text-gray-900 mb-4">Reconciliation Status</h3>
+                                    <div className="space-y-3">
+                                        <div>
+                                            <div className="flex justify-between text-sm mb-1">
+                                                <span className="text-gray-600">Matched</span>
+                                                <span className="font-medium">142/150</span>
+                                            </div>
+                                            <div className="w-full bg-gray-200 rounded-full h-2">
+                                                <div className="bg-green-500 h-2 rounded-full" style={{width: '94%'}}></div>
+                                            </div>
+                                        </div>
+                                        <div className="pt-3 border-t">
+                                            <div className="flex justify-between text-sm">
+                                                <span className="text-gray-600">Duplicates detected</span>
+                                                <span className="text-amber-600 font-medium">2</span>
+                                            </div>
+                                            <div className="flex justify-between text-sm mt-2">
+                                                <span className="text-gray-600">Needs review</span>
+                                                <span className="text-red-600 font-medium">6</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl p-6 text-white">
+                                    <h3 className="font-semibold mb-4">Quick Actions</h3>
+                                    <div className="space-y-3">
+                                        <button className="w-full bg-white/20 hover:bg-white/30 p-3 rounded-lg text-left transition">
+                                            Upload Bank Statement
+                                        </button>
+                                        <button className="w-full bg-white/20 hover:bg-white/30 p-3 rounded-lg text-left transition">
+                                            Sync All Accounts
+                                        </button>
+                                        <button className="w-full bg-white/20 hover:bg-white/30 p-3 rounded-lg text-left transition">
+                                            Export Transactions
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const ESGDashboard = () => {
+            const [selectedScope, setSelectedScope] = useState('all');
+            
+            return (
+                <div className="min-h-screen bg-gray-50">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                        <div className="mb-8">
+                            <h1 className="text-2xl font-bold text-gray-900 mb-2">ESG & Carbon Passport</h1>
+                            <p className="text-gray-600">Track and manage your environmental impact</p>
+                        </div>
+
+                        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
+                            {[
+                                { label: 'Total Emissions', value: '24.7t', change: -12, color: 'green' },
+                                { label: 'Scope 1', value: '5.2t', change: -8, color: 'blue' },
+                                { label: 'Scope 2', value: '8.3t', change: -15, color: 'indigo' },
+                                { label: 'Scope 3', value: '11.2t', change: -10, color: 'purple' }
+                            ].map((metric, i) => (
+                                <div key={i} className="bg-white rounded-xl p-6 card-shadow">
+                                    <p className="text-sm text-gray-600 mb-1">{metric.label}</p>
+                                    <p className="text-2xl font-bold text-gray-900">{metric.value}</p>
+                                    <div className="flex items-center mt-2">
+                                        <Icon 
+                                            name={metric.change < 0 ? "trending-down" : "trending-up"} 
+                                            size={16} 
+                                            color={metric.change < 0 ? "#10b981" : "#ef4444"} 
+                                        />
+                                        <span className={`text-sm ml-1 ${metric.change < 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                            {Math.abs(metric.change)}% vs last month
+                                        </span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            <div className="lg:col-span-2 space-y-6">
+                                <div className="bg-white rounded-xl p-6 card-shadow">
+                                    <div className="flex justify-between items-center mb-6">
+                                        <h2 className="text-lg font-semibold text-gray-900">Emissions Breakdown</h2>
+                                        <select 
+                                            value={selectedScope}
+                                            onChange={(e) => setSelectedScope(e.target.value)}
+                                            className="px-3 py-1 border border-gray-300 rounded-lg text-sm"
+                                        >
+                                            <option value="all">All Scopes</option>
+                                            <option value="1">Scope 1</option>
+                                            <option value="2">Scope 2</option>
+                                            <option value="3">Scope 3</option>
+                                        </select>
+                                    </div>
+
+                                    <div className="space-y-4">
+                                        {[
+                                            { category: 'Transportation', emissions: 8.5, percent: 34, color: 'blue' },
+                                            { category: 'Energy', emissions: 6.2, percent: 25, color: 'green' },
+                                            { category: 'Supply Chain', emissions: 5.8, percent: 23, color: 'purple' },
+                                            { category: 'Waste', emissions: 2.3, percent: 9, color: 'amber' },
+                                            { category: 'Other', emissions: 1.9, percent: 8, color: 'gray' }
+                                        ].map((item, i) => (
+                                            <div key={i}>
+                                                <div className="flex justify-between items-center mb-2">
+                                                    <span className="text-sm font-medium text-gray-700">{item.category}</span>
+                                                    <span className="text-sm text-gray-600">{item.emissions}t CO2e ({item.percent}%)</span>
+                                                </div>
+                                                <div className="w-full bg-gray-200 rounded-full h-3">
+                                                    <div 
+                                                        className={`bg-gradient-to-r from-${item.color}-400 to-${item.color}-600 h-3 rounded-full`}
+                                                        style={{width: `${item.percent}%`}}
+                                                    ></div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="bg-white rounded-xl p-6 card-shadow">
+                                    <h2 className="text-lg font-semibold text-gray-900 mb-4">Reduction Opportunities</h2>
+                                    <div className="space-y-3">
+                                        {[
+                                            { 
+                                                action: 'Switch to renewable energy provider',
+                                                impact: '3.2t CO2e/year',
+                                                cost: '$500/month savings',
+                                                difficulty: 'Easy'
+                                            },
+                                            {
+                                                action: 'Optimize shipping routes',
+                                                impact: '2.1t CO2e/year',
+                                                cost: '$2,000/month savings',
+                                                difficulty: 'Medium'
+                                            },
+                                            {
+                                                action: 'Implement remote work policy',
+                                                impact: '4.5t CO2e/year',
+                                                cost: '$3,500/month savings',
+                                                difficulty: 'Easy'
+                                            }
+                                        ].map((opp, i) => (
+                                            <div key={i} className="border border-gray-200 rounded-lg p-4">
+                                                <div className="flex justify-between items-start mb-2">
+                                                    <h3 className="font-medium text-gray-900">{opp.action}</h3>
+                                                    <span className={`px-2 py-1 text-xs rounded-full ${
+                                                        opp.difficulty === 'Easy' ? 'bg-green-100 text-green-700' :
+                                                        opp.difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-700' :
+                                                        'bg-red-100 text-red-700'
+                                                    }`}>
+                                                        {opp.difficulty}
+                                                    </span>
+                                                </div>
+                                                <div className="flex justify-between text-sm text-gray-600">
+                                                    <span>Impact: {opp.impact}</span>
+                                                    <span className="text-green-600 font-medium">{opp.cost}</span>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="space-y-6">
+                                <div className="bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl p-6 text-white">
+                                    <h3 className="font-semibold mb-4 flex items-center">
+                                        <Icon name="award" size={20} className="mr-2" />
+                                        Carbon Passport
+                                    </h3>
+                                    <div className="bg-white/20 rounded-lg p-4 mb-4">
+                                        <div className="flex justify-center mb-3">
+                                            <div className="w-24 h-24 bg-white rounded-lg flex items-center justify-center">
+                                                <div className="text-center">
+                                                    <div className="text-black text-xs">QR Code</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <p className="text-sm text-center">Scan for verification</p>
+                                    </div>
+                                    <button className="w-full bg-white text-green-600 py-2 rounded-lg hover:bg-green-50 transition">
+                                        Generate Report
+                                    </button>
+                                </div>
+
+                                <div className="bg-white rounded-xl p-6 card-shadow">
+                                    <h3 className="font-semibold text-gray-900 mb-4">ESG Score</h3>
+                                    <div className="text-center mb-4">
+                                        <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-br from-green-400 to-emerald-600">
+                                            <span className="text-2xl font-bold text-white">B+</span>
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2 text-sm">
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-600">Environmental</span>
+                                            <span className="font-medium">78/100</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-600">Social</span>
+                                            <span className="font-medium">82/100</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-600">Governance</span>
+                                            <span className="font-medium">85/100</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
+                                    <h3 className="font-semibold text-gray-900 mb-3">Carbon Marketplace</h3>
+                                    <p className="text-sm text-gray-600 mb-4">
+                                        Offset your remaining emissions through verified projects
+                                    </p>
+                                    <button className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition">
+                                        Browse Offsets
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const App = () => {
+            const [user, setUser] = useState({ name: 'Alan', email: 'alan@example.com' });
+            const [isReturning, setIsReturning] = useState(false);
+            const [currentPage, setCurrentPage] = useState('dashboard');
+
+            const handleLogin = () => {
+                setUser({ name: 'Alan', email: 'alan@example.com' });
+                setIsReturning(true);
+            };
+
+            const handleLogout = () => {
+                setUser(null);
+                setCurrentPage('dashboard');
+                setIsReturning(false);
+            };
+
+            const renderPage = () => {
+                if (!user) {
+                    return (
+                        <div className="min-h-screen bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+                            <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full">
+                                <div className="text-center mb-8">
+                                    <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-xl mx-auto mb-4"></div>
+                                    <h1 className="text-2xl font-bold text-gray-900">Welcome to CloudCFO</h1>
+                                    <p className="text-gray-600 mt-2">AI-powered financial intelligence platform</p>
+                                </div>
+                                <button 
+                                    onClick={handleLogin}
+                                    className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white py-3 rounded-lg hover:from-indigo-600 hover:to-purple-700 transition"
+                                >
+                                    Sign In
+                                </button>
+                            </div>
+                        </div>
+                    );
+                }
+
+                switch(currentPage) {
+                    case 'intelligence':
+                        return <IntelligenceDashboard />;
+                    case 'accounting':
+                        return <AccountingDashboard />;
+                    case 'banking':
+                        return <BankingDashboard />;
+                    case 'esg':
+                        return <ESGDashboard />;
+                    default:
+                        return <Dashboard user={user} isReturning={isReturning} setCurrentPage={setCurrentPage} />;
+                }
+            };
+
+            return (
+                <div>
+                    <Navbar 
+                        user={user} 
+                        onLogout={handleLogout} 
+                        currentPage={currentPage}
+                        setCurrentPage={setCurrentPage}
+                    />
+                    {renderPage()}
+                </div>
+            );
+        };
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>
