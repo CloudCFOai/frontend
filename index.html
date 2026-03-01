@@ -3,1398 +3,1065 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CloudCFO - AI-Powered Financial Intelligence Platform</title>
+    <title>CloudCFO — Your finances, captured automatically.</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Georgia&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf6',
+                            100: '#dcfce8',
+                            200: '#bbf7d1',
+                            300: '#86efad',
+                            400: '#4ade80',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d',
+                            950: '#052e16',
+                        },
+                        gold: { 400: '#fbbf24', 500: '#f59e0b', 600: '#d97706' },
+                        surface: { 50: '#fafbfc', 100: '#f4f6f8', 200: '#e8ecf0' },
+                    },
+                    fontFamily: {
+                        heading: ['Georgia', 'serif'],
+                        body: ['Inter', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif; }
-        
-        .gradient-bg {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        
-        .card-shadow {
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        }
-        
-        .glass-effect {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-        }
-        
-        @keyframes slideIn {
-            from { transform: translateX(-100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .animate-slide-in {
-            animation: slideIn 0.3s ease-out;
-        }
-        
-        .animate-fade-in {
-            animation: fadeIn 0.5s ease-out;
-        }
-        
-        .circular-chart {
-            position: relative;
-            width: 400px;
-            height: 400px;
-        }
-        
-        .chart-segment {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            clip-path: polygon(50% 50%, 50% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 0%, 50% 0%);
-        }
-        
-        .hover-scale {
-            transition: transform 0.2s ease;
-        }
-        
-        .hover-scale:hover {
-            transform: scale(1.05);
-        }
-        
-        .spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #667eea;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+        *, *::before, *::after { font-family: 'Inter', system-ui, sans-serif; }
+        h1, h2, h3, .font-heading { font-family: 'Georgia', serif; }
 
-        .alert-banner {
-            background: linear-gradient(90deg, #f97316 0%, #fb923c 100%);
-        }
+        /* Smooth scroll */
+        html { scroll-behavior: smooth; }
 
-        .kpi-trend-line {
-            stroke: #667eea;
-            stroke-width: 2;
-            fill: none;
-        }
+        /* Hero animation keyframes */
+        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-8px); } }
+        @keyframes float-delayed { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-12px); } }
+        @keyframes pulse-glow { 0%, 100% { opacity: 0.6; transform: scale(1); } 50% { opacity: 1; transform: scale(1.05); } }
+        @keyframes slide-in-left { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes slide-in-right { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes slide-in-up { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes draw-line { from { stroke-dashoffset: 200; } to { stroke-dashoffset: 0; } }
+        @keyframes scan-pulse { 0%, 100% { transform: scale(1); opacity: 0.3; } 50% { transform: scale(1.8); opacity: 0; } }
+        @keyframes flow-dot { 0% { offset-distance: 0%; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { offset-distance: 100%; opacity: 0; } }
+        @keyframes badge-pop { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+        @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
 
-        .module-card {
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
+        .float { animation: float 4s ease-in-out infinite; }
+        .float-d1 { animation: float-delayed 5s ease-in-out 0.5s infinite; }
+        .float-d2 { animation: float 4.5s ease-in-out 1s infinite; }
+        .float-d3 { animation: float-delayed 5.5s ease-in-out 1.5s infinite; }
+        .pulse-glow { animation: pulse-glow 3s ease-in-out infinite; }
+        .scan-pulse { animation: scan-pulse 2.5s ease-out infinite; }
 
-        .module-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-        }
+        .slide-up { animation: slide-in-up 0.6s ease-out both; }
+        .slide-up-d1 { animation: slide-in-up 0.6s ease-out 0.1s both; }
+        .slide-up-d2 { animation: slide-in-up 0.6s ease-out 0.2s both; }
+        .slide-up-d3 { animation: slide-in-up 0.6s ease-out 0.3s both; }
+        .slide-up-d4 { animation: slide-in-up 0.6s ease-out 0.4s both; }
+        .fade-in { animation: fade-in 0.8s ease-out both; }
 
-        .insight-card {
-            border-left: 4px solid #667eea;
-            animation: fadeIn 0.5s ease-out;
-        }
-
-        .progress-ring {
-            transform: rotate(-90deg);
-        }
-
-        .nav-link {
-            position: relative;
-            transition: color 0.2s ease;
-        }
-
-        .nav-link::after {
+        /* Noise texture overlay */
+        .noise-bg::before {
             content: '';
             position: absolute;
-            bottom: -2px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: #667eea;
-            transition: width 0.3s ease;
+            inset: 0;
+            opacity: 0.03;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+            pointer-events: none;
         }
 
-        .nav-link:hover::after,
-        .nav-link.active::after {
-            width: 100%;
+        /* Gradient mesh background */
+        .hero-gradient {
+            background:
+                radial-gradient(ellipse at 20% 50%, rgba(22, 163, 74, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(34, 197, 94, 0.1) 0%, transparent 40%),
+                radial-gradient(ellipse at 60% 80%, rgba(21, 128, 61, 0.08) 0%, transparent 40%),
+                linear-gradient(180deg, #ffffff 0%, #f0fdf4 100%);
+        }
+
+        /* Card hover effects */
+        .paradigm-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .paradigm-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.12);
+        }
+
+        /* Tab styling */
+        .tab-btn { transition: all 0.3s ease; }
+        .tab-btn.active {
+            background: linear-gradient(135deg, #166534, #15803d);
+            color: white;
+            box-shadow: 0 4px 12px rgba(22, 101, 52, 0.3);
+        }
+        .tab-content { display: none; animation: fade-in 0.4s ease; }
+        .tab-content.active { display: block; }
+
+        /* Pipeline step connector */
+        .pipeline-connector {
+            background: linear-gradient(90deg, #22c55e 0%, #16a34a 50%, #22c55e 100%);
+            background-size: 200% 100%;
+            animation: shimmer 3s linear infinite;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+
+        /* Badge channel styles */
+        .channel-badge {
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        /* Intersection Observer reveal */
+        .reveal {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Dark section gradient */
+        .dark-section {
+            background: linear-gradient(135deg, #052e16 0%, #14532d 40%, #166534 100%);
         }
     </style>
 </head>
-<body>
-    <div id="root"></div>
+<body class="bg-white text-gray-900 antialiased">
 
-    <script type="text/babel">
-        const { useState, useEffect, useRef, useCallback, useMemo } = React;
+<!-- ============================================================ -->
+<!-- SECTION 1: HEADER + HERO                                      -->
+<!-- ============================================================ -->
 
-        // Utility functions
-        const formatCurrency = (amount) => {
-            return new Intl.NumberFormat('en-US', {
-                style: 'currency',
-                currency: 'USD',
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 0,
-            }).format(amount);
-        };
+<!-- Sticky Header -->
+<header class="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100/80" id="header">
+    <div class="max-w-7xl mx-auto px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+            <!-- Logo -->
+            <a href="#" class="flex items-center gap-2.5 group">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center shadow-md shadow-brand-500/20 group-hover:shadow-brand-500/40 transition-shadow">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                    </svg>
+                </div>
+                <span class="text-xl font-bold text-gray-900 tracking-tight">Cloud<span class="text-brand-600">CFO</span></span>
+            </a>
+            <!-- Nav -->
+            <nav class="hidden md:flex items-center gap-1">
+                <a href="#paradigms" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-brand-700 hover:bg-brand-50 rounded-lg transition-all">Product</a>
+                <a href="#pipeline" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-brand-700 hover:bg-brand-50 rounded-lg transition-all">How It Works</a>
+                <a href="#pricing" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-brand-700 hover:bg-brand-50 rounded-lg transition-all">Pricing</a>
+                <a href="#" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-brand-700 hover:bg-brand-50 rounded-lg transition-all">Blog</a>
+            </nav>
+            <!-- CTA -->
+            <div class="flex items-center gap-4">
+                <a href="#" class="text-sm font-medium text-gray-600 hover:text-brand-700 transition hidden sm:block">Login</a>
+                <a href="#" class="px-5 py-2.5 bg-gradient-to-r from-brand-600 to-brand-700 text-white text-sm font-semibold rounded-xl hover:from-brand-700 hover:to-brand-800 transition-all shadow-md shadow-brand-600/25 hover:shadow-brand-600/40">Start Free</a>
+            </div>
+        </div>
+    </div>
+</header>
 
-        const formatNumber = (num) => {
-            if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
-            if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
-            return num.toString();
-        };
+<!-- Hero -->
+<section class="relative pt-28 pb-20 lg:pt-36 lg:pb-28 hero-gradient overflow-hidden noise-bg">
+    <div class="max-w-7xl mx-auto px-6 lg:px-8">
+        <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+            <!-- Left: Copy -->
+            <div class="slide-up">
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-brand-100 text-brand-700 rounded-full text-xs font-semibold mb-6 tracking-wide uppercase">
+                    <span class="w-1.5 h-1.5 bg-brand-500 rounded-full animate-pulse"></span>
+                    AI-Powered Bookkeeping & Carbon Accounting
+                </div>
+                <h1 class="font-heading text-4xl lg:text-[3.25rem] lg:leading-[1.15] font-bold text-gray-900 mb-6">
+                    Your finances,<br>
+                    <span class="bg-gradient-to-r from-brand-600 to-brand-800 bg-clip-text text-transparent">captured automatically.</span>
+                </h1>
+                <p class="text-lg text-gray-600 leading-relaxed mb-8 max-w-lg">
+                    CloudCFO captures every receipt, invoice, and transaction across your email, cloud storage, messaging apps, phone notifications, and bank feeds — then turns them into verified books and carbon reports. <strong class="text-gray-800">Automatically.</strong>
+                </p>
+                <div class="flex flex-wrap items-center gap-4 mb-10">
+                    <a href="#" class="inline-flex items-center gap-2 px-7 py-3.5 bg-gradient-to-r from-brand-600 to-brand-700 text-white font-semibold rounded-xl hover:from-brand-700 hover:to-brand-800 transition-all shadow-lg shadow-brand-600/25 hover:shadow-brand-600/40 text-sm">
+                        Start Free
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                    </a>
+                    <a href="#" class="inline-flex items-center gap-2 px-7 py-3.5 border-2 border-gray-200 text-gray-700 font-semibold rounded-xl hover:border-brand-300 hover:text-brand-700 hover:bg-brand-50/50 transition-all text-sm">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        Watch Demo
+                    </a>
+                </div>
+                <!-- Trust badges -->
+                <div class="flex flex-wrap items-center gap-x-6 gap-y-3 text-sm text-gray-500">
+                    <span class="flex items-center gap-1.5">
+                        <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                        <strong class="text-gray-700">&lt; 500ms</strong> processing
+                    </span>
+                    <span class="flex items-center gap-1.5">
+                        <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <strong class="text-gray-700">99.5%</strong> AI accuracy
+                    </span>
+                    <span class="flex items-center gap-1.5">
+                        <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                        SOC 2 compliant
+                    </span>
+                    <span class="flex items-center gap-1.5">
+                        <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/></svg>
+                        Dual intelligence
+                    </span>
+                </div>
+            </div>
 
-        // Mock data
-        const mockKPIs = {
-            new: {
-                documentsProcessed: 0,
-                taxSavings: 0,
-                co2Tracked: 0,
-                processingTime: 482,
-                accuracy: 99.9
-            },
-            returning: {
-                documentsProcessed: 1515,
-                taxSavings: 4200,
-                co2Tracked: 2.4,
-                processingTime: 482,
-                accuracy: 99.9
-            }
-        };
+            <!-- Right: Hero Visual — Document Flow Illustration -->
+            <div class="relative slide-up-d2 hidden lg:block">
+                <div class="relative w-full h-[420px]">
+                    <!-- Central Hub -->
+                    <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
+                        <div class="w-28 h-28 rounded-2xl bg-gradient-to-br from-brand-600 to-brand-800 flex flex-col items-center justify-center shadow-2xl shadow-brand-700/30 relative">
+                            <div class="absolute inset-0 rounded-2xl scan-pulse bg-brand-500/20"></div>
+                            <svg class="w-8 h-8 text-white mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                            <span class="text-white text-[10px] font-bold tracking-wider">CloudCFO</span>
+                            <span class="text-brand-200 text-[8px]">AI Engine</span>
+                        </div>
+                    </div>
 
-        const mockActivities = [
-            { id: 1, type: 'Gmail', time: '10:05, 09:44 AM', status: 'listening' },
-            { id: 2, type: 'Whatsapp', time: '11:05, 11:23 AM', status: 'listening' },
-            { id: 3, type: 'Drive', time: '12:05, 10:35 AM', status: 'listening' }
-        ];
+                    <!-- Source Icons (Left side, flowing in) -->
+                    <!-- Gmail -->
+                    <div class="absolute left-2 top-8 float">
+                        <div class="w-14 h-14 bg-white rounded-xl shadow-lg shadow-gray-200/60 flex items-center justify-center border border-gray-100">
+                            <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none"><path d="M2 6l10 7 10-7" stroke="#EA4335" stroke-width="1.5" stroke-linecap="round"/><rect x="2" y="4" width="20" height="16" rx="3" stroke="#4285F4" stroke-width="1.5" fill="none"/></svg>
+                        </div>
+                        <span class="block text-center text-[9px] text-gray-500 mt-1 font-medium">Gmail</span>
+                    </div>
+                    <!-- WhatsApp -->
+                    <div class="absolute left-0 top-[140px] float-d1">
+                        <div class="w-14 h-14 bg-white rounded-xl shadow-lg shadow-gray-200/60 flex items-center justify-center border border-gray-100">
+                            <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.77.46 3.43 1.27 4.88L2 22l5.12-1.27A9.96 9.96 0 0012 22c5.52 0 10-4.48 10-10S17.52 2 12 2z" stroke="#25D366" stroke-width="1.5"/><path d="M8.5 10.5c.5-1 1.5-2 2.5-2s1.5.5 2 1-.5 2-1 2.5-2 1.5-3 1" stroke="#25D366" stroke-width="1.5" stroke-linecap="round"/></svg>
+                        </div>
+                        <span class="block text-center text-[9px] text-gray-500 mt-1 font-medium">WhatsApp</span>
+                    </div>
+                    <!-- Phone/Notifications -->
+                    <div class="absolute left-6 bottom-16 float-d2">
+                        <div class="w-14 h-14 bg-white rounded-xl shadow-lg shadow-gray-200/60 flex items-center justify-center border border-gray-100 relative">
+                            <svg class="w-6 h-6 text-gold-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                            <span class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-[8px] text-white flex items-center justify-center font-bold">3</span>
+                        </div>
+                        <span class="block text-center text-[9px] text-gray-500 mt-1 font-medium">Notifications</span>
+                    </div>
+                    <!-- Google Drive -->
+                    <div class="absolute left-20 top-[260px] float-d3">
+                        <div class="w-14 h-14 bg-white rounded-xl shadow-lg shadow-gray-200/60 flex items-center justify-center border border-gray-100">
+                            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none"><polygon points="12,2 2,18 6,22 16,6" stroke="#0066DA" stroke-width="1.5" fill="none"/><polygon points="12,2 22,18 18,22 8,6" stroke="#00AC47" stroke-width="1.5" fill="none"/><line x1="2" y1="18" x2="22" y2="18" stroke="#EA4335" stroke-width="1.5"/></svg>
+                        </div>
+                        <span class="block text-center text-[9px] text-gray-500 mt-1 font-medium">Drive</span>
+                    </div>
+                    <!-- Telegram -->
+                    <div class="absolute left-28 top-2 float-d2">
+                        <div class="w-12 h-12 bg-white rounded-xl shadow-lg shadow-gray-200/60 flex items-center justify-center border border-gray-100">
+                            <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 19l9-7-9-7-9 7 9 7z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 19V5"/></svg>
+                        </div>
+                        <span class="block text-center text-[9px] text-gray-500 mt-1 font-medium">Telegram</span>
+                    </div>
+                    <!-- Bank -->
+                    <div class="absolute left-36 bottom-4 float">
+                        <div class="w-12 h-12 bg-white rounded-xl shadow-lg shadow-gray-200/60 flex items-center justify-center border border-gray-100">
+                            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+                        </div>
+                        <span class="block text-center text-[9px] text-gray-500 mt-1 font-medium">Bank</span>
+                    </div>
 
-        const mockIntegrations = [
-            { id: 1, name: 'Bookkeeping', connected: false },
-            { id: 2, name: 'Carbon', connected: false },
-            { id: 3, name: 'Quickbooks', connected: true },
-            { id: 4, name: 'Xero', connected: true }
-        ];
-
-        const mockInsights = [
-            {
-                id: 1,
-                category: 'Critical',
-                title: 'Tax Deduction Opportunity',
-                description: 'We found $12,840 in potential deductions across 156 uncategorized Q3 transactions',
-                impact: '$12,840',
-                confidence: 92
-            },
-            {
-                id: 2,
-                category: 'Opportunity',
-                title: 'Cash Flow Optimization',
-                description: 'Your receivables aging shows $89,500 overdue from 4 clients',
-                impact: '$89,500',
-                confidence: 88
-            },
-            {
-                id: 3,
-                category: 'Trend',
-                title: 'Supply Chain Emissions',
-                description: 'Carbon emissions increased 23% driven by Carrier XYZ freight',
-                impact: '15 tons CO2e',
-                confidence: 95
-            }
-        ];
-
-        // Components
-        const Icon = ({ name, size = 20, color = 'currentColor' }) => {
-            useEffect(() => {
-                lucide.createIcons();
-            }, []);
-            return <i data-lucide={name} style={{ width: size, height: size, color }}></i>;
-        };
-
-        const Navbar = ({ user, onLogout, currentPage, setCurrentPage }) => {
-            return (
-                <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <div className="flex justify-between items-center h-16">
-                            <div className="flex items-center space-x-8">
-                                <div className="flex items-center space-x-2">
-                                    <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-lg"></div>
-                                    <span className="font-bold text-xl">CloudCFO</span>
-                                </div>
-                                {user && (
-                                    <div className="hidden md:flex space-x-6">
-                                        <button 
-                                            onClick={() => setCurrentPage('dashboard')}
-                                            className={`nav-link text-gray-600 hover:text-gray-900 ${currentPage === 'dashboard' ? 'active text-gray-900' : ''}`}
-                                        >
-                                            Dashboard
-                                        </button>
-                                        <button 
-                                            onClick={() => setCurrentPage('intelligence')}
-                                            className={`nav-link text-gray-600 hover:text-gray-900 ${currentPage === 'intelligence' ? 'active text-gray-900' : ''}`}
-                                        >
-                                            Intelligence
-                                        </button>
-                                        <button 
-                                            onClick={() => setCurrentPage('accounting')}
-                                            className={`nav-link text-gray-600 hover:text-gray-900 ${currentPage === 'accounting' ? 'active text-gray-900' : ''}`}
-                                        >
-                                            Accounting & Tax
-                                        </button>
-                                        <button 
-                                            onClick={() => setCurrentPage('banking')}
-                                            className={`nav-link text-gray-600 hover:text-gray-900 ${currentPage === 'banking' ? 'active text-gray-900' : ''}`}
-                                        >
-                                            Banking
-                                        </button>
-                                        <button 
-                                            onClick={() => setCurrentPage('esg')}
-                                            className={`nav-link text-gray-600 hover:text-gray-900 ${currentPage === 'esg' ? 'active text-gray-900' : ''}`}
-                                        >
-                                            ESG
-                                        </button>
-                                    </div>
-                                )}
+                    <!-- Output Dashboards (Right side) -->
+                    <!-- Accounting -->
+                    <div class="absolute right-0 top-12 float-d1">
+                        <div class="w-48 bg-white rounded-xl shadow-xl shadow-gray-200/50 border border-gray-100 p-3 overflow-hidden">
+                            <div class="flex items-center gap-2 mb-2">
+                                <div class="w-6 h-6 bg-brand-100 rounded flex items-center justify-center"><svg class="w-3.5 h-3.5 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg></div>
+                                <span class="text-[10px] font-semibold text-gray-800">Accounting</span>
                             </div>
-                            <div className="flex items-center space-x-4">
-                                {user ? (
-                                    <>
-                                        <button className="p-2 text-gray-400 hover:text-gray-600">
-                                            <Icon name="bell" size={20} />
-                                        </button>
-                                        <button className="p-2 text-gray-400 hover:text-gray-600">
-                                            <Icon name="settings" size={20} />
-                                        </button>
-                                        <button 
-                                            onClick={onLogout}
-                                            className="flex items-center space-x-2 text-gray-700 hover:text-gray-900"
-                                        >
-                                            <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
-                                                <span className="text-sm font-medium text-indigo-600">
-                                                    {user.name.charAt(0)}
-                                                </span>
-                                            </div>
-                                            <span className="hidden md:block text-sm">{user.name}</span>
-                                        </button>
-                                    </>
-                                ) : (
-                                    <div className="flex items-center space-x-4">
-                                        <a href="#" className="text-gray-600 hover:text-gray-900">Login</a>
-                                        <button className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
-                                            Get Started
-                                        </button>
-                                    </div>
-                                )}
+                            <div class="space-y-1.5">
+                                <div class="flex justify-between text-[9px]"><span class="text-gray-500">Revenue</span><span class="font-semibold text-brand-600">$847,250</span></div>
+                                <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-brand-400 to-brand-600 rounded-full" style="width:72%"></div></div>
+                                <div class="flex justify-between text-[9px]"><span class="text-gray-500">Net Profit</span><span class="font-semibold text-brand-600">$324,070</span></div>
+                                <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-brand-400 to-brand-600 rounded-full" style="width:38%"></div></div>
                             </div>
                         </div>
                     </div>
-                </nav>
-            );
-        };
+                    <!-- ESG -->
+                    <div class="absolute right-4 bottom-8 float-d3">
+                        <div class="w-48 bg-white rounded-xl shadow-xl shadow-gray-200/50 border border-gray-100 p-3 overflow-hidden">
+                            <div class="flex items-center gap-2 mb-2">
+                                <div class="w-6 h-6 bg-teal-100 rounded flex items-center justify-center"><svg class="w-3.5 h-3.5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064"/></svg></div>
+                                <span class="text-[10px] font-semibold text-gray-800">ESG & Carbon</span>
+                            </div>
+                            <div class="space-y-1.5">
+                                <div class="flex justify-between text-[9px]"><span class="text-gray-500">CO₂ Emissions</span><span class="font-semibold text-teal-600">1,247 tCO₂e</span></div>
+                                <div class="flex justify-between text-[9px]"><span class="text-gray-500">ESG Score</span><span class="font-semibold text-teal-600">78/100</span></div>
+                                <div class="flex gap-1 mt-1">
+                                    <span class="px-1.5 py-0.5 bg-green-100 text-green-700 text-[8px] rounded font-medium">E: 82</span>
+                                    <span class="px-1.5 py-0.5 bg-blue-100 text-blue-700 text-[8px] rounded font-medium">S: 75</span>
+                                    <span class="px-1.5 py-0.5 bg-purple-100 text-purple-700 text-[8px] rounded font-medium">G: 77</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-        const KPICard = ({ title, value, change, trend, icon, color = 'indigo' }) => {
-            const trendData = [65, 59, 80, 81, 56, 55, 70, 80, 90, 100];
-            
-            return (
-                <div className="bg-white rounded-xl p-6 card-shadow hover-scale">
-                    <div className="flex justify-between items-start mb-4">
+                    <!-- Animated flow lines (SVG) -->
+                    <svg class="absolute inset-0 w-full h-full pointer-events-none z-10" viewBox="0 0 500 420">
+                        <!-- Flow lines from sources to center -->
+                        <path d="M80 50 Q180 100 230 200" stroke="url(#flowGrad)" stroke-width="1.5" fill="none" opacity="0.3" stroke-dasharray="4 4"/>
+                        <path d="M60 170 Q140 190 230 210" stroke="url(#flowGrad)" stroke-width="1.5" fill="none" opacity="0.3" stroke-dasharray="4 4"/>
+                        <path d="M80 330 Q160 280 230 220" stroke="url(#flowGrad)" stroke-width="1.5" fill="none" opacity="0.3" stroke-dasharray="4 4"/>
+                        <!-- Flow lines from center to outputs -->
+                        <path d="M290 190 Q340 160 370 100" stroke="url(#flowGrad2)" stroke-width="1.5" fill="none" opacity="0.3" stroke-dasharray="4 4"/>
+                        <path d="M290 230 Q340 270 370 310" stroke="url(#flowGrad2)" stroke-width="1.5" fill="none" opacity="0.3" stroke-dasharray="4 4"/>
+                        <defs>
+                            <linearGradient id="flowGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#22c55e" stop-opacity="0"/><stop offset="100%" stop-color="#22c55e" stop-opacity="1"/></linearGradient>
+                            <linearGradient id="flowGrad2" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#16a34a" stop-opacity="1"/><stop offset="100%" stop-color="#16a34a" stop-opacity="0"/></linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Bottom fade -->
+    <div class="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-surface-50 to-transparent"></div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- SECTION 2: SOCIAL PROOF / TRUST BAR                           -->
+<!-- ============================================================ -->
+<section class="bg-surface-50 border-y border-gray-100 py-10">
+    <div class="max-w-7xl mx-auto px-6 lg:px-8">
+        <p class="text-center text-sm text-gray-400 font-medium tracking-wide uppercase mb-8">Trusted by forward-thinking finance teams</p>
+        <div class="flex flex-wrap items-center justify-center gap-x-12 gap-y-6">
+            <!-- Stat blocks -->
+            <div class="text-center">
+                <p class="text-3xl font-bold text-gray-900">50,000+</p>
+                <p class="text-sm text-gray-500 mt-1">Documents processed</p>
+            </div>
+            <div class="w-px h-12 bg-gray-200 hidden md:block"></div>
+            <div class="text-center">
+                <p class="text-3xl font-bold text-gray-900">12</p>
+                <p class="text-sm text-gray-500 mt-1">Integration channels</p>
+            </div>
+            <div class="w-px h-12 bg-gray-200 hidden md:block"></div>
+            <div class="text-center">
+                <p class="text-3xl font-bold text-gray-900">$2M+</p>
+                <p class="text-sm text-gray-500 mt-1">Tax savings identified</p>
+            </div>
+            <div class="w-px h-12 bg-gray-200 hidden md:block"></div>
+            <div class="text-center">
+                <p class="text-3xl font-bold text-gray-900">&lt; 500ms</p>
+                <p class="text-sm text-gray-500 mt-1">Processing time</p>
+            </div>
+            <div class="w-px h-12 bg-gray-200 hidden md:block"></div>
+            <div class="flex items-center gap-3">
+                <!-- Enterprise pilot logos as text badges -->
+                <span class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-600">Swiss Post</span>
+                <span class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-600">Family Offices</span>
+                <span class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-600">Enterprise</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- SECTION 3: THE FOUR CAPTURE PARADIGMS                         -->
+<!-- ============================================================ -->
+<section class="py-20 lg:py-28 bg-white relative" id="paradigms">
+    <div class="max-w-7xl mx-auto px-6 lg:px-8">
+        <div class="text-center mb-16 reveal">
+            <h2 class="font-heading text-3xl lg:text-4xl font-bold text-gray-900 mb-4">Every receipt finds its way home</h2>
+            <p class="text-lg text-gray-500 max-w-2xl mx-auto">Four intelligent capture methods. Zero manual data entry.</p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6 lg:gap-8">
+
+            <!-- Card 1: Auto-Discovery -->
+            <div class="paradigm-card bg-white rounded-2xl border-2 border-brand-200 p-8 relative overflow-hidden group reveal">
+                <div class="absolute top-0 right-0 w-40 h-40 bg-gradient-to-bl from-brand-50 to-transparent rounded-bl-full opacity-60"></div>
+                <div class="relative">
+                    <div class="flex items-start justify-between mb-5">
+                        <div class="w-14 h-14 bg-gradient-to-br from-brand-100 to-brand-200 rounded-2xl flex items-center justify-center">
+                            <!-- Radar icon -->
+                            <svg class="w-7 h-7 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.348 14.651a3.75 3.75 0 010-5.303m5.304 0a3.75 3.75 0 010 5.303m-7.425 2.122a6.75 6.75 0 010-9.546m9.546 0a6.75 6.75 0 010 9.546M5.106 18.894c-3.808-3.808-3.808-9.98 0-13.789m13.788 0c3.808 3.808 3.808 9.981 0 13.79M12 12h.008v.007H12V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/></svg>
+                        </div>
+                        <span class="px-3 py-1 bg-brand-600 text-white text-[10px] font-bold rounded-full uppercase tracking-wider">Flagship</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-1">Auto-Discovery</h3>
+                    <p class="text-sm font-medium text-brand-600 mb-4">Set it once. We watch everything.</p>
+                    <p class="text-sm text-gray-600 leading-relaxed mb-5">Connect your Google or Microsoft account with a single OAuth consent. CloudCFO continuously monitors your inbox and cloud storage — invoices, receipts, and statements are detected and captured automatically. You'll never manually upload an email attachment again.</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="channel-badge bg-red-50 text-red-700 border border-red-200">Gmail</span>
+                        <span class="channel-badge bg-blue-50 text-blue-700 border border-blue-200">Google Drive</span>
+                        <span class="channel-badge bg-sky-50 text-sky-700 border border-sky-200">Outlook</span>
+                        <span class="channel-badge bg-indigo-50 text-indigo-700 border border-indigo-200">OneDrive</span>
+                        <span class="channel-badge bg-violet-50 text-violet-700 border border-violet-200">Teams</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2: Notification Capture -->
+            <div class="paradigm-card bg-white rounded-2xl border-2 border-gold-400/40 p-8 relative overflow-hidden group reveal">
+                <div class="absolute top-0 right-0 w-40 h-40 bg-gradient-to-bl from-amber-50 to-transparent rounded-bl-full opacity-60"></div>
+                <div class="relative">
+                    <div class="flex items-start justify-between mb-5">
+                        <div class="w-14 h-14 bg-gradient-to-br from-amber-100 to-amber-200 rounded-2xl flex items-center justify-center">
+                            <svg class="w-7 h-7 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3"/></svg>
+                        </div>
+                        <span class="px-3 py-1 bg-gradient-to-r from-amber-500 to-gold-500 text-white text-[10px] font-bold rounded-full uppercase tracking-wider">New</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-1">Notification Capture</h3>
+                    <p class="text-sm font-medium text-amber-600 mb-4">Your phone sees it. So do we.</p>
+                    <p class="text-sm text-gray-600 leading-relaxed mb-5">Install the CloudCFO mobile app and grant notification access. Every digital receipt from ride-hailing, food delivery, payment apps, and more is captured automatically — no forwarding, no screenshots, no friction. The dark data that other platforms miss.</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="channel-badge bg-gray-100 text-gray-700 border border-gray-200">Uber</span>
+                        <span class="channel-badge bg-gray-100 text-gray-700 border border-gray-200">Glovo</span>
+                        <span class="channel-badge bg-gray-100 text-gray-700 border border-gray-200">Bolt</span>
+                        <span class="channel-badge bg-gray-100 text-gray-700 border border-gray-200">Wise</span>
+                        <span class="channel-badge bg-gray-100 text-gray-700 border border-gray-200">Revolut</span>
+                        <span class="channel-badge bg-gray-100 text-gray-700 border border-gray-200">All Apps</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3: Instant Forwarding -->
+            <div class="paradigm-card bg-white rounded-2xl border-2 border-teal-200 p-8 relative overflow-hidden group reveal">
+                <div class="absolute top-0 right-0 w-40 h-40 bg-gradient-to-bl from-teal-50 to-transparent rounded-bl-full opacity-60"></div>
+                <div class="relative">
+                    <div class="flex items-start justify-between mb-5">
+                        <div class="w-14 h-14 bg-gradient-to-br from-teal-100 to-teal-200 rounded-2xl flex items-center justify-center">
+                            <svg class="w-7 h-7 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-1">Instant Forwarding</h3>
+                    <p class="text-sm font-medium text-teal-600 mb-4">Snap it. Forward it. Done.</p>
+                    <p class="text-sm text-gray-600 leading-relaxed mb-5">Forward any receipt or invoice to your dedicated CloudCFO WhatsApp number or Telegram bot. The system identifies you by your phone number, validates the attachment, and routes it into the processing pipeline. Confirmation sent back in seconds.</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="channel-badge bg-green-50 text-green-700 border border-green-200">WhatsApp</span>
+                        <span class="channel-badge bg-blue-50 text-blue-700 border border-blue-200">Telegram</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 4: Bulk Upload -->
+            <div class="paradigm-card bg-white rounded-2xl border-2 border-violet-200 p-8 relative overflow-hidden group reveal">
+                <div class="absolute top-0 right-0 w-40 h-40 bg-gradient-to-bl from-violet-50 to-transparent rounded-bl-full opacity-60"></div>
+                <div class="relative">
+                    <div class="flex items-start justify-between mb-5">
+                        <div class="w-14 h-14 bg-gradient-to-br from-violet-100 to-violet-200 rounded-2xl flex items-center justify-center">
+                            <svg class="w-7 h-7 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-1">Bulk Upload & Migration</h3>
+                    <p class="text-sm font-medium text-violet-600 mb-4">10,000+ documents in one go.</p>
+                    <p class="text-sm text-gray-600 leading-relaxed mb-5">Migrating from another system? Drag and drop your entire document archive. CloudCFO processes thousands of documents in batch — extracting, classifying, and organizing years of financial history automatically.</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="channel-badge bg-violet-50 text-violet-700 border border-violet-200">Drag & Drop</span>
+                        <span class="channel-badge bg-violet-50 text-violet-700 border border-violet-200">Batch Import</span>
+                        <span class="channel-badge bg-violet-50 text-violet-700 border border-violet-200">CSV / ZIP</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- SECTION 4: FINANCIAL INTEGRATIONS                             -->
+<!-- ============================================================ -->
+<section class="py-20 bg-surface-50 border-y border-gray-100" id="integrations">
+    <div class="max-w-7xl mx-auto px-6 lg:px-8">
+        <div class="text-center mb-14 reveal">
+            <h2 class="font-heading text-3xl lg:text-4xl font-bold text-gray-900 mb-4">Connected to your financial ecosystem</h2>
+            <p class="text-lg text-gray-500 max-w-2xl mx-auto">Reconcile automatically. Report carbon impact instantly.</p>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 reveal">
+            <!-- Integration cards -->
+            <div class="bg-white rounded-xl p-5 text-center border border-gray-100 hover:border-brand-300 hover:shadow-lg transition-all group">
+                <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform"><span class="text-xl font-bold text-green-600">Q</span></div>
+                <p class="font-semibold text-sm text-gray-900">QuickBooks</p>
+                <p class="text-[10px] text-gray-500 mt-1">Cloud accounting</p>
+                <span class="inline-flex items-center gap-1 mt-2 text-[10px] text-brand-600 font-medium"><span class="w-1.5 h-1.5 bg-brand-500 rounded-full"></span>Connected</span>
+            </div>
+            <div class="bg-white rounded-xl p-5 text-center border border-gray-100 hover:border-brand-300 hover:shadow-lg transition-all group">
+                <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform"><span class="text-xl font-bold text-blue-600">X</span></div>
+                <p class="font-semibold text-sm text-gray-900">Xero</p>
+                <p class="text-[10px] text-gray-500 mt-1">Cloud accounting</p>
+                <span class="inline-flex items-center gap-1 mt-2 text-[10px] text-gray-400 font-medium">Connect →</span>
+            </div>
+            <div class="bg-white rounded-xl p-5 text-center border border-gray-100 hover:border-brand-300 hover:shadow-lg transition-all group">
+                <div class="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                    <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+                </div>
+                <p class="font-semibold text-sm text-gray-900">Stripe</p>
+                <p class="text-[10px] text-gray-500 mt-1">Payment processing</p>
+                <span class="inline-flex items-center gap-1 mt-2 text-[10px] text-brand-600 font-medium"><span class="w-1.5 h-1.5 bg-brand-500 rounded-full"></span>Connected</span>
+            </div>
+            <div class="bg-white rounded-xl p-5 text-center border border-gray-100 hover:border-brand-300 hover:shadow-lg transition-all group">
+                <div class="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                    <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+                <p class="font-semibold text-sm text-gray-900">Wise</p>
+                <p class="text-[10px] text-gray-500 mt-1">Multi-currency</p>
+                <span class="inline-flex items-center gap-1 mt-2 text-[10px] text-brand-600 font-medium"><span class="w-1.5 h-1.5 bg-brand-500 rounded-full"></span>Connected</span>
+            </div>
+            <div class="bg-white rounded-xl p-5 text-center border border-gray-100 hover:border-brand-300 hover:shadow-lg transition-all group">
+                <div class="w-12 h-12 bg-teal-100 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                    <svg class="w-6 h-6 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064"/></svg>
+                </div>
+                <p class="font-semibold text-sm text-gray-900">Climatiq</p>
+                <p class="text-[10px] text-gray-500 mt-1">Carbon API</p>
+                <span class="inline-flex items-center gap-1 mt-2 text-[10px] text-brand-600 font-medium"><span class="w-1.5 h-1.5 bg-brand-500 rounded-full"></span>Connected</span>
+            </div>
+            <div class="bg-white rounded-xl p-5 text-center border border-gray-100 hover:border-brand-300 hover:shadow-lg transition-all group">
+                <div class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                    <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                </div>
+                <p class="font-semibold text-sm text-gray-900">Banks</p>
+                <p class="text-[10px] text-gray-500 mt-1">Open Banking</p>
+                <span class="inline-flex items-center gap-1 mt-2 text-[10px] text-gray-400 font-medium">Connect →</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- SECTION 5: THE ZERO-TOUCH JOURNEY (Pipeline)                  -->
+<!-- ============================================================ -->
+<section class="py-20 lg:py-28 bg-white" id="pipeline">
+    <div class="max-w-7xl mx-auto px-6 lg:px-8">
+        <div class="text-center mb-16 reveal">
+            <h2 class="font-heading text-3xl lg:text-4xl font-bold text-gray-900 mb-4">From document to intelligence in under 500 milliseconds</h2>
+            <p class="text-lg text-gray-500 max-w-2xl mx-auto">See how CloudCFO transforms raw documents into verified accounting entries and carbon reports.</p>
+        </div>
+
+        <div class="relative reveal">
+            <!-- Pipeline Steps -->
+            <div class="grid md:grid-cols-4 gap-0 relative">
+                <!-- Connector lines -->
+                <div class="hidden md:block absolute top-16 left-[25%] right-[25%] h-0.5">
+                    <div class="pipeline-connector h-full w-full opacity-30 rounded"></div>
+                </div>
+
+                <!-- Step 1: Capture -->
+                <div class="text-center px-4 relative z-10">
+                    <div class="w-16 h-16 bg-gradient-to-br from-brand-500 to-brand-700 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg shadow-brand-600/20">
+                        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.348 14.651a3.75 3.75 0 010-5.303m5.304 0a3.75 3.75 0 010 5.303m-7.425 2.122a6.75 6.75 0 010-9.546m9.546 0a6.75 6.75 0 010 9.546M12 12h.008v.007H12V12z"/></svg>
+                    </div>
+                    <span class="inline-block px-2.5 py-0.5 bg-brand-100 text-brand-700 text-[10px] font-bold rounded-full mb-3">STEP 1</span>
+                    <h4 class="font-bold text-gray-900 mb-2">Capture</h4>
+                    <p class="text-sm text-gray-500">Auto-Discovery, Notifications, Forwarding, or Upload — documents flow in from 12+ channels automatically.</p>
+                </div>
+                <!-- Arrow (mobile) -->
+                <div class="md:hidden flex justify-center my-4"><svg class="w-5 h-5 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg></div>
+
+                <!-- Step 2: Extract -->
+                <div class="text-center px-4 relative z-10">
+                    <div class="w-16 h-16 bg-gradient-to-br from-teal-500 to-teal-700 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg shadow-teal-600/20">
+                        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m5.231 13.481L15 17.25m-4.5-15H5.625c-.621 0-1.125.504-1.125 1.125v16.5c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9zm3.75 11.625a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/></svg>
+                    </div>
+                    <span class="inline-block px-2.5 py-0.5 bg-teal-100 text-teal-700 text-[10px] font-bold rounded-full mb-3">STEP 2</span>
+                    <h4 class="font-bold text-gray-900 mb-2">Extract & Classify</h4>
+                    <p class="text-sm text-gray-500">7 AI intelligence layers extract amounts, dates, vendors, tax codes, and carbon categories simultaneously.</p>
+                </div>
+                <div class="md:hidden flex justify-center my-4"><svg class="w-5 h-5 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg></div>
+
+                <!-- Step 3: Validate -->
+                <div class="text-center px-4 relative z-10">
+                    <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg shadow-blue-600/20">
+                        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                    </div>
+                    <span class="inline-block px-2.5 py-0.5 bg-blue-100 text-blue-700 text-[10px] font-bold rounded-full mb-3">STEP 3</span>
+                    <h4 class="font-bold text-gray-900 mb-2">Validate & Match</h4>
+                    <p class="text-sm text-gray-500">Cross-reference against bank feeds, knowledge base, and historical patterns. 99.5% accuracy.</p>
+                </div>
+                <div class="md:hidden flex justify-center my-4"><svg class="w-5 h-5 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg></div>
+
+                <!-- Step 4: Report -->
+                <div class="text-center px-4 relative z-10">
+                    <div class="w-16 h-16 bg-gradient-to-br from-amber-500 to-amber-700 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg shadow-amber-600/20">
+                        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"/></svg>
+                    </div>
+                    <span class="inline-block px-2.5 py-0.5 bg-amber-100 text-amber-700 text-[10px] font-bold rounded-full mb-3">STEP 4</span>
+                    <h4 class="font-bold text-gray-900 mb-2">Report & Optimize</h4>
+                    <p class="text-sm text-gray-500">Dual output: verified accounting entries + carbon impact calculations. Tax optimization built in.</p>
+                </div>
+            </div>
+
+            <!-- Speed badge -->
+            <div class="text-center mt-12">
+                <div class="inline-flex items-center gap-3 px-6 py-3 bg-brand-900 rounded-full">
+                    <svg class="w-5 h-5 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    <span class="text-white font-semibold text-sm">End-to-end processing: <span class="text-brand-300">&lt; 500ms</span></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- SECTION 6: DASHBOARD PREVIEW                                  -->
+<!-- ============================================================ -->
+<section class="py-20 lg:py-28 dark-section relative noise-bg" id="dashboards">
+    <div class="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
+        <div class="text-center mb-14 reveal">
+            <h2 class="font-heading text-3xl lg:text-4xl font-bold text-white mb-4">Your entire financial system, in <span class="text-brand-300">one intelligence dashboard</span></h2>
+            <p class="text-lg text-brand-200/70 max-w-2xl mx-auto">Accounting, tax optimization, and carbon reporting — unified.</p>
+        </div>
+
+        <!-- Tab Navigation -->
+        <div class="flex flex-wrap justify-center gap-2 mb-10 reveal">
+            <button class="tab-btn active px-5 py-2.5 rounded-xl text-sm font-semibold transition-all" data-tab="tab-discovery">Auto-Discovery</button>
+            <button class="tab-btn px-5 py-2.5 rounded-xl text-sm font-semibold text-white/60 hover:text-white hover:bg-white/10 transition-all" data-tab="tab-extraction">Intelligent Extraction</button>
+            <button class="tab-btn px-5 py-2.5 rounded-xl text-sm font-semibold text-white/60 hover:text-white hover:bg-white/10 transition-all" data-tab="tab-accounting">Accounting & Tax</button>
+            <button class="tab-btn px-5 py-2.5 rounded-xl text-sm font-semibold text-white/60 hover:text-white hover:bg-white/10 transition-all" data-tab="tab-esg">ESG & Carbon</button>
+        </div>
+
+        <!-- Tab Contents -->
+        <div class="reveal">
+            <!-- Tab 1: Auto-Discovery -->
+            <div id="tab-discovery" class="tab-content active">
+                <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 lg:p-8">
+                    <div class="grid lg:grid-cols-3 gap-6">
+                        <div class="lg:col-span-1">
+                            <h3 class="text-white font-bold text-lg mb-2">Auto-Discovery Feed</h3>
+                            <p class="text-brand-200/60 text-sm mb-6">Documents arriving from all connected sources, with AI confidence scores and auto-categorization.</p>
+                            <div class="space-y-3">
+                                <div class="flex items-center gap-2 text-sm"><svg class="w-4 h-4 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg><span class="text-white/80">Real-time monitoring</span></div>
+                                <div class="flex items-center gap-2 text-sm"><svg class="w-4 h-4 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg><span class="text-white/80">AI confidence scoring</span></div>
+                                <div class="flex items-center gap-2 text-sm"><svg class="w-4 h-4 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg><span class="text-white/80">One-click approve or reclassify</span></div>
+                            </div>
+                        </div>
+                        <div class="lg:col-span-2 bg-gray-900 rounded-xl p-5 border border-gray-800">
+                            <!-- Mock discovery feed -->
+                            <div class="space-y-3">
+                                <div class="flex items-center gap-3 p-3 bg-brand-900/30 border border-brand-700/30 rounded-lg">
+                                    <div class="w-8 h-8 bg-red-500/20 rounded-lg flex items-center justify-center"><span class="text-red-400 text-xs font-bold">G</span></div>
+                                    <div class="flex-1"><p class="text-white text-sm font-medium">AWS Invoice — Dec 2024</p><p class="text-gray-500 text-xs">Gmail • Auto-discovered • 2 min ago</p></div>
+                                    <span class="px-2 py-1 bg-brand-500/20 text-brand-300 text-xs rounded-full font-medium">98% conf</span>
+                                </div>
+                                <div class="flex items-center gap-3 p-3 bg-gray-800/50 rounded-lg">
+                                    <div class="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center"><span class="text-green-400 text-xs font-bold">W</span></div>
+                                    <div class="flex-1"><p class="text-white text-sm font-medium">Uber Receipt — $24.50</p><p class="text-gray-500 text-xs">WhatsApp forward • 15 min ago</p></div>
+                                    <span class="px-2 py-1 bg-brand-500/20 text-brand-300 text-xs rounded-full font-medium">95% conf</span>
+                                </div>
+                                <div class="flex items-center gap-3 p-3 bg-amber-900/20 border border-amber-700/30 rounded-lg">
+                                    <div class="w-8 h-8 bg-amber-500/20 rounded-lg flex items-center justify-center"><span class="text-amber-400 text-xs font-bold">📱</span></div>
+                                    <div class="flex-1"><p class="text-white text-sm font-medium">Glovo — Food Delivery</p><p class="text-gray-500 text-xs">Notification capture • 1 hr ago</p></div>
+                                    <span class="px-2 py-1 bg-amber-500/20 text-amber-300 text-xs rounded-full font-medium">Review</span>
+                                </div>
+                                <div class="flex items-center gap-3 p-3 bg-gray-800/50 rounded-lg">
+                                    <div class="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center"><span class="text-blue-400 text-xs font-bold">D</span></div>
+                                    <div class="flex-1"><p class="text-white text-sm font-medium">Office Lease Agreement</p><p class="text-gray-500 text-xs">Google Drive • Auto-discovered • 3 hrs ago</p></div>
+                                    <span class="px-2 py-1 bg-brand-500/20 text-brand-300 text-xs rounded-full font-medium">92% conf</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 2: Extraction -->
+            <div id="tab-extraction" class="tab-content">
+                <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 lg:p-8">
+                    <div class="grid lg:grid-cols-2 gap-8">
                         <div>
-                            <p className="text-gray-500 text-sm mb-1">{title}</p>
-                            <h3 className="text-2xl font-bold text-gray-900">{value}</h3>
-                        </div>
-                        {icon && (
-                            <div className={`p-2 bg-${color}-100 rounded-lg`}>
-                                <Icon name={icon} size={20} color={`var(--${color}-600)`} />
-                            </div>
-                        )}
-                    </div>
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-2">
-                            <Icon name={change >= 0 ? "trending-up" : "trending-down"} size={16} color={change >= 0 ? "#10b981" : "#ef4444"} />
-                            <span className={`text-sm font-medium ${change >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                {Math.abs(change)}%
-                            </span>
-                            <span className="text-gray-500 text-sm">this month</span>
-                        </div>
-                    </div>
-                    <div className="mt-4 h-12">
-                        <svg width="100%" height="100%" viewBox="0 0 200 50">
-                            <polyline
-                                className="kpi-trend-line"
-                                points={trendData.map((val, i) => `${i * 20},${50 - (val / 2)}`).join(' ')}
-                            />
-                        </svg>
-                    </div>
-                </div>
-            );
-        };
-
-        const CircularDashboard = ({ onModuleClick }) => {
-            const modules = [
-                { id: 'intelligence', name: 'Intelligence', color: '#86efac', icon: 'brain' },
-                { id: 'accounting', name: 'Accounting', color: '#fde047', icon: 'calculator' },
-                { id: 'banking', name: 'Banking & Payments', color: '#c7d2fe', icon: 'credit-card' },
-                { id: 'esg', name: 'ESG', color: '#e0e7ff', icon: 'leaf' }
-            ];
-
-            return (
-                <div className="flex items-center justify-center p-8">
-                    <div className="relative w-96 h-96">
-                        {modules.map((module, index) => {
-                            const angle = (index * 90) - 45;
-                            const rotation = `rotate(${angle}deg)`;
-                            const reverseRotation = `rotate(${-angle}deg)`;
-                            
-                            return (
-                                <div
-                                    key={module.id}
-                                    className="absolute w-48 h-48 cursor-pointer transition-all hover:scale-110"
-                                    style={{
-                                        top: '50%',
-                                        left: '50%',
-                                        transform: `translate(-50%, -50%) ${rotation} translateY(-60px)`,
-                                        transformOrigin: 'center'
-                                    }}
-                                    onClick={() => onModuleClick(module.id)}
-                                >
-                                    <div
-                                        className="w-full h-full rounded-2xl flex flex-col items-center justify-center p-4"
-                                        style={{
-                                            backgroundColor: module.color,
-                                            transform: reverseRotation
-                                        }}
-                                    >
-                                        <Icon name={module.icon} size={32} />
-                                        <span className="mt-2 text-sm font-semibold text-gray-800 text-center">
-                                            {module.name}
-                                        </span>
-                                    </div>
+                            <h3 class="text-white font-bold text-lg mb-2">Intelligent Extraction</h3>
+                            <p class="text-brand-200/60 text-sm mb-6">7 AI layers process every document simultaneously — extracting financial data and carbon impact in parallel.</p>
+                            <!-- Mock document -->
+                            <div class="bg-gray-900 rounded-xl p-5 border border-gray-800">
+                                <div class="flex items-center gap-2 mb-4 pb-3 border-b border-gray-800">
+                                    <div class="w-6 h-6 bg-brand-500/20 rounded flex items-center justify-center"><svg class="w-3.5 h-3.5 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></div>
+                                    <span class="text-white text-sm font-medium">Invoice_AWS_Dec2024.pdf</span>
                                 </div>
-                            );
-                        })}
-                        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-white rounded-full shadow-lg flex items-center justify-center">
-                            <div className="text-center">
-                                <div className="text-2xl font-bold text-gray-900">CFO</div>
-                                <div className="text-xs text-gray-500">AI Engine</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            );
-        };
-
-        const AIAssistant = () => {
-            const [query, setQuery] = useState('');
-            const [messages, setMessages] = useState([]);
-            const [isTyping, setIsTyping] = useState(false);
-
-            const exampleQueries = [
-                "Show me unusual expenses this month",
-                "What's my biggest tax deduction opportunity?",
-                "Project cash flow for next 6 months",
-                "Compare Q3 to last year"
-            ];
-
-            const handleSubmit = (e) => {
-                e.preventDefault();
-                if (!query.trim()) return;
-
-                setMessages([...messages, { type: 'user', text: query }]);
-                setQuery('');
-                setIsTyping(true);
-
-                setTimeout(() => {
-                    setMessages(prev => [...prev, {
-                        type: 'assistant',
-                        text: `Based on your data, ${query.toLowerCase().includes('expense') ? 
-                            'I found 23 unusual transactions totaling $3,467 that deviate from your normal spending patterns.' :
-                            'I\'ll analyze that for you. Processing your request...'}`
-                    }]);
-                    setIsTyping(false);
-                }, 1500);
-            };
-
-            return (
-                <div className="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl p-6 text-white">
-                    <div className="flex items-center space-x-3 mb-4">
-                        <div className="p-2 bg-white/20 rounded-lg">
-                            <Icon name="sparkles" size={24} color="white" />
-                        </div>
-                        <div>
-                            <h3 className="text-lg font-semibold">Ask CloudCFO AI</h3>
-                            <p className="text-sm text-blue-100">Set up your AI Engine in 3 Simple Steps</p>
-                        </div>
-                    </div>
-
-                    <div className="bg-white/10 rounded-lg p-4 mb-4 max-h-40 overflow-y-auto">
-                        {messages.length === 0 ? (
-                            <div className="text-blue-100 text-sm">
-                                <p className="mb-2">More precise questions work better. Try searching for:</p>
-                                <ul className="space-y-1">
-                                    {exampleQueries.map((example, i) => (
-                                        <li key={i} className="flex items-start">
-                                            <span className="mr-2">•</span>
-                                            <span className="italic">{example}</span>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        ) : (
-                            <div className="space-y-3">
-                                {messages.map((msg, i) => (
-                                    <div key={i} className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}>
-                                        <div className={`max-w-xs px-3 py-2 rounded-lg text-sm ${
-                                            msg.type === 'user' ? 'bg-white text-gray-900' : 'bg-white/20 text-white'
-                                        }`}>
-                                            {msg.text}
-                                        </div>
-                                    </div>
-                                ))}
-                                {isTyping && (
-                                    <div className="flex justify-start">
-                                        <div className="bg-white/20 px-3 py-2 rounded-lg">
-                                            <div className="flex space-x-1">
-                                                <div className="w-2 h-2 bg-white rounded-full animate-bounce"></div>
-                                                <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                                                <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        )}
-                    </div>
-
-                    <form onSubmit={handleSubmit} className="flex space-x-2">
-                        <input
-                            type="text"
-                            value={query}
-                            onChange={(e) => setQuery(e.target.value)}
-                            placeholder="Ask CloudCFO a question..."
-                            className="flex-1 px-4 py-2 bg-white/20 border border-white/30 rounded-lg text-white placeholder-blue-200 focus:outline-none focus:border-white/50"
-                        />
-                        <button
-                            type="submit"
-                            className="px-4 py-2 bg-white text-indigo-600 rounded-lg hover:bg-blue-50 transition"
-                        >
-                            <Icon name="arrow-up" size={20} />
-                        </button>
-                    </form>
-                </div>
-            );
-        };
-
-        const Dashboard = ({ user, isReturning, setCurrentPage }) => {
-            const [showAlert, setShowAlert] = useState(isReturning);
-            const kpis = isReturning ? mockKPIs.returning : mockKPIs.new;
-
-            return (
-                <div className="min-h-screen bg-gray-50">
-                    {showAlert && (
-                        <div className="alert-banner text-white px-4 py-3 flex items-center justify-between animate-slide-in">
-                            <div className="flex items-center space-x-3">
-                                <Icon name="alert-triangle" size={20} />
-                                <span>CloudCFO AI identified marketing spend that is 45% higher than usual</span>
-                            </div>
-                            <div className="flex items-center space-x-3">
-                                <button className="text-white hover:text-orange-100">View report</button>
-                                <button onClick={() => setShowAlert(false)} className="text-white hover:text-orange-100">
-                                    <Icon name="x" size={20} />
-                                </button>
-                            </div>
-                        </div>
-                    )}
-
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                        <div className="mb-8 animate-fade-in">
-                            <h1 className="text-2xl font-bold text-gray-900 mb-2">
-                                {isReturning ? `Welcome back, ${user.name}!` : `Welcome to CFO, ${user.name}!`}
-                            </h1>
-                            <p className="text-gray-600">Bring your own bookkeeping and supercharge it</p>
-
-                            <div className="flex items-center space-x-8 mt-4 text-sm">
-                                <div className="flex items-center space-x-2">
-                                    <span className="text-gray-500">AI Processing</span>
-                                    <span className="font-semibold text-green-600">{kpis.processingTime}ms</span>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                    <span className="text-gray-500">2-way sync</span>
-                                    <span className="font-semibold text-green-600">Real-time</span>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                    <span className="text-gray-500">Accuracy</span>
-                                    <span className="font-semibold text-green-600">{kpis.accuracy}%</span>
+                                <div class="space-y-2 text-xs">
+                                    <div class="flex items-center gap-3 p-2 bg-gray-800/60 rounded"><span class="text-gray-500 w-20">Vendor</span><span class="text-white font-medium">Amazon Web Services</span><span class="ml-auto text-brand-400">✓</span></div>
+                                    <div class="flex items-center gap-3 p-2 bg-gray-800/60 rounded"><span class="text-gray-500 w-20">Amount</span><span class="text-white font-medium">$2,450.00</span><span class="ml-auto text-brand-400">✓</span></div>
+                                    <div class="flex items-center gap-3 p-2 bg-gray-800/60 rounded"><span class="text-gray-500 w-20">Date</span><span class="text-white font-medium">Dec 15, 2024</span><span class="ml-auto text-brand-400">✓</span></div>
+                                    <div class="flex items-center gap-3 p-2 bg-gray-800/60 rounded"><span class="text-gray-500 w-20">Category</span><span class="text-white font-medium">Software & Cloud</span><span class="ml-auto text-brand-400">✓</span></div>
+                                    <div class="flex items-center gap-3 p-2 bg-teal-900/30 border border-teal-700/30 rounded"><span class="text-gray-500 w-20">CO₂ Impact</span><span class="text-teal-300 font-medium">0.47 tCO₂e</span><span class="ml-auto text-teal-400">✓</span></div>
                                 </div>
                             </div>
                         </div>
-
-                        {!isReturning && (
-                            <div className="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl p-6 text-white mb-8 animate-fade-in">
-                                <h2 className="text-xl font-semibold mb-2">Discover CloudCFO</h2>
-                                <p className="mb-4">Connect your tools once. We'll handle the rest — in under 500ms.</p>
-                                <div className="flex space-x-4">
-                                    <button className="bg-white text-indigo-600 px-4 py-2 rounded-lg hover:bg-gray-100">
-                                        Connect now
-                                    </button>
-                                    <button className="bg-white/20 text-white px-4 py-2 rounded-lg hover:bg-white/30 flex items-center space-x-2">
-                                        <span>See how it works</span>
-                                        <Icon name="external-link" size={16} />
-                                    </button>
-                                </div>
-                            </div>
-                        )}
-
-                        <div className="mb-8">
-                            <div className="flex justify-between items-center mb-4">
-                                <h2 className="text-lg font-semibold text-gray-900">KPIs</h2>
-                                <button className="text-sm text-gray-500 hover:text-gray-700 flex items-center space-x-1">
-                                    <Icon name="sliders" size={16} />
-                                    <span>Customize range</span>
-                                </button>
-                            </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                                <KPICard 
-                                    title="Documents processed" 
-                                    value={formatNumber(kpis.documentsProcessed)}
-                                    change={15}
-                                    icon="file-text"
-                                    color="blue"
-                                />
-                                <KPICard 
-                                    title="Tax Savings Found" 
-                                    value={formatCurrency(kpis.taxSavings)}
-                                    change={43}
-                                    icon="dollar-sign"
-                                    color="green"
-                                />
-                                <KPICard 
-                                    title="CO2 tracked" 
-                                    value={`${kpis.co2Tracked}t`}
-                                    change={-10}
-                                    icon="leaf"
-                                    color="emerald"
-                                />
-                                <KPICard 
-                                    title="CO2 tracked" 
-                                    value={`${kpis.co2Tracked}t`}
-                                    change={-10}
-                                    icon="trending-down"
-                                    color="amber"
-                                />
-                            </div>
-                            {!isReturning && (
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                                    <button className="bg-white p-4 rounded-lg border border-gray-200 hover:border-indigo-300 transition">
-                                        <span className="text-gray-700 font-medium">Connect your software</span>
-                                    </button>
-                                    <button className="bg-white p-4 rounded-lg border border-gray-200 hover:border-indigo-300 transition">
-                                        <span className="text-gray-700 font-medium">Start saving your taxes</span>
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                            <div className="lg:col-span-2 space-y-6">
-                                <div className="bg-white rounded-xl p-6 card-shadow">
-                                    <CircularDashboard onModuleClick={setCurrentPage} />
-                                </div>
-
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div className="bg-white rounded-xl p-6 card-shadow">
-                                        <div className="flex justify-between items-center mb-4">
-                                            <h3 className="font-semibold text-gray-900">Auto-discovery activity</h3>
-                                            <button className="text-gray-400 hover:text-gray-600">
-                                                <Icon name="arrow-right" size={20} />
-                                            </button>
-                                        </div>
-                                        <div className="space-y-3">
-                                            {mockActivities.map((activity) => (
-                                                <div key={activity.id} className="flex items-center justify-between">
-                                                    <div className="flex items-center space-x-3">
-                                                        <Icon name="mail" size={16} color="#667eea" />
-                                                        <div>
-                                                            <p className="text-sm font-medium text-gray-900">{activity.type}</p>
-                                                            <p className="text-xs text-gray-500">{activity.time}</p>
-                                                        </div>
-                                                    </div>
-                                                    <span className="text-xs text-green-600 bg-green-50 px-2 py-1 rounded">
-                                                        <Icon name="headphones" size={12} /> Listening
-                                                    </span>
-                                                </div>
-                                            ))}
-                                        </div>
-                                        {isReturning && (
-                                            <div className="mt-4 pt-4 border-t border-gray-100">
-                                                <p className="text-sm text-indigo-600 font-medium">
-                                                    3 new receipts processed in the last 10 min →
-                                                </p>
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    <div className="bg-white rounded-xl p-6 card-shadow">
-                                        <div className="flex justify-between items-center mb-4">
-                                            <h3 className="font-semibold text-gray-900">Integrations</h3>
-                                            <button className="text-gray-400 hover:text-gray-600">
-                                                <Icon name="arrow-right" size={20} />
-                                            </button>
-                                        </div>
-                                        <p className="text-sm text-gray-500 mb-4">
-                                            Set up your AI Engine in 3 Simple Steps
-                                        </p>
-                                        <div className="space-y-3">
-                                            <div className="flex space-x-2">
-                                                <button className="px-3 py-1 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200">
-                                                    Bookkeeping
-                                                </button>
-                                                <button className="px-3 py-1 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200">
-                                                    Carbon
-                                                </button>
-                                            </div>
-                                            {mockIntegrations.map((integration) => (
-                                                <div key={integration.id} className="flex items-center justify-between">
-                                                    <div className="flex items-center space-x-2">
-                                                        <Icon name="box" size={16} color="#667eea" />
-                                                        <span className="text-sm text-gray-700">{integration.name}</span>
-                                                    </div>
-                                                    <button className={`px-3 py-1 text-xs rounded-lg ${
-                                                        integration.connected 
-                                                            ? 'bg-green-50 text-green-600' 
-                                                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                                                    }`}>
-                                                        {integration.connected ? 'Connected' : 'Connect'}
-                                                    </button>
-                                                </div>
-                                            ))}
-                                        </div>
+                        <div class="flex items-center">
+                            <div class="space-y-4 w-full">
+                                <div class="p-4 bg-gray-900 rounded-xl border border-gray-800">
+                                    <h4 class="text-white text-sm font-semibold mb-3">7 Intelligence Layers</h4>
+                                    <div class="space-y-2">
+                                        <div class="flex items-center gap-2 text-xs"><span class="w-5 h-5 bg-brand-500 rounded text-white flex items-center justify-center text-[10px] font-bold">1</span><span class="text-gray-300">Document Classification</span><span class="ml-auto text-brand-400">✓</span></div>
+                                        <div class="flex items-center gap-2 text-xs"><span class="w-5 h-5 bg-brand-500 rounded text-white flex items-center justify-center text-[10px] font-bold">2</span><span class="text-gray-300">OCR & Text Extraction</span><span class="ml-auto text-brand-400">✓</span></div>
+                                        <div class="flex items-center gap-2 text-xs"><span class="w-5 h-5 bg-brand-500 rounded text-white flex items-center justify-center text-[10px] font-bold">3</span><span class="text-gray-300">Entity Recognition</span><span class="ml-auto text-brand-400">✓</span></div>
+                                        <div class="flex items-center gap-2 text-xs"><span class="w-5 h-5 bg-brand-500 rounded text-white flex items-center justify-center text-[10px] font-bold">4</span><span class="text-gray-300">Financial Field Extraction</span><span class="ml-auto text-brand-400">✓</span></div>
+                                        <div class="flex items-center gap-2 text-xs"><span class="w-5 h-5 bg-teal-500 rounded text-white flex items-center justify-center text-[10px] font-bold">5</span><span class="text-gray-300">Carbon Impact Calculation</span><span class="ml-auto text-teal-400">✓</span></div>
+                                        <div class="flex items-center gap-2 text-xs"><span class="w-5 h-5 bg-blue-500 rounded text-white flex items-center justify-center text-[10px] font-bold">6</span><span class="text-gray-300">Cross-Validation</span><span class="ml-auto text-blue-400">✓</span></div>
+                                        <div class="flex items-center gap-2 text-xs"><span class="w-5 h-5 bg-amber-500 rounded text-white flex items-center justify-center text-[10px] font-bold">7</span><span class="text-gray-300">Knowledge Base Learning</span><span class="ml-auto text-amber-400">✓</span></div>
                                     </div>
                                 </div>
-                            </div>
-
-                            <div className="space-y-6">
-                                {isReturning && (
-                                    <div className="bg-purple-50 rounded-xl p-6">
-                                        <h3 className="font-semibold text-gray-900 mb-4">For you</h3>
-                                        <div className="space-y-3">
-                                            <div className="bg-white rounded-lg p-4">
-                                                <h4 className="font-medium text-gray-900 mb-2">Insights</h4>
-                                                <p className="text-2xl font-bold text-indigo-600">$4,892</p>
-                                                <p className="text-sm text-gray-600">of this month's savings identified</p>
-                                            </div>
-                                            <div className="bg-white rounded-lg p-4">
-                                                <h4 className="font-medium text-gray-900 mb-2">What to do</h4>
-                                                <button className="w-full text-left text-sm text-indigo-600 hover:text-indigo-700">
-                                                    Push to Quickbooks →
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <button className="w-full mt-4 text-center text-sm text-gray-500 hover:text-gray-700">
-                                            View all
-                                        </button>
-                                    </div>
-                                )}
-
-                                <AIAssistant />
-
-                                <div className="bg-white rounded-xl p-6 card-shadow">
-                                    <div className="flex items-center justify-between mb-4">
-                                        <h3 className="font-semibold text-gray-900">Things to do on CloudCFO</h3>
-                                        <Icon name="chevron-down" size={20} />
-                                    </div>
-                                    <div className="text-sm text-gray-500 mb-2">2 of 3 completed</div>
-                                    <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
-                                        <div className="bg-gradient-to-r from-indigo-500 to-purple-600 h-2 rounded-full" style={{width: '66%'}}></div>
-                                    </div>
-                                    <div className="space-y-3">
-                                        <div className="flex items-center space-x-3">
-                                            <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
-                                                <Icon name="check" size={12} color="white" />
-                                            </div>
-                                            <span className="text-sm text-gray-700 line-through">Connect your bank account</span>
-                                        </div>
-                                        <div className="flex items-center space-x-3">
-                                            <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
-                                                <Icon name="check" size={12} color="white" />
-                                            </div>
-                                            <span className="text-sm text-gray-700 line-through">Upload first receipt</span>
-                                        </div>
-                                        <div className="flex items-center space-x-3">
-                                            <div className="w-5 h-5 border-2 border-gray-300 rounded-full"></div>
-                                            <span className="text-sm text-gray-700">Complete tax profile</span>
-                                        </div>
-                                    </div>
+                                <div class="p-3 bg-brand-900/30 border border-brand-700/30 rounded-xl text-center">
+                                    <span class="text-brand-300 text-sm font-semibold">Processing cost reduced by 90% via self-learning KB</span>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            );
-        };
+            </div>
 
-        const IntelligenceDashboard = () => {
-            const [selectedInsight, setSelectedInsight] = useState(null);
-            const [timeRange, setTimeRange] = useState('30d');
-            const [showRecommendations, setShowRecommendations] = useState(true);
-
-            return (
-                <div className="min-h-screen bg-gray-50">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                        <div className="mb-8">
-                            <h1 className="text-2xl font-bold text-gray-900 mb-2">Financial Intelligence</h1>
-                            <p className="text-gray-600">AI-powered insights and predictions for your business</p>
-                        </div>
-
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                            <div className="lg:col-span-2 space-y-6">
-                                <div className="bg-white rounded-xl p-6 card-shadow">
-                                    <div className="flex justify-between items-center mb-6">
-                                        <h2 className="text-lg font-semibold text-gray-900">AI Insights</h2>
-                                        <select 
-                                            value={timeRange}
-                                            onChange={(e) => setTimeRange(e.target.value)}
-                                            className="px-3 py-1 border border-gray-300 rounded-lg text-sm"
-                                        >
-                                            <option value="7d">Last 7 days</option>
-                                            <option value="30d">Last 30 days</option>
-                                            <option value="90d">Last 90 days</option>
-                                        </select>
-                                    </div>
-                                    
-                                    <div className="space-y-4">
-                                        {mockInsights.map((insight) => (
-                                            <div
-                                                key={insight.id}
-                                                onClick={() => setSelectedInsight(insight)}
-                                                className={`insight-card p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition ${
-                                                    selectedInsight?.id === insight.id ? 'ring-2 ring-indigo-500' : ''
-                                                }`}
-                                            >
-                                                <div className="flex justify-between items-start mb-2">
-                                                    <div className="flex items-center space-x-2">
-                                                        <span className={`px-2 py-1 text-xs rounded-full font-medium ${
-                                                            insight.category === 'Critical' ? 'bg-red-100 text-red-700' :
-                                                            insight.category === 'Opportunity' ? 'bg-green-100 text-green-700' :
-                                                            'bg-blue-100 text-blue-700'
-                                                        }`}>
-                                                            {insight.category}
-                                                        </span>
-                                                        <h3 className="font-medium text-gray-900">{insight.title}</h3>
-                                                    </div>
-                                                    <div className="flex items-center space-x-1">
-                                                        <span className="text-xs text-gray-500">Confidence:</span>
-                                                        <span className="text-sm font-semibold text-gray-700">{insight.confidence}%</span>
-                                                    </div>
-                                                </div>
-                                                <p className="text-sm text-gray-600 mb-3">{insight.description}</p>
-                                                <div className="flex justify-between items-center">
-                                                    <span className="text-lg font-bold text-indigo-600">{insight.impact}</span>
-                                                    <div className="flex space-x-2">
-                                                        <button className="px-3 py-1 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700">
-                                                            Apply
-                                                        </button>
-                                                        <button className="px-3 py-1 bg-gray-200 text-gray-700 text-sm rounded-lg hover:bg-gray-300">
-                                                            Dismiss
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
+            <!-- Tab 3: Accounting -->
+            <div id="tab-accounting" class="tab-content">
+                <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 lg:p-8">
+                    <div class="grid lg:grid-cols-3 gap-6">
+                        <div class="lg:col-span-1">
+                            <h3 class="text-white font-bold text-lg mb-2">Accounting & Tax Dashboard</h3>
+                            <p class="text-brand-200/60 text-sm mb-6">Full double-entry bookkeeping with AI-powered tax optimization and real-time reconciliation.</p>
+                            <div class="space-y-4">
+                                <div class="p-3 bg-gray-900 rounded-lg border border-gray-800">
+                                    <p class="text-gray-500 text-xs mb-1">Revenue</p>
+                                    <p class="text-2xl font-bold text-white">$847,250</p>
+                                    <p class="text-brand-400 text-xs mt-1">↑ 12.5% vs last quarter</p>
                                 </div>
-
-                                <div className="bg-white rounded-xl p-6 card-shadow">
-                                    <h2 className="text-lg font-semibold text-gray-900 mb-4">Predictive Analytics</h2>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div className="bg-gradient-to-br from-indigo-50 to-blue-50 p-4 rounded-lg">
-                                            <h3 className="font-medium text-gray-900 mb-2">Revenue Forecast</h3>
-                                            <p className="text-2xl font-bold text-indigo-600">$125,400</p>
-                                            <p className="text-sm text-gray-600">Next 30 days</p>
-                                            <div className="mt-2 text-xs text-gray-500">85% confidence</div>
-                                        </div>
-                                        <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-4 rounded-lg">
-                                            <h3 className="font-medium text-gray-900 mb-2">Cash Flow Runway</h3>
-                                            <p className="text-2xl font-bold text-green-600">4.2 months</p>
-                                            <p className="text-sm text-gray-600">At current burn rate</p>
-                                            <div className="mt-2 text-xs text-gray-500">Updated daily</div>
-                                        </div>
-                                        <div className="bg-gradient-to-br from-amber-50 to-orange-50 p-4 rounded-lg">
-                                            <h3 className="font-medium text-gray-900 mb-2">Risk Score</h3>
-                                            <p className="text-2xl font-bold text-amber-600">Medium</p>
-                                            <p className="text-sm text-gray-600">3 factors identified</p>
-                                            <div className="mt-2 text-xs text-gray-500">View details →</div>
-                                        </div>
-                                        <div className="bg-gradient-to-br from-purple-50 to-pink-50 p-4 rounded-lg">
-                                            <h3 className="font-medium text-gray-900 mb-2">Tax Savings</h3>
-                                            <p className="text-2xl font-bold text-purple-600">$18,750</p>
-                                            <p className="text-sm text-gray-600">Potential this quarter</p>
-                                            <div className="mt-2 text-xs text-gray-500">12 opportunities</div>
-                                        </div>
-                                    </div>
+                                <div class="p-3 bg-gray-900 rounded-lg border border-gray-800">
+                                    <p class="text-gray-500 text-xs mb-1">Net Profit</p>
+                                    <p class="text-2xl font-bold text-brand-400">$324,070</p>
+                                    <p class="text-gray-500 text-xs mt-1">38.2% margin</p>
+                                </div>
+                                <div class="p-3 bg-amber-900/20 rounded-lg border border-amber-700/30">
+                                    <p class="text-amber-300 text-xs mb-1">Tax Savings Found</p>
+                                    <p class="text-2xl font-bold text-amber-400">$24,850</p>
+                                    <p class="text-amber-400/60 text-xs mt-1">12 opportunities identified</p>
                                 </div>
                             </div>
+                        </div>
+                        <div class="lg:col-span-2 bg-gray-900 rounded-xl p-5 border border-gray-800">
+                            <div class="flex items-center gap-4 mb-4 pb-3 border-b border-gray-800">
+                                <span class="text-white text-sm font-semibold">Chart of Accounts</span>
+                                <span class="text-gray-600 text-xs">Q4 2024</span>
+                            </div>
+                            <div class="space-y-2">
+                                <div class="flex items-center justify-between p-2.5 bg-gray-800/50 rounded-lg"><div class="flex items-center gap-2"><span class="w-2.5 h-2.5 bg-emerald-500 rounded-sm"></span><span class="text-white text-sm">Assets</span></div><span class="text-white text-sm font-semibold">$1,245,680</span></div>
+                                <div class="flex items-center justify-between p-2.5 bg-gray-800/50 rounded-lg"><div class="flex items-center gap-2"><span class="w-2.5 h-2.5 bg-rose-500 rounded-sm"></span><span class="text-white text-sm">Liabilities</span></div><span class="text-white text-sm font-semibold">$421,320</span></div>
+                                <div class="flex items-center justify-between p-2.5 bg-gray-800/50 rounded-lg"><div class="flex items-center gap-2"><span class="w-2.5 h-2.5 bg-blue-500 rounded-sm"></span><span class="text-white text-sm">Equity</span></div><span class="text-white text-sm font-semibold">$824,360</span></div>
+                                <div class="flex items-center justify-between p-2.5 bg-gray-800/50 rounded-lg"><div class="flex items-center gap-2"><span class="w-2.5 h-2.5 bg-brand-500 rounded-sm"></span><span class="text-white text-sm">Revenue</span></div><span class="text-white text-sm font-semibold">$847,250</span></div>
+                                <div class="flex items-center justify-between p-2.5 bg-gray-800/50 rounded-lg"><div class="flex items-center gap-2"><span class="w-2.5 h-2.5 bg-amber-500 rounded-sm"></span><span class="text-white text-sm">Expenses</span></div><span class="text-white text-sm font-semibold">$523,180</span></div>
+                            </div>
+                            <div class="mt-4 pt-3 border-t border-gray-800 flex items-center justify-between">
+                                <span class="text-gray-500 text-xs">Reconciliation: 92% complete</span>
+                                <div class="w-32 h-1.5 bg-gray-800 rounded-full overflow-hidden"><div class="h-full bg-brand-500 rounded-full" style="width:92%"></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-                            <div className="space-y-6">
-                                <div className="bg-white rounded-xl p-6 card-shadow">
-                                    <h3 className="font-semibold text-gray-900 mb-4">Recommendation Tracker</h3>
-                                    <div className="space-y-3">
-                                        <div className="flex justify-between items-center">
-                                            <span className="text-sm text-gray-600">Implemented</span>
-                                            <span className="font-semibold">8/12</span>
-                                        </div>
-                                        <div className="w-full bg-gray-200 rounded-full h-2">
-                                            <div className="bg-green-500 h-2 rounded-full" style={{width: '66%'}}></div>
-                                        </div>
-                                        <div className="pt-2 border-t">
-                                            <p className="text-sm text-gray-600 mb-2">Total ROI from recommendations:</p>
-                                            <p className="text-2xl font-bold text-green-600">$34,200</p>
+            <!-- Tab 4: ESG -->
+            <div id="tab-esg" class="tab-content">
+                <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 lg:p-8">
+                    <div class="grid lg:grid-cols-3 gap-6">
+                        <div class="lg:col-span-1">
+                            <h3 class="text-white font-bold text-lg mb-2">ESG & Carbon Dashboard</h3>
+                            <p class="text-brand-200/60 text-sm mb-6">GHG Protocol-aligned carbon accounting with automated Scope 1, 2, and 3 tracking.</p>
+                            <div class="space-y-4">
+                                <div class="p-3 bg-gray-900 rounded-lg border border-gray-800">
+                                    <p class="text-gray-500 text-xs mb-1">Total Emissions</p>
+                                    <p class="text-2xl font-bold text-white">1,247 <span class="text-sm font-normal text-gray-500">tCO₂e</span></p>
+                                    <p class="text-brand-400 text-xs mt-1">↓ 18.3% vs 2023</p>
+                                </div>
+                                <div class="p-3 bg-gray-900 rounded-lg border border-gray-800">
+                                    <p class="text-gray-500 text-xs mb-1">ESG Score</p>
+                                    <div class="flex items-end gap-3">
+                                        <p class="text-2xl font-bold text-white">78<span class="text-sm text-gray-500">/100</span></p>
+                                        <div class="flex gap-1.5 pb-1">
+                                            <span class="px-1.5 py-0.5 bg-brand-500/20 text-brand-300 text-[10px] rounded font-medium">E:82</span>
+                                            <span class="px-1.5 py-0.5 bg-blue-500/20 text-blue-300 text-[10px] rounded font-medium">S:75</span>
+                                            <span class="px-1.5 py-0.5 bg-purple-500/20 text-purple-300 text-[10px] rounded font-medium">G:77</span>
                                         </div>
                                     </div>
                                 </div>
-
-                                <div className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl p-6 text-white">
-                                    <h3 className="font-semibold mb-4">Quick Actions</h3>
-                                    <div className="space-y-3">
-                                        <button className="w-full bg-white/20 hover:bg-white/30 p-3 rounded-lg text-left transition">
-                                            <div className="flex items-center justify-between">
-                                                <span className="text-sm">Generate Monthly Report</span>
-                                                <Icon name="file-text" size={16} />
-                                            </div>
-                                        </button>
-                                        <button className="w-full bg-white/20 hover:bg-white/30 p-3 rounded-lg text-left transition">
-                                            <div className="flex items-center justify-between">
-                                                <span className="text-sm">Run Scenario Analysis</span>
-                                                <Icon name="trending-up" size={16} />
-                                            </div>
-                                        </button>
-                                        <button className="w-full bg-white/20 hover:bg-white/30 p-3 rounded-lg text-left transition">
-                                            <div className="flex items-center justify-between">
-                                                <span className="text-sm">Schedule Report Delivery</span>
-                                                <Icon name="calendar" size={16} />
-                                            </div>
-                                        </button>
-                                    </div>
+                                <div class="p-3 bg-gray-900 rounded-lg border border-gray-800">
+                                    <p class="text-gray-500 text-xs mb-1">Offset Progress</p>
+                                    <p class="text-2xl font-bold text-amber-400">67%</p>
+                                    <div class="w-full bg-gray-800 rounded-full h-1.5 mt-2"><div class="h-full bg-gradient-to-r from-amber-500 to-brand-500 rounded-full" style="width:67%"></div></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="lg:col-span-2 bg-gray-900 rounded-xl p-5 border border-gray-800">
+                            <div class="flex items-center gap-4 mb-4 pb-3 border-b border-gray-800">
+                                <span class="text-white text-sm font-semibold">Emissions by Scope</span>
+                            </div>
+                            <div class="grid grid-cols-3 gap-4 mb-5">
+                                <div class="p-3 bg-brand-900/30 border border-brand-700/30 rounded-lg text-center">
+                                    <p class="text-2xl font-bold text-brand-300">187</p>
+                                    <p class="text-gray-500 text-xs">Scope 1 (tCO₂e)</p>
+                                    <p class="text-brand-400 text-[10px] mt-1">Direct emissions</p>
+                                </div>
+                                <div class="p-3 bg-blue-900/30 border border-blue-700/30 rounded-lg text-center">
+                                    <p class="text-2xl font-bold text-blue-300">312</p>
+                                    <p class="text-gray-500 text-xs">Scope 2 (tCO₂e)</p>
+                                    <p class="text-blue-400 text-[10px] mt-1">Purchased energy</p>
+                                </div>
+                                <div class="p-3 bg-amber-900/30 border border-amber-700/30 rounded-lg text-center">
+                                    <p class="text-2xl font-bold text-amber-300">748</p>
+                                    <p class="text-gray-500 text-xs">Scope 3 (tCO₂e)</p>
+                                    <p class="text-amber-400 text-[10px] mt-1">Value chain</p>
+                                </div>
+                            </div>
+                            <div class="space-y-2">
+                                <div class="flex items-center gap-3 text-sm"><span class="text-gray-500 w-32">Energy & Utilities</span><div class="flex-1 bg-gray-800 rounded-full h-2"><div class="bg-brand-500 h-2 rounded-full" style="width:33%"></div></div><span class="text-white text-xs w-16 text-right">412 t</span></div>
+                                <div class="flex items-center gap-3 text-sm"><span class="text-gray-500 w-32">Business Travel</span><div class="flex-1 bg-gray-800 rounded-full h-2"><div class="bg-blue-500 h-2 rounded-full" style="width:24%"></div></div><span class="text-white text-xs w-16 text-right">298 t</span></div>
+                                <div class="flex items-center gap-3 text-sm"><span class="text-gray-500 w-32">Supply Chain</span><div class="flex-1 bg-gray-800 rounded-full h-2"><div class="bg-amber-500 h-2 rounded-full" style="width:23%"></div></div><span class="text-white text-xs w-16 text-right">287 t</span></div>
+                                <div class="flex items-center gap-3 text-sm"><span class="text-gray-500 w-32">Commuting</span><div class="flex-1 bg-gray-800 rounded-full h-2"><div class="bg-purple-500 h-2 rounded-full" style="width:12.5%"></div></div><span class="text-white text-xs w-16 text-right">156 t</span></div>
+                            </div>
+                            <div class="mt-4 pt-3 border-t border-gray-800">
+                                <div class="flex items-center gap-2 text-xs text-gray-500">
+                                    <span class="px-2 py-0.5 bg-brand-500/20 text-brand-300 rounded-full text-[10px] font-medium">92% Verified</span>
+                                    <span>GHG Protocol • Climatiq API • Third-party verified</span>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            );
-        };
+            </div>
+        </div>
+    </div>
+</section>
 
-        const AccountingDashboard = () => {
-            const [activeTab, setActiveTab] = useState('expenses');
-            
-            return (
-                <div className="min-h-screen bg-gray-50">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                        <div className="mb-8">
-                            <h1 className="text-2xl font-bold text-gray-900 mb-2">Accounting & Tax</h1>
-                            <p className="text-gray-600">Expense analytics, vendor analysis, and tax optimization</p>
-                        </div>
 
-                        <div className="bg-white rounded-xl shadow-lg">
-                            <div className="border-b border-gray-200">
-                                <nav className="flex space-x-8 px-6">
-                                    {['expenses', 'vendors', 'vat', 'tax', 'reports'].map((tab) => (
-                                        <button
-                                            key={tab}
-                                            onClick={() => setActiveTab(tab)}
-                                            className={`py-4 px-1 border-b-2 font-medium text-sm capitalize ${
-                                                activeTab === tab
-                                                    ? 'border-indigo-500 text-indigo-600'
-                                                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                                            }`}
-                                        >
-                                            {tab}
-                                        </button>
-                                    ))}
-                                </nav>
-                            </div>
+<!-- ============================================================ -->
+<!-- SECTION 7: BUILT FOR EVERY ROLE                               -->
+<!-- ============================================================ -->
+<section class="py-20 lg:py-28 bg-white" id="roles">
+    <div class="max-w-7xl mx-auto px-6 lg:px-8">
+        <div class="text-center mb-16 reveal">
+            <h2 class="font-heading text-3xl lg:text-4xl font-bold text-gray-900 mb-4">One financial system, <span class="bg-gradient-to-r from-brand-600 to-brand-800 bg-clip-text text-transparent">built</span> for you.</h2>
+        </div>
 
-                            <div className="p-6">
-                                {activeTab === 'expenses' && (
-                                    <div className="space-y-6">
-                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-4 rounded-lg">
-                                                <h3 className="text-sm text-gray-600 mb-1">Total Expenses</h3>
-                                                <p className="text-2xl font-bold text-indigo-600">$47,329</p>
-                                                <p className="text-sm text-gray-500 mt-1">This month</p>
-                                            </div>
-                                            <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-4 rounded-lg">
-                                                <h3 className="text-sm text-gray-600 mb-1">Categorized</h3>
-                                                <p className="text-2xl font-bold text-green-600">94%</p>
-                                                <p className="text-sm text-gray-500 mt-1">156 of 166 transactions</p>
-                                            </div>
-                                            <div className="bg-gradient-to-br from-amber-50 to-orange-50 p-4 rounded-lg">
-                                                <h3 className="text-sm text-gray-600 mb-1">Pending Review</h3>
-                                                <p className="text-2xl font-bold text-amber-600">10</p>
-                                                <p className="text-sm text-gray-500 mt-1">Requires attention</p>
-                                            </div>
-                                        </div>
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 reveal">
+            <!-- CFOs -->
+            <div class="bg-white rounded-2xl border border-gray-200 p-7 hover:border-brand-300 hover:shadow-xl transition-all group">
+                <div class="w-12 h-12 bg-brand-100 rounded-xl flex items-center justify-center mb-5 group-hover:bg-brand-200 transition">
+                    <svg class="w-6 h-6 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"/></svg>
+                </div>
+                <h4 class="font-bold text-gray-900 mb-2">CFOs</h4>
+                <p class="text-sm text-gray-500 leading-relaxed">Real-time P&L, cash flow forecasting, and tax optimization. One dashboard instead of five tools.</p>
+            </div>
+            <!-- Managers -->
+            <div class="bg-white rounded-2xl border border-gray-200 p-7 hover:border-brand-300 hover:shadow-xl transition-all group">
+                <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-5 group-hover:bg-blue-200 transition">
+                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"/></svg>
+                </div>
+                <h4 class="font-bold text-gray-900 mb-2">Managers</h4>
+                <p class="text-sm text-gray-500 leading-relaxed">Approve expenses, track budgets, and monitor team spending — all with zero manual reconciliation.</p>
+            </div>
+            <!-- Bookkeepers -->
+            <div class="bg-white rounded-2xl border border-gray-200 p-7 hover:border-brand-300 hover:shadow-xl transition-all group">
+                <div class="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center mb-5 group-hover:bg-amber-200 transition">
+                    <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/></svg>
+                </div>
+                <h4 class="font-bold text-gray-900 mb-2">Bookkeepers & Accountants</h4>
+                <p class="text-sm text-gray-500 leading-relaxed">AI does the data entry. You focus on advisory, compliance, and client relationships.</p>
+            </div>
+            <!-- Founders -->
+            <div class="bg-white rounded-2xl border border-gray-200 p-7 hover:border-brand-300 hover:shadow-xl transition-all group">
+                <div class="w-12 h-12 bg-violet-100 rounded-xl flex items-center justify-center mb-5 group-hover:bg-violet-200 transition">
+                    <svg class="w-6 h-6 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 006.16-12.12A14.98 14.98 0 009.631 8.41m5.96 5.96a14.926 14.926 0 01-5.841 2.58m-.119-8.54a6 6 0 00-7.381 5.84h4.8m2.581-5.84a14.927 14.927 0 00-2.58 5.84m2.699 2.7c-.103.021-.207.041-.311.06a15.09 15.09 0 01-2.448-2.448 14.9 14.9 0 01.06-.312m-2.24 2.39a4.493 4.493 0 00-1.757 4.306 4.493 4.493 0 004.306-1.758M16.5 9a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/></svg>
+                </div>
+                <h4 class="font-bold text-gray-900 mb-2">Founders</h4>
+                <p class="text-sm text-gray-500 leading-relaxed">Stop chasing receipts. CloudCFO handles it all while you focus on building your company.</p>
+            </div>
+        </div>
+    </div>
+</section>
 
-                                        <div className="bg-gray-50 rounded-lg p-6">
-                                            <h3 className="font-semibold text-gray-900 mb-4">Expense Breakdown by Category</h3>
-                                            <div className="space-y-3">
-                                                {[
-                                                    { name: 'Marketing & Advertising', amount: 12500, percent: 26 },
-                                                    { name: 'Software & Tools', amount: 8750, percent: 18 },
-                                                    { name: 'Contractors', amount: 15300, percent: 32 },
-                                                    { name: 'Office & Supplies', amount: 3200, percent: 7 },
-                                                    { name: 'Travel & Entertainment', amount: 7579, percent: 16 }
-                                                ].map((category, i) => (
-                                                    <div key={i}>
-                                                        <div className="flex justify-between text-sm mb-1">
-                                                            <span className="text-gray-700">{category.name}</span>
-                                                            <span className="font-medium">{formatCurrency(category.amount)}</span>
-                                                        </div>
-                                                        <div className="w-full bg-gray-200 rounded-full h-2">
-                                                            <div 
-                                                                className="bg-gradient-to-r from-indigo-500 to-purple-600 h-2 rounded-full"
-                                                                style={{width: `${category.percent}%`}}
-                                                            ></div>
-                                                        </div>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
 
-                                {activeTab === 'tax' && (
-                                    <div className="space-y-6">
-                                        <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-lg p-6">
-                                            <h3 className="font-semibold text-gray-900 mb-4">Tax Optimization Opportunities</h3>
-                                            <div className="space-y-4">
-                                                {[
-                                                    { title: 'Home Office Deduction', savings: 3200, status: 'Available' },
-                                                    { title: 'Vehicle Mileage', savings: 4500, status: 'Pending' },
-                                                    { title: 'R&D Tax Credit', savings: 12000, status: 'Eligible' },
-                                                    { title: 'Equipment Depreciation', savings: 2800, status: 'Available' }
-                                                ].map((opp, i) => (
-                                                    <div key={i} className="bg-white rounded-lg p-4 flex justify-between items-center">
-                                                        <div>
-                                                            <h4 className="font-medium text-gray-900">{opp.title}</h4>
-                                                            <p className="text-sm text-gray-500">Potential savings</p>
-                                                        </div>
-                                                        <div className="text-right">
-                                                            <p className="text-lg font-bold text-green-600">{formatCurrency(opp.savings)}</p>
-                                                            <span className={`text-xs px-2 py-1 rounded-full ${
-                                                                opp.status === 'Available' ? 'bg-green-100 text-green-700' :
-                                                                opp.status === 'Pending' ? 'bg-yellow-100 text-yellow-700' :
-                                                                'bg-blue-100 text-blue-700'
-                                                            }`}>
-                                                                {opp.status}
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                            <button className="w-full mt-4 bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition">
-                                                Generate Tax Report
-                                            </button>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
+<!-- ============================================================ -->
+<!-- SECTION 8: PRICING / CTA                                      -->
+<!-- ============================================================ -->
+<section class="py-20 lg:py-28 bg-surface-50 border-t border-gray-100" id="pricing">
+    <div class="max-w-7xl mx-auto px-6 lg:px-8">
+        <div class="text-center mb-14 reveal">
+            <h2 class="font-heading text-3xl lg:text-4xl font-bold text-gray-900 mb-4">Take charge of your <span class="bg-gradient-to-r from-brand-600 to-brand-800 bg-clip-text text-transparent">financials</span></h2>
+            <p class="text-lg text-gray-500">Start free. Scale when you're ready.</p>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto reveal">
+            <!-- Free -->
+            <div class="bg-white rounded-2xl border border-gray-200 p-8 hover:shadow-lg transition-all">
+                <p class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">Free</p>
+                <p class="text-3xl font-bold text-gray-900 mb-1">$0</p>
+                <p class="text-sm text-gray-500 mb-6">per month</p>
+                <div class="space-y-3 mb-8">
+                    <div class="flex items-center gap-2 text-sm text-gray-600"><svg class="w-4 h-4 text-brand-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Up to 100 documents/month</div>
+                    <div class="flex items-center gap-2 text-sm text-gray-600"><svg class="w-4 h-4 text-brand-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>2 capture channels</div>
+                    <div class="flex items-center gap-2 text-sm text-gray-600"><svg class="w-4 h-4 text-brand-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Basic accounting reports</div>
+                    <div class="flex items-center gap-2 text-sm text-gray-600"><svg class="w-4 h-4 text-brand-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Carbon footprint overview</div>
+                </div>
+                <a href="#" class="block text-center py-3 border-2 border-gray-200 text-gray-700 font-semibold rounded-xl hover:border-brand-300 hover:text-brand-700 transition text-sm">Get Started</a>
+            </div>
+
+            <!-- Pro (Featured) -->
+            <div class="bg-gradient-to-b from-brand-900 to-brand-950 rounded-2xl p-8 text-white relative shadow-2xl shadow-brand-900/30 transform md:-translate-y-2">
+                <span class="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-gradient-to-r from-gold-400 to-gold-500 text-brand-950 text-xs font-bold rounded-full shadow-md">MOST POPULAR</span>
+                <p class="text-sm font-semibold text-brand-300 uppercase tracking-wider mb-2">Pro</p>
+                <p class="text-3xl font-bold mb-1">$49</p>
+                <p class="text-sm text-brand-300/70 mb-6">per month</p>
+                <div class="space-y-3 mb-8">
+                    <div class="flex items-center gap-2 text-sm text-white/90"><svg class="w-4 h-4 text-brand-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Unlimited document capture</div>
+                    <div class="flex items-center gap-2 text-sm text-white/90"><svg class="w-4 h-4 text-brand-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>All 4 capture paradigms</div>
+                    <div class="flex items-center gap-2 text-sm text-white/90"><svg class="w-4 h-4 text-brand-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>All integrations</div>
+                    <div class="flex items-center gap-2 text-sm text-white/90"><svg class="w-4 h-4 text-brand-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Full ESG & carbon reporting</div>
+                    <div class="flex items-center gap-2 text-sm text-white/90"><svg class="w-4 h-4 text-brand-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>AI tax optimization</div>
+                </div>
+                <a href="#" class="block text-center py-3 bg-gradient-to-r from-gold-400 to-gold-500 text-brand-950 font-bold rounded-xl hover:from-gold-500 hover:to-gold-600 transition text-sm shadow-lg shadow-gold-500/20">Start Free Trial</a>
+            </div>
+
+            <!-- Enterprise -->
+            <div class="bg-white rounded-2xl border border-gray-200 p-8 hover:shadow-lg transition-all">
+                <p class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">Enterprise</p>
+                <p class="text-3xl font-bold text-gray-900 mb-1">Custom</p>
+                <p class="text-sm text-gray-500 mb-6">tailored pricing</p>
+                <div class="space-y-3 mb-8">
+                    <div class="flex items-center gap-2 text-sm text-gray-600"><svg class="w-4 h-4 text-brand-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Custom deployment</div>
+                    <div class="flex items-center gap-2 text-sm text-gray-600"><svg class="w-4 h-4 text-brand-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>API access</div>
+                    <div class="flex items-center gap-2 text-sm text-gray-600"><svg class="w-4 h-4 text-brand-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Dedicated support</div>
+                    <div class="flex items-center gap-2 text-sm text-gray-600"><svg class="w-4 h-4 text-brand-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>SLA & compliance</div>
+                </div>
+                <a href="#" class="block text-center py-3 border-2 border-gray-200 text-gray-700 font-semibold rounded-xl hover:border-brand-300 hover:text-brand-700 transition text-sm">Book a Demo</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- SECTION 9: FOOTER                                             -->
+<!-- ============================================================ -->
+<footer class="bg-gray-900 text-white pt-16 pb-8">
+    <div class="max-w-7xl mx-auto px-6 lg:px-8">
+        <div class="grid md:grid-cols-5 gap-8 mb-12">
+            <!-- Brand -->
+            <div class="md:col-span-2">
+                <div class="flex items-center gap-2.5 mb-4">
+                    <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
                     </div>
+                    <span class="text-xl font-bold">Cloud<span class="text-brand-400">CFO</span></span>
                 </div>
-            );
-        };
-
-        const BankingDashboard = () => {
-            const [showReconciliation, setShowReconciliation] = useState(false);
-            
-            return (
-                <div className="min-h-screen bg-gray-50">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                        <div className="mb-8">
-                            <h1 className="text-2xl font-bold text-gray-900 mb-2">Banking & Payments</h1>
-                            <p className="text-gray-600">Account reconciliation and transaction management</p>
-                        </div>
-
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                            <div className="lg:col-span-2 space-y-6">
-                                <div className="bg-white rounded-xl p-6 card-shadow">
-                                    <h2 className="text-lg font-semibold text-gray-900 mb-4">Connected Accounts</h2>
-                                    <div className="space-y-4">
-                                        {[
-                                            { name: 'Business Checking', bank: 'Chase', balance: 45670, status: 'synced' },
-                                            { name: 'Business Savings', bank: 'Chase', balance: 125000, status: 'synced' },
-                                            { name: 'Credit Card', bank: 'Amex', balance: -8750, status: 'pending' }
-                                        ].map((account, i) => (
-                                            <div key={i} className="border border-gray-200 rounded-lg p-4">
-                                                <div className="flex justify-between items-start">
-                                                    <div>
-                                                        <h3 className="font-medium text-gray-900">{account.name}</h3>
-                                                        <p className="text-sm text-gray-500">{account.bank}</p>
-                                                    </div>
-                                                    <div className="text-right">
-                                                        <p className={`text-lg font-bold ${account.balance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                                            {formatCurrency(Math.abs(account.balance))}
-                                                        </p>
-                                                        <span className={`text-xs px-2 py-1 rounded-full ${
-                                                            account.status === 'synced' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
-                                                        }`}>
-                                                            {account.status}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                <div className="bg-white rounded-xl p-6 card-shadow">
-                                    <div className="flex justify-between items-center mb-4">
-                                        <h2 className="text-lg font-semibold text-gray-900">Recent Transactions</h2>
-                                        <button 
-                                            onClick={() => setShowReconciliation(!showReconciliation)}
-                                            className="text-sm text-indigo-600 hover:text-indigo-700"
-                                        >
-                                            {showReconciliation ? 'Hide' : 'Show'} Reconciliation
-                                        </button>
-                                    </div>
-                                    
-                                    {showReconciliation && (
-                                        <div className="mb-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
-                                            <div className="flex items-center justify-between mb-2">
-                                                <span className="font-medium text-amber-900">Unreconciled Transactions</span>
-                                                <span className="text-amber-700">3 items</span>
-                                            </div>
-                                            <button className="text-sm text-amber-700 hover:text-amber-800">
-                                                Start Reconciliation →
-                                            </button>
-                                        </div>
-                                    )}
-
-                                    <div className="space-y-2">
-                                        {[
-                                            { date: 'Dec 5', desc: 'AWS Services', amount: -1250, category: 'Software' },
-                                            { date: 'Dec 5', desc: 'Client Payment - Invoice #1234', amount: 15000, category: 'Income' },
-                                            { date: 'Dec 4', desc: 'Google Ads', amount: -750, category: 'Marketing' },
-                                            { date: 'Dec 4', desc: 'Office Rent', amount: -3500, category: 'Office' },
-                                            { date: 'Dec 3', desc: 'Contractor Payment', amount: -2500, category: 'Contractors' }
-                                        ].map((tx, i) => (
-                                            <div key={i} className="flex justify-between items-center p-3 hover:bg-gray-50 rounded-lg">
-                                                <div className="flex items-center space-x-4">
-                                                    <div className="text-xs text-gray-500 w-12">{tx.date}</div>
-                                                    <div>
-                                                        <p className="text-sm font-medium text-gray-900">{tx.desc}</p>
-                                                        <p className="text-xs text-gray-500">{tx.category}</p>
-                                                    </div>
-                                                </div>
-                                                <span className={`font-medium ${tx.amount >= 0 ? 'text-green-600' : 'text-gray-900'}`}>
-                                                    {formatCurrency(Math.abs(tx.amount))}
-                                                </span>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="space-y-6">
-                                <div className="bg-white rounded-xl p-6 card-shadow">
-                                    <h3 className="font-semibold text-gray-900 mb-4">Reconciliation Status</h3>
-                                    <div className="space-y-3">
-                                        <div>
-                                            <div className="flex justify-between text-sm mb-1">
-                                                <span className="text-gray-600">Matched</span>
-                                                <span className="font-medium">142/150</span>
-                                            </div>
-                                            <div className="w-full bg-gray-200 rounded-full h-2">
-                                                <div className="bg-green-500 h-2 rounded-full" style={{width: '94%'}}></div>
-                                            </div>
-                                        </div>
-                                        <div className="pt-3 border-t">
-                                            <div className="flex justify-between text-sm">
-                                                <span className="text-gray-600">Duplicates detected</span>
-                                                <span className="text-amber-600 font-medium">2</span>
-                                            </div>
-                                            <div className="flex justify-between text-sm mt-2">
-                                                <span className="text-gray-600">Needs review</span>
-                                                <span className="text-red-600 font-medium">6</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl p-6 text-white">
-                                    <h3 className="font-semibold mb-4">Quick Actions</h3>
-                                    <div className="space-y-3">
-                                        <button className="w-full bg-white/20 hover:bg-white/30 p-3 rounded-lg text-left transition">
-                                            Upload Bank Statement
-                                        </button>
-                                        <button className="w-full bg-white/20 hover:bg-white/30 p-3 rounded-lg text-left transition">
-                                            Sync All Accounts
-                                        </button>
-                                        <button className="w-full bg-white/20 hover:bg-white/30 p-3 rounded-lg text-left transition">
-                                            Export Transactions
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <p class="text-sm text-gray-400 leading-relaxed mb-4 max-w-xs">AI-powered bookkeeping and carbon accounting. Every receipt captured automatically. Every emission tracked.</p>
+                <p class="text-sm text-gray-500">Made with <span class="text-red-400">❤</span> 🇲🇦 in Morocco</p>
+            </div>
+            <!-- Links -->
+            <div>
+                <h5 class="font-semibold text-sm mb-4 text-gray-300">Product</h5>
+                <div class="space-y-2.5">
+                    <a href="#" class="block text-sm text-gray-500 hover:text-white transition">Auto-Discovery</a>
+                    <a href="#" class="block text-sm text-gray-500 hover:text-white transition">Notification Capture</a>
+                    <a href="#" class="block text-sm text-gray-500 hover:text-white transition">Integrations</a>
+                    <a href="#" class="block text-sm text-gray-500 hover:text-white transition">ESG & Carbon</a>
                 </div>
-            );
-        };
-
-        const ESGDashboard = () => {
-            const [selectedScope, setSelectedScope] = useState('all');
-            
-            return (
-                <div className="min-h-screen bg-gray-50">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                        <div className="mb-8">
-                            <h1 className="text-2xl font-bold text-gray-900 mb-2">ESG & Carbon Passport</h1>
-                            <p className="text-gray-600">Track and manage your environmental impact</p>
-                        </div>
-
-                        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
-                            {[
-                                { label: 'Total Emissions', value: '24.7t', change: -12, color: 'green' },
-                                { label: 'Scope 1', value: '5.2t', change: -8, color: 'blue' },
-                                { label: 'Scope 2', value: '8.3t', change: -15, color: 'indigo' },
-                                { label: 'Scope 3', value: '11.2t', change: -10, color: 'purple' }
-                            ].map((metric, i) => (
-                                <div key={i} className="bg-white rounded-xl p-6 card-shadow">
-                                    <p className="text-sm text-gray-600 mb-1">{metric.label}</p>
-                                    <p className="text-2xl font-bold text-gray-900">{metric.value}</p>
-                                    <div className="flex items-center mt-2">
-                                        <Icon 
-                                            name={metric.change < 0 ? "trending-down" : "trending-up"} 
-                                            size={16} 
-                                            color={metric.change < 0 ? "#10b981" : "#ef4444"} 
-                                        />
-                                        <span className={`text-sm ml-1 ${metric.change < 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                            {Math.abs(metric.change)}% vs last month
-                                        </span>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                            <div className="lg:col-span-2 space-y-6">
-                                <div className="bg-white rounded-xl p-6 card-shadow">
-                                    <div className="flex justify-between items-center mb-6">
-                                        <h2 className="text-lg font-semibold text-gray-900">Emissions Breakdown</h2>
-                                        <select 
-                                            value={selectedScope}
-                                            onChange={(e) => setSelectedScope(e.target.value)}
-                                            className="px-3 py-1 border border-gray-300 rounded-lg text-sm"
-                                        >
-                                            <option value="all">All Scopes</option>
-                                            <option value="1">Scope 1</option>
-                                            <option value="2">Scope 2</option>
-                                            <option value="3">Scope 3</option>
-                                        </select>
-                                    </div>
-
-                                    <div className="space-y-4">
-                                        {[
-                                            { category: 'Transportation', emissions: 8.5, percent: 34, color: 'blue' },
-                                            { category: 'Energy', emissions: 6.2, percent: 25, color: 'green' },
-                                            { category: 'Supply Chain', emissions: 5.8, percent: 23, color: 'purple' },
-                                            { category: 'Waste', emissions: 2.3, percent: 9, color: 'amber' },
-                                            { category: 'Other', emissions: 1.9, percent: 8, color: 'gray' }
-                                        ].map((item, i) => (
-                                            <div key={i}>
-                                                <div className="flex justify-between items-center mb-2">
-                                                    <span className="text-sm font-medium text-gray-700">{item.category}</span>
-                                                    <span className="text-sm text-gray-600">{item.emissions}t CO2e ({item.percent}%)</span>
-                                                </div>
-                                                <div className="w-full bg-gray-200 rounded-full h-3">
-                                                    <div 
-                                                        className={`bg-gradient-to-r from-${item.color}-400 to-${item.color}-600 h-3 rounded-full`}
-                                                        style={{width: `${item.percent}%`}}
-                                                    ></div>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                <div className="bg-white rounded-xl p-6 card-shadow">
-                                    <h2 className="text-lg font-semibold text-gray-900 mb-4">Reduction Opportunities</h2>
-                                    <div className="space-y-3">
-                                        {[
-                                            { 
-                                                action: 'Switch to renewable energy provider',
-                                                impact: '3.2t CO2e/year',
-                                                cost: '$500/month savings',
-                                                difficulty: 'Easy'
-                                            },
-                                            {
-                                                action: 'Optimize shipping routes',
-                                                impact: '2.1t CO2e/year',
-                                                cost: '$2,000/month savings',
-                                                difficulty: 'Medium'
-                                            },
-                                            {
-                                                action: 'Implement remote work policy',
-                                                impact: '4.5t CO2e/year',
-                                                cost: '$3,500/month savings',
-                                                difficulty: 'Easy'
-                                            }
-                                        ].map((opp, i) => (
-                                            <div key={i} className="border border-gray-200 rounded-lg p-4">
-                                                <div className="flex justify-between items-start mb-2">
-                                                    <h3 className="font-medium text-gray-900">{opp.action}</h3>
-                                                    <span className={`px-2 py-1 text-xs rounded-full ${
-                                                        opp.difficulty === 'Easy' ? 'bg-green-100 text-green-700' :
-                                                        opp.difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-700' :
-                                                        'bg-red-100 text-red-700'
-                                                    }`}>
-                                                        {opp.difficulty}
-                                                    </span>
-                                                </div>
-                                                <div className="flex justify-between text-sm text-gray-600">
-                                                    <span>Impact: {opp.impact}</span>
-                                                    <span className="text-green-600 font-medium">{opp.cost}</span>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="space-y-6">
-                                <div className="bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl p-6 text-white">
-                                    <h3 className="font-semibold mb-4 flex items-center">
-                                        <Icon name="award" size={20} className="mr-2" />
-                                        Carbon Passport
-                                    </h3>
-                                    <div className="bg-white/20 rounded-lg p-4 mb-4">
-                                        <div className="flex justify-center mb-3">
-                                            <div className="w-24 h-24 bg-white rounded-lg flex items-center justify-center">
-                                                <div className="text-center">
-                                                    <div className="text-black text-xs">QR Code</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <p className="text-sm text-center">Scan for verification</p>
-                                    </div>
-                                    <button className="w-full bg-white text-green-600 py-2 rounded-lg hover:bg-green-50 transition">
-                                        Generate Report
-                                    </button>
-                                </div>
-
-                                <div className="bg-white rounded-xl p-6 card-shadow">
-                                    <h3 className="font-semibold text-gray-900 mb-4">ESG Score</h3>
-                                    <div className="text-center mb-4">
-                                        <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-br from-green-400 to-emerald-600">
-                                            <span className="text-2xl font-bold text-white">B+</span>
-                                        </div>
-                                    </div>
-                                    <div className="space-y-2 text-sm">
-                                        <div className="flex justify-between">
-                                            <span className="text-gray-600">Environmental</span>
-                                            <span className="font-medium">78/100</span>
-                                        </div>
-                                        <div className="flex justify-between">
-                                            <span className="text-gray-600">Social</span>
-                                            <span className="font-medium">82/100</span>
-                                        </div>
-                                        <div className="flex justify-between">
-                                            <span className="text-gray-600">Governance</span>
-                                            <span className="font-medium">85/100</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
-                                    <h3 className="font-semibold text-gray-900 mb-3">Carbon Marketplace</h3>
-                                    <p className="text-sm text-gray-600 mb-4">
-                                        Offset your remaining emissions through verified projects
-                                    </p>
-                                    <button className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition">
-                                        Browse Offsets
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+            </div>
+            <div>
+                <h5 class="font-semibold text-sm mb-4 text-gray-300">Company</h5>
+                <div class="space-y-2.5">
+                    <a href="#" class="block text-sm text-gray-500 hover:text-white transition">About</a>
+                    <a href="#" class="block text-sm text-gray-500 hover:text-white transition">Careers</a>
+                    <a href="#" class="block text-sm text-gray-500 hover:text-white transition">Blog</a>
+                    <a href="#" class="block text-sm text-gray-500 hover:text-white transition">Contact</a>
                 </div>
-            );
-        };
-
-        const App = () => {
-            const [user, setUser] = useState({ name: 'Alan', email: 'alan@example.com' });
-            const [isReturning, setIsReturning] = useState(false);
-            const [currentPage, setCurrentPage] = useState('dashboard');
-
-            const handleLogin = () => {
-                setUser({ name: 'Alan', email: 'alan@example.com' });
-                setIsReturning(true);
-            };
-
-            const handleLogout = () => {
-                setUser(null);
-                setCurrentPage('dashboard');
-                setIsReturning(false);
-            };
-
-            const renderPage = () => {
-                if (!user) {
-                    return (
-                        <div className="min-h-screen bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
-                            <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full">
-                                <div className="text-center mb-8">
-                                    <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-xl mx-auto mb-4"></div>
-                                    <h1 className="text-2xl font-bold text-gray-900">Welcome to CloudCFO</h1>
-                                    <p className="text-gray-600 mt-2">AI-powered financial intelligence platform</p>
-                                </div>
-                                <button 
-                                    onClick={handleLogin}
-                                    className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white py-3 rounded-lg hover:from-indigo-600 hover:to-purple-700 transition"
-                                >
-                                    Sign In
-                                </button>
-                            </div>
-                        </div>
-                    );
-                }
-
-                switch(currentPage) {
-                    case 'intelligence':
-                        return <IntelligenceDashboard />;
-                    case 'accounting':
-                        return <AccountingDashboard />;
-                    case 'banking':
-                        return <BankingDashboard />;
-                    case 'esg':
-                        return <ESGDashboard />;
-                    default:
-                        return <Dashboard user={user} isReturning={isReturning} setCurrentPage={setCurrentPage} />;
-                }
-            };
-
-            return (
-                <div>
-                    <Navbar 
-                        user={user} 
-                        onLogout={handleLogout} 
-                        currentPage={currentPage}
-                        setCurrentPage={setCurrentPage}
-                    />
-                    {renderPage()}
+            </div>
+            <div>
+                <h5 class="font-semibold text-sm mb-4 text-gray-300">Legal</h5>
+                <div class="space-y-2.5">
+                    <a href="#" class="block text-sm text-gray-500 hover:text-white transition">Privacy Policy</a>
+                    <a href="#" class="block text-sm text-gray-500 hover:text-white transition">Terms of Service</a>
+                    <a href="#" class="block text-sm text-gray-500 hover:text-white transition">Security</a>
+                    <a href="#" class="block text-sm text-gray-500 hover:text-white transition">GDPR</a>
                 </div>
-            );
-        };
+            </div>
+        </div>
 
-        ReactDOM.render(<App />, document.getElementById('root'));
-    </script>
+        <div class="border-t border-gray-800 pt-6 flex flex-col md:flex-row items-center justify-between gap-4">
+            <p class="text-xs text-gray-500">&copy; 2026 CloudCFO.ai — All rights reserved.</p>
+            <div class="flex items-center gap-4">
+                <span class="text-xs text-gray-600">Powered by</span>
+                <a href="#" class="text-xs text-gray-500 hover:text-brand-400 transition font-medium">MerlinData.ai</a>
+            </div>
+            <!-- Social Icons -->
+            <div class="flex items-center gap-3">
+                <a href="#" class="w-8 h-8 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-gray-700 transition">
+                    <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/></svg>
+                </a>
+                <a href="#" class="w-8 h-8 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-gray-700 transition">
+                    <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                </a>
+                <a href="#" class="w-8 h-8 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-gray-700 transition">
+                    <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+                </a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- ============================================================ -->
+<!-- SCRIPTS                                                       -->
+<!-- ============================================================ -->
+<script>
+    // Tab switching
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById(btn.dataset.tab).classList.add('active');
+        });
+    });
+
+    // Intersection Observer for scroll reveals
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    // Header scroll effect
+    let lastScroll = 0;
+    window.addEventListener('scroll', () => {
+        const header = document.getElementById('header');
+        const scroll = window.scrollY;
+        if (scroll > 50) {
+            header.classList.add('shadow-sm');
+        } else {
+            header.classList.remove('shadow-sm');
+        }
+        lastScroll = scroll;
+    });
+</script>
+
 </body>
 </html>
